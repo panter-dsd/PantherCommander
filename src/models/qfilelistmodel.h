@@ -30,6 +30,7 @@
 #include <QFileIconProvider>
 #include <QDir>
 #include <QFuture>
+#include <QFSFileEngine>
 #ifdef Q_WS_WIN
 	#include <windows.h>
 #endif
@@ -40,6 +41,98 @@ enum GetFileListError
 	FLM_DISC_ERROR,
 	FLM_PRIVILEGY_ERROR
 };
+class QPCFileInfo {
+public:
+	enum Type { Dir, File, System };
+
+	QPCFileInfo() {}
+	QPCFileInfo(const QFileInfo &info) : mFileInfo(info) {}
+
+	inline bool isDir() const { return type() == Dir; }
+	inline bool isFile() const { return type() == File; }
+	inline bool isSystem() const { return type() == System; }
+
+	bool operator ==(const QPCFileInfo &fileInfo) const {
+	   return mFileInfo == fileInfo.mFileInfo
+	   && permissions() == fileInfo.permissions();
+	}
+
+	bool isCaseSensitive() const {
+		QFSFileEngine fe(mFileInfo.absoluteFilePath());
+		return fe.caseSensitive();
+	}
+	QFile::Permissions permissions() const {
+		return mPermissions;
+	}
+
+	void setPermissions (QFile::Permissions permissions) {
+		mPermissions = permissions;
+	}
+
+	Type type() const {
+		if (mFileInfo.isDir()) {
+			return QPCFileInfo::Dir;
+		}
+		if (mFileInfo.isFile()) {
+			return QPCFileInfo::File;
+		}
+		if (!mFileInfo.exists() && mFileInfo.isSymLink()) {
+			return QPCFileInfo::System;
+		}
+		return QPCFileInfo::System;
+	}
+
+	bool isSymLink() const {
+		return mFileInfo.isSymLink();
+	}
+
+	bool isHidden() const {
+		return mFileInfo.isHidden();
+	}
+
+	QFileInfo fileInfo() const {
+		return mFileInfo;
+	}
+
+	QDateTime lastModified() const {
+		return mFileInfo.lastModified();
+	}
+
+	QDateTime created() const {
+		return mFileInfo.created();
+	}
+
+	QDateTime lastRead() const {
+		return mFileInfo.lastRead();
+	}
+
+	QString fileName() const{
+		return mFileInfo.fileName();
+	}
+
+	QString absoluteFilePath() const{
+		return mFileInfo.absoluteFilePath();
+	}
+
+	QString filePath() const{
+		return mFileInfo.filePath();
+	}
+
+	qint64 size() const {
+		qint64 size = -1;
+		if (mFileInfo.isDir())
+			size = 0;
+		if (mFileInfo.isFile())
+			size = mFileInfo.size();
+		return size;
+	}
+
+	QIcon icon;
+
+private :
+	QFileInfo mFileInfo;
+	QFile::Permissions mPermissions;
+};
 //
 class QFileListModel : public QAbstractItemModel
 {
@@ -48,11 +141,12 @@ public:
 
 private:
 	QDir									qdCurrentDir;
-	QList<QFileInfo>				infoList;
+	QList<QPCFileInfo>				infoList;
 	QFuture<void>					future;
 	QIcon									qiFolderIcon;
 	QIcon									qiFileIcon;
 	QList<QIcon>					iconList;
+	QHash<QString,QIcon>	iconHash;
 	QFileIconProvider*				provider;
 	int										lastError;
 	int										dirsCount;
@@ -98,7 +192,7 @@ public:
 private:
 	int getFileList();
 	inline int getIndex(const QFileInfo& info);
-	static void getIcons(QList<QFileInfo>& info,QList<QIcon>* icons,QFileIconProvider* prov);
+	static void getIcons(QList<QPCFileInfo>* info,QFileIconProvider* prov);
 public slots:
 	void slotRefresh();
 signals:

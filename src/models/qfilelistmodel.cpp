@@ -41,39 +41,41 @@ QFileListModel::~QFileListModel()
 int QFileListModel::getFileList()
 {
 	qdCurrentDir.setFilter(QDir::AllEntries | QDir::Hidden | QDir::System);
-	//qdCurrentDir.setSorting(QDir::Unsorted);
-	qdCurrentDir.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
-	QDirIterator it(qdCurrentDir);
-	if (!qdCurrentDir.isRoot() && !it.hasNext())
+	qdCurrentDir.setSorting(QDir::Unsorted);
+	QDirIterator qdiIterator(qdCurrentDir);
+	if (!qdiIterator.hasNext() && !qdCurrentDir.isRoot())
 	{
 		return FLM_PRIVILEGY_ERROR;
 	}
 	dirsCount=filesCount=filesSize=0;
 	future.cancel();
+	future.waitForFinished();
 	infoList.clear();
-	iconList.clear();
 	QTime time;
 	time.start();
 	int index=0;
-	while (it.hasNext())
+	while (qdiIterator.hasNext())
 	{
-		it.next();
-		if(it.fileName() == QLatin1String("."))
+		const QString& qsName=qdiIterator.next();
+		if (qsName.endsWith("/.") || qsName.endsWith("/.."))
+		{
 			continue;
-
-		//infoList.insert(getIndex(it.fileInfo()), it.fileInfo());
-		infoList.append(it.fileInfo());
-		if (it.fileInfo().isDir())
-			++dirsCount;
+		}
+		//infoList.insert(getIndex(qdiIterator.fileInfo()),qdiIterator.fileInfo());
+		infoList.append(QPCFileInfo(qdiIterator.fileInfo()));
+		if (qdiIterator.fileInfo().isDir())
+		{
+			dirsCount++;
+		}
 		else
-			++filesCount;
+			filesCount++;
 	}
 	qDebug(QString::number(time.elapsed()).toLocal8Bit());
 	if (!qdCurrentDir.isRoot())
 	{
-		infoList << QFileInfo(qdCurrentDir.absolutePath());
+		infoList.insert(0,QPCFileInfo(QFileInfo(qdCurrentDir.absolutePath())));
 	}
-	future = QtConcurrent::run(getIcons,infoList,&iconList,provider);
+	future = QtConcurrent::run(getIcons,&infoList,provider);
 	return FLM_NO_ERROR;
 }
 //
@@ -174,15 +176,10 @@ QVariant QFileListModel::data ( const QModelIndex & index, int role) const
 	}
 	if (role==Qt::DecorationRole && index.column()==0)
 	{
-		if (iconList.count()> index.row())
-			return iconList.at(index.row());
+		if (!infoList.at(index.row()).icon.isNull())
+			return infoList.at(index.row()).icon;
 		else
 			return (infoList.at(index.row()).isDir()) ? qiFolderIcon : qiFileIcon;
-//		if (infoList.at(index.row()).isStandardIcon)
-//		{
-//			return isDir(index) ? qiFolderIcon : qiFileIcon;
-//		}
-//		return *infoList.at(index.row()).icon;
 	}
 	if (role==Qt::UserRole )
 	{
@@ -305,11 +302,13 @@ inline int QFileListModel::getIndex(const QFileInfo& info)
 	return index;
 }
 //
-void QFileListModel::getIcons(QList<QFileInfo>& info,QList<QIcon>* icons,QFileIconProvider* prov)
+void QFileListModel::getIcons(QList<QPCFileInfo>* info,QFileIconProvider* prov)
 {
-	for (int i=0; i<info.count();i++)
+	for (int i=0; i<info->count();i++)
 	{
-		icons->append(prov->icon(info.at(i)));
+		if (!info->at(i).icon.isNull())
+			continue;
+		(*info)[i].icon=prov->icon(info->at(i).fileInfo());
 	}
 }
 //
@@ -377,3 +376,5 @@ void QFileListModel::setFilter(QDir::Filters filters)
 	this->reset();
 }
 //
+
+
