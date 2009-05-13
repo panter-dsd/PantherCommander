@@ -1040,7 +1040,7 @@ QStringList QFileOperationsThread::getDrivesList()
 			buffer=stream.readLine();
 			QFileInfo fileInfo(buffer.split(" ").at(1));
 			if (fileInfo.isDir())
-				list.append(fileInfo.absolutePath());
+				list.append(fileInfo.absoluteFilePath());
 		}
 	}
 	file.close();
