@@ -197,53 +197,56 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 	if(!isLocalFileSystem(qsDestFileName))
 		return true;
 
-#ifdef Q_WS_WIN
+#ifndef Q_WS_WIN
 	FILETIME time;
 	FILETIME time1;
 	FILETIME time2;
-	HANDLE firstFileHandle,secondFileHandle;
-	QT_WA({firstFileHandle=CreateFileW((TCHAR*)qsSourceFileName.utf16(),
+	HANDLE firstFileHandle = INVALID_HANDLE_VALUE;
+	HANDLE secondFileHandle = INVALID_HANDLE_VALUE;
+	QT_WA({
+		firstFileHandle = CreateFileW((TCHAR*)qsSourceFileName.utf16(),
 							0,
 							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
 							0,
 							OPEN_EXISTING,
 							0,
-							0);},
-					{firstFileHandle=CreateFileA(qsSourceFileName.toLocal8Bit(),
+							0);
+	} , {
+		firstFileHandle = CreateFileA(qsSourceFileName.toLocal8Bit(),
 							0,
 							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
 							0,
 							OPEN_EXISTING,
 							0,
-							0);});
-	QT_WA({secondFileHandle=CreateFileW((TCHAR*)qsDestFileName.utf16(),
+							0);
+	});
+	if (firstFileHandle == INVALID_HANDLE_VALUE)
+		return false;
+
+	QT_WA({
+		secondFileHandle = CreateFileW((TCHAR*)qsDestFileName.utf16(),
 							GENERIC_WRITE,
 							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
 							0,
 							OPEN_EXISTING,
 							0,
-							0);},
-					{secondFileHandle=CreateFileA(qsDestFileName.toLocal8Bit(),
+							0);
+	} , {
+		secondFileHandle = CreateFileA(qsDestFileName.toLocal8Bit(),
 							GENERIC_WRITE,
 							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
 							0,
 							OPEN_EXISTING,
 							0,
-							0);});
-	if (int(firstFileHandle)==-1)
-		return false;
-	if (int(secondFileHandle)==-1)
+							0);
+	});
+	if (secondFileHandle == INVALID_HANDLE_VALUE)
 	{
 		CloseHandle(firstFileHandle);
 		return false;
 	}
-	if (!GetFileTime(firstFileHandle,&time,&time1,&time2))
-	{
-		CloseHandle(firstFileHandle);
-		CloseHandle(secondFileHandle);
-		return false;
-	}
-	if (!SetFileTime(secondFileHandle,&time,&time1,&time2))
+
+	if (!GetFileTime(firstFileHandle,&time,&time1,&time2) && !SetFileTime(secondFileHandle,&time,&time1,&time2))
 	{
 		CloseHandle(firstFileHandle);
 		CloseHandle(secondFileHandle);

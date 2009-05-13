@@ -22,13 +22,15 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-#include <QApplication>
-#include <QTextCodec>
-#include <QSettings>
+#include <QtCore/QSettings>
+#include <QtCore/QTextCodec>
+
+#include <QtGui/QApplication>
+
 #include "mainwindowimpl.h"
-//
+
 #define ApplicationVersion "0.0.0.6"
-//
+
 int main(int argc, char **argv)
 {
 	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
