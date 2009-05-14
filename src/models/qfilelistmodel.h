@@ -30,6 +30,7 @@
 #include <QFileIconProvider>
 #include <QDir>
 #include <QFuture>
+#include <QFutureWatcher>
 #include <QFSFileEngine>
 #ifdef Q_WS_WIN
 	#include <windows.h>
@@ -139,12 +140,10 @@ public:
 
 private:
 	QDir									qdCurrentDir;
-	QList<QPCFileInfo>				infoList;
+	QList<QPCFileInfo>			infoList;
 	QFuture<void>					future;
 	QIcon									qiFolderIcon;
 	QIcon									qiFileIcon;
-	QList<QIcon>					iconList;
-	QHash<QString,QIcon>	iconHash;
 	QFileIconProvider*				provider;
 	int										lastError;
 	int										dirsCount;
@@ -191,6 +190,7 @@ private:
 	int getFileList();
 	inline int getIndex(const QFileInfo& info);
 	static void getIcons(QList<QPCFileInfo>* info,QFileIconProvider* prov);
+	static void getInfoList(QFileInfoList *fileInfoList,const QDir& dir);
 public slots:
 	void slotRefresh();
 signals:

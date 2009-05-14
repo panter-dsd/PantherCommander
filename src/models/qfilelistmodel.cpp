@@ -45,41 +45,25 @@ QFileListModel::~QFileListModel()
 //
 int QFileListModel::getFileList()
 {
-	qdCurrentDir.setFilter(QDir::AllEntries | QDir::Hidden | QDir::System);
-	qdCurrentDir.setSorting(QDir::Unsorted);
-	QDirIterator it(qdCurrentDir);
-	if (!it.hasNext() && !qdCurrentDir.isRoot())
-		return FLM_PRIVILEGY_ERROR;
-
-	dirsCount=filesCount=filesSize=0;
 	future.cancel();
 	future.waitForFinished();
-	infoList.clear();
-QTime time;
-time.start();
+	qdCurrentDir.setFilter(QDir::AllEntries | QDir::Hidden | QDir::System);
+	qdCurrentDir.setSorting(QDir::Unsorted);
+//Get file list
 	QFileInfoList infos;
-	while (it.hasNext())
-	{
-		it.next();
-
-		QFileInfo info(it.fileInfo());
-		if (info.fileName() == QLatin1String("."))
-			continue;
-
-		//infoList.insert(getIndex(info), info);
-		//infoList.append(QPCFileInfo(info));
-		infos.append(info);
-		if (info.isDir())
-			++dirsCount;
-		else
-			++filesCount;
-	}
-	infos = Dir::sortFileList(infos, QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+	future = QtConcurrent::run(getInfoList, &infos, qdCurrentDir);
+	while(future.isRunning())
+		qApp->processEvents();
+//Sort file list
+	QFuture<QFileInfoList> sortFuture=QtConcurrent::run(Dir::sortFileList,infos, QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+	while(sortFuture.isRunning())
+		qApp->processEvents();
+	infos=sortFuture.result();
+	infoList.clear();
 	foreach(const QFileInfo& info, infos)
 		infoList.append(QPCFileInfo(info));
-qDebug() << time.elapsed();
+
 	future = QtConcurrent::run(getIcons, &infoList, provider);
-	return FLM_NO_ERROR;
 }
 //
 QModelIndex QFileListModel::index(int row, int column, const QModelIndex &parent) const
@@ -91,7 +75,7 @@ QModelIndex QFileListModel::index(int row, int column, const QModelIndex &parent
 //
 QModelIndex QFileListModel::parent(const QModelIndex& child) const
 {
-	if (!child.isValid())
+	if (!child.isValid() || (child.row()==0 && child.column()==0))
 		return QModelIndex();
 	return createIndex(0,0);
 }
@@ -270,39 +254,13 @@ QVariant QFileListModel::headerData ( int section,
 //
 bool QFileListModel::isDir(const QModelIndex& index) const
 {
-	return (infoList.at(index.row()).isDir());
+	return index.isValid() ?(infoList.at(index.row()).isDir()) : false;
 }
 //
 void QFileListModel::slotRefresh()
 {
 	lastError=getFileList();
 	this->reset();
-	//this->reset();//If this remove and last dirrectory whith no files, sorting is no enableds
-}
-//
-inline int QFileListModel::getIndex(const QFileInfo& info)
-{
-	if (infoList.isEmpty())
-		return 0;
-	int first=0;
-	int last=infoList.count()-1;
-	int index=(first+last)/2;
-	while(last!=first)
-	{
-		if (info.size()==infoList.at(index).size())
-			break;
-		if (info.size()<infoList.at(index).size())
-		{
-			last=index;
-		}
-		else
-		{
-			first=index+1;
-		}
-		index=(first+last)/2;
-	}
-//
-	return index;
 }
 //
 void QFileListModel::getIcons(QList<QPCFileInfo>* info,QFileIconProvider* prov)
@@ -317,9 +275,7 @@ void QFileListModel::getIcons(QList<QPCFileInfo>* info,QFileIconProvider* prov)
 //
 qint64 QFileListModel::size(const QModelIndex& index)
 {
-	if (!index.isValid())
-		return 0;
-	return infoList.at(index.row()).size();
+	return index.isValid() ? infoList.at(index.row()).size() : 0;
 }
 //
 QFile::Permissions QFileListModel::permissions(const QModelIndex& index)
@@ -331,9 +287,7 @@ QFile::Permissions QFileListModel::permissions(const QModelIndex& index)
 //
 QString QFileListModel::filePath(const QModelIndex& index)
 {
-	if (!index.isValid())
-		return "";
-	return infoList.at(index.row()).filePath();
+	return index.isValid() ? infoList.at(index.row()).filePath() : "";
 }
 //
 QString QFileListModel::fileName(const QModelIndex& index)
@@ -358,9 +312,9 @@ QVariant QFileListModel::myComputer()
 QModelIndex QFileListModel::setRootPath(const QString& path)
 {
 	qdCurrentDir=QDir(path);
-	lastError=getFileList();
+	getFileList();
 	this->reset();
-	emit rootPathChanged(path);
+	emit rootPathChanged(qdCurrentDir.absolutePath());
 	return index(0,0);
 }
 //
@@ -377,6 +331,22 @@ void QFileListModel::setFilter(QDir::Filters filters)
 	qdCurrentDir.setFilter(filters);
 	lastError=getFileList();
 	this->reset();
+}
+//
+void QFileListModel::getInfoList(QFileInfoList* fileInfoList,const QDir& dir)
+{
+	QDirIterator it(dir);
+	if (!it.hasNext() && !dir.isRoot())
+		return;
+	while (it.hasNext())
+	{
+		it.next();
+		QFileInfo info(it.fileInfo());
+		if (info.fileName() == QLatin1String("."))
+			continue;
+
+		fileInfoList->append(info);
+	}
 }
 //
 

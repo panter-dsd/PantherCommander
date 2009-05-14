@@ -45,6 +45,9 @@ QFilePanel::QFilePanel(QWidget* parent) : QWidget(parent),
 	createActions();
 
 	updateDiscInformation();
+	const QString path=qflvCurrentFileList->directory().absolutePath();
+	if (!path.startsWith("/"))
+		qtbDriveButton->setText(path.mid(0,1));
 	timerID=startTimer(TIMER_INTERVAL);
 }
 
@@ -58,6 +61,7 @@ void QFilePanel::createWidgets()
 
 	qtbDriveButton=new QToolButton(this);
 	qtbDriveButton->setIcon(QFileIconProvider().icon(QFileIconProvider::Drive));
+	qtbDriveButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 	connect(qtbDriveButton, SIGNAL(clicked()),
 			this, SLOT(slotSelectDisc()));
 
@@ -114,6 +118,8 @@ void QFilePanel::slotPathChanged(const QString& path)
 	QString tabText;
 #ifdef Q_WS_WIN
 	tabText = QDir(path).absolutePath().mid(0,2) + QDir(path).dirName();
+	if (!path.startsWith("/"))
+		qtbDriveButton->setText(path.mid(0,1));
 #else
 	QDir dir(path);
 	if(!dir.isRoot())
