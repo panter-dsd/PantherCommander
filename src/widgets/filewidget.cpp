@@ -104,7 +104,7 @@ void FileWidgetPrivate::createWidgets()
 	QObject::connect(model, SIGNAL(rootPathChanged(const QString&)),
 						q, SLOT(_q_pathChanged(const QString&)));
 
-
+/*
 	{
 		QFileListSortFilterProxyModel* prx = new QFileListSortFilterProxyModel(q);
 //		prx->setDynamicSortFilter(true);
@@ -112,7 +112,7 @@ void FileWidgetPrivate::createWidgets()
 		proxyModel = prx;
 	}
 	proxyModel->setSourceModel(model);
-
+*/
 
 	treeView = new QFullView(q);
 	treeView->setRootIsDecorated(false);
@@ -130,8 +130,8 @@ void FileWidgetPrivate::createWidgets()
 //	treeView->setDragDropMode(QAbstractItemView::DragDrop);
 	treeView->setDragDropMode(QAbstractItemView::InternalMove);
 #endif
-	treeView->setModel(proxyModel);
-//	treeView->setModel(model);
+//	treeView->setModel(proxyModel);
+	treeView->setModel(model);
 
 	QObject::connect(treeView, SIGNAL(activated(const QModelIndex&)),
 						q, SLOT(_q_activate(const QModelIndex&)));

@@ -18,8 +18,8 @@
 * Boston, MA 02110-1301 USA
 *-------------------------------------------------------------------
 * Project:		Panther Commander
-* Author:		PanteR
-* Contact:	panter.dsd@gmail.com
+* Author:		Ritt K.
+* Contact:		ritt.ks@gmail.com
 *******************************************************************/
 
 #ifndef FINDFILESDIALOG_H

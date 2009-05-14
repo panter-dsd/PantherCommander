@@ -41,20 +41,22 @@ enum GetFileListError
 	FLM_DISC_ERROR,
 	FLM_PRIVILEGY_ERROR
 };
-class QPCFileInfo {
+class QPCFileInfo
+{
 public:
 	enum Type { Dir, File, System };
 
-	QPCFileInfo() {}
-	QPCFileInfo(const QFileInfo &info) : mFileInfo(info) {}
+	QPCFileInfo()
+	{}
+	QPCFileInfo(const QFileInfo &info) : mFileInfo(info)
+	{}
 
 	inline bool isDir() const { return type() == Dir; }
 	inline bool isFile() const { return type() == File; }
 	inline bool isSystem() const { return type() == System; }
 
 	bool operator ==(const QPCFileInfo &fileInfo) const {
-	   return mFileInfo == fileInfo.mFileInfo
-	   && permissions() == fileInfo.permissions();
+		return mFileInfo == fileInfo.mFileInfo && permissions() == fileInfo.permissions();
 	}
 
 	bool isCaseSensitive() const {
@@ -119,12 +121,7 @@ public:
 	}
 
 	qint64 size() const {
-		qint64 size = -1;
-		if (mFileInfo.isDir())
-			size = 0;
-		if (mFileInfo.isFile())
-			size = mFileInfo.size();
-		return size;
+		return mFileInfo.size();
 	}
 
 	QIcon icon;
@@ -136,7 +133,8 @@ private :
 //
 class QFileListModel : public QAbstractItemModel
 {
-Q_OBJECT
+	Q_OBJECT
+
 public:
 
 private:

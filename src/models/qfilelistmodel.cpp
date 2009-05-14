@@ -21,8 +21,13 @@
 * Author:		PanteR
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
-#include <QtGui>
+
 #include "qfilelistmodel.h"
+
+#include <QtGui>
+#include <QDebug>
+
+#include "dirsorter.h"
 //
 QFileListModel::QFileListModel(QObject *parent)
 		:QAbstractItemModel(parent)
@@ -42,40 +47,38 @@ int QFileListModel::getFileList()
 {
 	qdCurrentDir.setFilter(QDir::AllEntries | QDir::Hidden | QDir::System);
 	qdCurrentDir.setSorting(QDir::Unsorted);
-	QDirIterator qdiIterator(qdCurrentDir);
-	if (!qdiIterator.hasNext() && !qdCurrentDir.isRoot())
-	{
+	QDirIterator it(qdCurrentDir);
+	if (!it.hasNext() && !qdCurrentDir.isRoot())
 		return FLM_PRIVILEGY_ERROR;
-	}
+
 	dirsCount=filesCount=filesSize=0;
 	future.cancel();
 	future.waitForFinished();
 	infoList.clear();
-	QTime time;
-	time.start();
-	int index=0;
-	while (qdiIterator.hasNext())
+QTime time;
+time.start();
+	QFileInfoList infos;
+	while (it.hasNext())
 	{
-		const QString& qsName=qdiIterator.next();
-		if (qsName.endsWith("/.") || qsName.endsWith("/.."))
-		{
+		it.next();
+
+		QFileInfo info(it.fileInfo());
+		if (info.fileName() == QLatin1String("."))
 			continue;
-		}
-		//infoList.insert(getIndex(qdiIterator.fileInfo()),qdiIterator.fileInfo());
-		infoList.append(QPCFileInfo(qdiIterator.fileInfo()));
-		if (qdiIterator.fileInfo().isDir())
-		{
-			dirsCount++;
-		}
+
+		//infoList.insert(getIndex(info), info);
+		//infoList.append(QPCFileInfo(info));
+		infos.append(info);
+		if (info.isDir())
+			++dirsCount;
 		else
-			filesCount++;
+			++filesCount;
 	}
-	qDebug(QString::number(time.elapsed()).toLocal8Bit());
-	if (!qdCurrentDir.isRoot())
-	{
-		infoList.insert(0,QPCFileInfo(QFileInfo(qdCurrentDir.absolutePath())));
-	}
-	future = QtConcurrent::run(getIcons,&infoList,provider);
+	infos = Dir::sortFileList(infos, QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+	foreach(const QFileInfo& info, infos)
+		infoList.append(QPCFileInfo(info));
+qDebug() << time.elapsed();
+	future = QtConcurrent::run(getIcons, &infoList, provider);
 	return FLM_NO_ERROR;
 }
 //
@@ -83,7 +86,7 @@ QModelIndex QFileListModel::index(int row, int column, const QModelIndex &parent
 {
 	if (column>columnCount() || row>infoList.count() || infoList.isEmpty())
 		return QModelIndex();
-	return createIndex(row,column);
+	return createIndex(row, column);
 }
 //
 QModelIndex QFileListModel::parent(const QModelIndex& child) const
