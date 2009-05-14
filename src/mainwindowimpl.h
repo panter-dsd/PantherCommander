@@ -90,6 +90,7 @@ private:
 	QAction*										actionMkDir;
 	QAction*										actionRemove;
 	QAction*										actionExit;
+	QAction*										actionFindFiles;
 	QAction*										actionPreferences;
 public:
 	explicit MainWindowImpl(QWidget* parent = 0, Qt::WFlags f = 0);
@@ -138,6 +139,7 @@ private slots:
 	void slotToolBarContextMenu(const QPoint& pos);
 	void slotToolButtonChange();
 	void slotToolButtonDelete();
+	void slotFindFiles();
 	void slotPreferences();
 
 	void slotTestingFileDialog();

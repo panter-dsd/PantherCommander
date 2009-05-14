@@ -26,11 +26,12 @@
 
 #include <QtGui>
 //
+#include "findfilesdialog.h"
+#include "pantherviewer.h"
 #include "qdrivebar.h"
 #include "qfilepanel.h"
 #include "qfileoperationsdialog.h"
-#include "PantherViewer/pantherviewer.h"
-#include "Preferences/qpreferencesdialog.h"
+#include "qpreferencesdialog.h"
 //
 MainWindowImpl::MainWindowImpl(QWidget* parent, Qt::WFlags f)
 	: QMainWindow(parent, f)
@@ -235,6 +236,14 @@ void MainWindowImpl::createActions()
 	addAction(actionExit);
 
 
+	actionFindFiles = new QAction(this);
+	actionFindFiles->setText(tr("Find Files"));
+//	actionFindFiles->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
+	connect(actionFindFiles, SIGNAL(triggered(bool)), 
+			this, SLOT(slotFindFiles()));
+	addAction(actionFindFiles);
+
+
 	actionPreferences = new QAction(this);
 	actionPreferences->setText(tr("Preferences"));
 //	actionPreferences->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_O));
@@ -248,6 +257,9 @@ void MainWindowImpl::createMenus()
 	QMenu* qmFile = menuBar()->addMenu(tr("File"));
 	qmFile->addAction(actionRename);
 	qmFile->addAction(actionExit);
+
+	QMenu* qmActions = menuBar()->addMenu(tr("Actions"));
+	qmActions->addAction(actionFindFiles);
 
 	QMenu* qmConfiguration = menuBar()->addMenu(tr("Configuration"));
 	qmConfiguration->addAction(actionPreferences);
@@ -1276,13 +1288,18 @@ void MainWindowImpl::slotToolButtonDelete()
 	if (action)
 		qmToolBarButtons.remove(action->data().toString());
 }
+
+void MainWindowImpl::slotFindFiles()
+{
+	FindFilesDialog dialog(this);
+	dialog.exec();
+}
 //
 void MainWindowImpl::slotPreferences()
 {
 	QSettings settings;
-	QPreferencesDialog* preferences = new QPreferencesDialog(&settings, this);
-	preferences->exec();
-	delete preferences;
+	QPreferencesDialog dialog(&settings, this);
+	dialog.exec();
 }
 //
 void MainWindowImpl::slotSetDisc(const QString& path)

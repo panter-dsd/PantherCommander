@@ -197,7 +197,7 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 	if(!isLocalFileSystem(qsDestFileName))
 		return true;
 
-#ifndef Q_WS_WIN
+#ifdef Q_WS_WIN
 	FILETIME time;
 	FILETIME time1;
 	FILETIME time2;
@@ -903,73 +903,78 @@ bool QFileOperationsThread::execute(const QString& filePath, const QStringList& 
 #ifndef Q_CC_MSVC
 	#warning "TODO: *panther: respect `arguments' and `workingDirectory'"
 #endif
-	QFileInfo qfiFileInfo(filePath);
-	if(!qfiFileInfo.exists() || !qfiFileInfo.isFile())
+	QFileInfo fi(filePath);
+	if(!fi.exists() || !fi.isFile())
 	{
 		// absolute path; not exists or not a file
-		if(!qfiFileInfo.isRelative())
+		if(!fi.isRelative())
 			return false;
 		// relative path; see if file exists in current dir
-		qfiFileInfo.setFile(QDir::current(), filePath);
-		if(!qfiFileInfo.exists() || !qfiFileInfo.isFile())
+		fi.setFile(QDir::current(), filePath);
+		if(!fi.exists() || !fi.isFile())
 			return false;
 	}
 
 #ifdef Q_WS_WIN
-	if (qfiFileInfo.suffix().toLower() == QLatin1String("bat"))
+	QString fpath = QDir::toNativeSeparators(fi.absoluteFilePath());
+	QString wpath = QDir::toNativeSeparators(workingDirectory);
+	if (fi.suffix().toLower() == QLatin1String("bat"))
 	{
 		return QProcess::startDetached("cmd.exe",
-								QStringList() << "/C" << QDir::toNativeSeparators(qfiFileInfo.absoluteFilePath()),
-								qfiFileInfo.absolutePath());
+								QStringList() << "/C" << fpath,
+								workingDirectory);
 	}
 	else
 	{
 		HINSTANCE__* instance;
-		QT_WA({instance=ShellExecuteW(0,
-						(TCHAR*)QString("Open").utf16(),
-						(TCHAR*)QDir::toNativeSeparators(qfiFileInfo.absoluteFilePath()).utf16(),
-						NULL,
-						(TCHAR*)QDir::toNativeSeparators(qfiFileInfo.absolutePath()).utf16(),
-						SW_NORMAL);},
-						{instance=ShellExecuteA(0,
-						"Open",
-						QDir::toNativeSeparators(qfiFileInfo.absoluteFilePath()).toLocal8Bit(),
-						NULL,
-						QDir::toNativeSeparators(qfiFileInfo.absolutePath()).toLocal8Bit(),
-						SW_NORMAL);});
-		if (int(instance)<32)
+		QT_WA({
+			instance = ShellExecute(0,
+									(TCHAR*)QString("Open").utf16(),
+									(TCHAR*)fpath.utf16(),
+									0,
+									(TCHAR*)wpath.utf16(),
+									SW_NORMAL);
+		} , {
+			instance = ShellExecuteA(0,
+									"Open",
+									fpath.toLocal8Bit(),
+									0,
+									wpath.toLocal8Bit(),
+									SW_NORMAL);
+		});
+		if((int)instance > 32)
+			return true;
+
+		if((int)instance == SE_ERR_NOASSOC)
 		{
-			if (int(instance)==SE_ERR_NOASSOC)
-			{
-				QT_WA({ShellExecuteW(0,
-								(TCHAR*)QString("open").utf16(),
-								(TCHAR*)QString("rundll32.exe").utf16(),
-								(TCHAR*)QString("shell32.dll,OpenAs_RunDLL "+QDir::toNativeSeparators(qfiFileInfo.absoluteFilePath())).utf16(),
-								NULL,
-								SW_SHOWNORMAL);},
-							{ShellExecuteA(0,
-								"open",
-								"rundll32.exe",
-								"shell32.dll,OpenAs_RunDLL "+
-								QDir::toNativeSeparators(qfiFileInfo.absoluteFilePath()).toLocal8Bit(),
-								NULL,
-								SW_SHOWNORMAL);});
+			QT_WA({
+				instance = ShellExecute(0,
+										(TCHAR*)QString("open").utf16(),
+										(TCHAR*)QString("rundll32.exe").utf16(),
+										(TCHAR*)QString("shell32.dll,OpenAs_RunDLL "+fpath).utf16(),
+										0,
+										SW_SHOWNORMAL);
+			} , {
+				instance = ShellExecuteA(0,
+										"open",
+										"rundll32.exe",
+										QString("shell32.dll,OpenAs_RunDLL "+fpath).toLocal8Bit(),
+										0,
+										SW_SHOWNORMAL);
+			});
+			if((int)instance > 32)
 				return true;
-			}
 		}
 	}
 #else
-	if (qfiFileInfo.isExecutable())
+	if(fi.isExecutable())
 	{
-		if(QProcess::startDetached(qfiFileInfo.absoluteFilePath(),
-								QStringList(),
-								qfiFileInfo.absolutePath()))
+		if(QProcess::startDetached(fi.absoluteFilePath(), arguments, workingDirectory))
 			return true;
 	}
-
-	return QDesktopServices::openUrl(QUrl::fromLocalFile(qfiFileInfo.absoluteFilePath()));
 #endif
-	return false;
+
+	return QDesktopServices::openUrl(QUrl(filePath));
 }
 //
 #ifdef Q_WS_WIN
