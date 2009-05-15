@@ -10,7 +10,6 @@ class QPushButton;
 #include <QDialog>
 //
 #include "qabstractpreferencespage.h"
-#include "qpreferenceglobal.h"
 //
 class QPreferencesDialog : public QDialog
 {

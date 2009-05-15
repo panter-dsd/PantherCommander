@@ -1,6 +1,9 @@
 #include <QtGui>
 #include "qpreferencesdialog.h"
 //
+#include "qpreferenceglobal.h"
+#include "qinterfacepreference.h"
+//
 QPreferencesDialog::QPreferencesDialog(QSettings* qsSettings,QWidget * parent, Qt::WFlags f)
 	: QDialog(parent,f)
 {
@@ -22,13 +25,15 @@ void QPreferencesDialog::createControls()
 {
 	qlwPreferencesList=new QListWidget(this);
 	QStringList qslPreferenceItems;
-	qslPreferenceItems << QPreferenceGlobal::preferenceGroup();
+	qslPreferenceItems << QPreferenceGlobal::preferenceGroup()
+			<< QInterfacePreference::preferenceGroup();
 	qlwPreferencesList->addItems(qslPreferenceItems);
 	qlwPreferencesList->setCurrentRow(0);
 	setMaximumSizePreferencesList();
 
 	qswPreferencesWidgets=new QStackedWidget();
 	qswPreferencesWidgets->addWidget(new QPreferenceGlobal(qsetAppSettings,qswPreferencesWidgets));
+	qswPreferencesWidgets->addWidget(new QInterfacePreference(qsetAppSettings,qswPreferencesWidgets));
 
 	qdbbButtons=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Apply|QDialogButtonBox::Cancel,
 				Qt::Horizontal,

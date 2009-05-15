@@ -24,24 +24,18 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 //
-#include <QIcon>
-#include <QDateTime>
-#include <QAbstractItemModel>
-#include <QFileIconProvider>
-#include <QDir>
-#include <QFuture>
-#include <QFutureWatcher>
-#include <QFSFileEngine>
+#include <QtGui/QIcon>
+#include <QtCore/QDateTime>
+#include <QtCore/QAbstractItemModel>
+#include <QtGui/QFileIconProvider>
+#include <QtCore/QDir>
+#include <QtCore/QFuture>
+#include <QtCore/QFSFileEngine>
+#include <QtCore/QFileSystemWatcher>
 #ifdef Q_WS_WIN
 	#include <windows.h>
 #endif
 //
-enum GetFileListError
-{
-	FLM_NO_ERROR,
-	FLM_DISC_ERROR,
-	FLM_PRIVILEGY_ERROR
-};
 class QPCFileInfo
 {
 public:
@@ -137,7 +131,12 @@ class QFileListModel : public QAbstractItemModel
 	Q_OBJECT
 
 public:
-
+	enum Columns {
+		NAME,
+		EXT,
+		SIZE,
+		TIME_LAST_UPDATE,
+		ATTR};
 private:
 	QDir									qdCurrentDir;
 	QList<QPCFileInfo>			infoList;
@@ -145,7 +144,7 @@ private:
 	QIcon									qiFolderIcon;
 	QIcon									qiFileIcon;
 	QFileIconProvider*				provider;
-	int										lastError;
+	QFileSystemWatcher			fileSystemWatcher;
 	int										dirsCount;
 	int										filesCount;
 	qint64									filesSize;
@@ -155,18 +154,18 @@ public:
 	virtual void setNameFilterDisables(bool) {;}
 	void setFilter(QDir::Filters filters);
 	virtual void setReadOnly(bool) {;}
-	qint64 size(const QModelIndex& index);
-	QFile::Permissions permissions(const QModelIndex& index);
-	QString filePath(const QModelIndex& index);
-	QString fileName(const QModelIndex& index);
-	QDir rootDirectory();
+	qint64 size(const QModelIndex& index) const;
+	QFile::Permissions permissions(const QModelIndex& index) const;
+	QString filePath(const QModelIndex& index) const;
+	QString fileName(const QModelIndex& index) const;
+	QDir rootDirectory() const;
 	QString rootPath() const {return qdCurrentDir.absolutePath();}
-	QVariant myComputer();
+	QVariant myComputer() const;
 	QModelIndex setRootPath(const QString& path);
-	QDir::Filters filter() {return qdCurrentDir.filter();}
-	QFileIconProvider *iconProvider() {return provider;}
+	QDir::Filters filter() const {return qdCurrentDir.filter();}
+	QFileIconProvider *iconProvider() const {return provider;}
 	void setIconProvider(QFileIconProvider *iconProvider) {delete provider; provider=iconProvider;}
-	QModelIndex index(const QString& fileName);
+	QModelIndex index(const QString& fileName) const;
 	bool hasChildren(const QModelIndex &parent) const;
 
 
@@ -178,22 +177,19 @@ public:
 	Qt::ItemFlags flags ( const QModelIndex & index ) const;
 	int rowCount(const QModelIndex& =QModelIndex()) const {return infoList.count();}
 	int columnCount(const QModelIndex& =QModelIndex()) const {return 5;}
-	int sortColumn() {return 1;}
-	Qt::SortOrder sortOrder() {return Qt::AscendingOrder;}
-	int getLastError() {return lastError;}
+	int sortColumn() const {return 1;}
+	Qt::SortOrder sortOrder() const {return Qt::AscendingOrder;}
 	bool isDir(const QModelIndex& index) const;
 	QString getSizeStr(double size) const;
-	int getDirsCount() {return dirsCount;}
-	int getFilesCount() {return filesCount;}
-	qint64 getFilesSize() {return filesSize;}
 private:
-	int getFileList();
-	inline int getIndex(const QFileInfo& info);
+	void getFileList();
 	static void getIcons(QList<QPCFileInfo>* info,QFileIconProvider* prov);
 	static void getInfoList(QFileInfoList *fileInfoList,const QDir& dir);
 public slots:
 	void slotRefresh();
 signals:
 	void rootPathChanged(const QString&);
+	void rowsInserted(const QModelIndex &parent, int first, int last);
+	void rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
 };
 #endif // QFILELISTMODEL_H

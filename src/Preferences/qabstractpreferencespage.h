@@ -1,7 +1,8 @@
 #ifndef QABSTRACTPREFERENCESPAGE_H
 #define QABSTRACTPREFERENCESPAGE_H
 
-#include <QWidget>
+#include <QtGui/QWidget>
+#include <QtCore/QSettings>
 
 class QSettings;
 class QString;

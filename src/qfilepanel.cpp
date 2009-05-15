@@ -62,6 +62,8 @@ void QFilePanel::createWidgets()
 	qtbDriveButton=new QToolButton(this);
 	qtbDriveButton->setIcon(QFileIconProvider().icon(QFileIconProvider::Drive));
 	qtbDriveButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	qtbDriveButton->setAutoRaise(true);
+	qtbDriveButton->setFocusPolicy(Qt::NoFocus);
 	connect(qtbDriveButton, SIGNAL(clicked()),
 			this, SLOT(slotSelectDisc()));
 
