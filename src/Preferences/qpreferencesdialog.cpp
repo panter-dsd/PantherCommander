@@ -7,13 +7,13 @@
 QPreferencesDialog::QPreferencesDialog(QSettings* qsSettings,QWidget * parent, Qt::WFlags f)
 	: QDialog(parent,f)
 {
-	this->resize(640,480);
 	this->setWindowTitle(tr("Preferences"));
 	qsetAppSettings=qsSettings;
 	createControls();
 	setLayouts();
 	setConnects();
 	qdbbButtons->button(QDialogButtonBox::Apply)->setEnabled(false);
+	this->resize(640,480);
 }
 //
 QPreferencesDialog::~QPreferencesDialog()
@@ -31,9 +31,12 @@ void QPreferencesDialog::createControls()
 	qlwPreferencesList->setCurrentRow(0);
 	setMaximumSizePreferencesList();
 
+	QScrollArea *area;
 	qswPreferencesWidgets=new QStackedWidget();
 	qswPreferencesWidgets->addWidget(new QPreferenceGlobal(qsetAppSettings,qswPreferencesWidgets));
-	qswPreferencesWidgets->addWidget(new QInterfacePreference(qsetAppSettings,qswPreferencesWidgets));
+	area=new QScrollArea(this);
+	area->setWidget(new QInterfacePreference(qsetAppSettings,qswPreferencesWidgets));
+	qswPreferencesWidgets->addWidget(area);
 
 	qdbbButtons=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Apply|QDialogButtonBox::Cancel,
 				Qt::Horizontal,
@@ -45,14 +48,12 @@ void QPreferencesDialog::createControls()
 //
 void QPreferencesDialog::setLayouts()
 {
-	QWidget* qwPreferencesWidget=new QWidget();
 	QHBoxLayout* qhblPreferencesLayout=new QHBoxLayout();
 	qhblPreferencesLayout->addWidget(qlwPreferencesList);
 	qhblPreferencesLayout->addWidget(qswPreferencesWidgets);
-	qwPreferencesWidget->setLayout(qhblPreferencesLayout);
 
 	QVBoxLayout* qvblMainLayout=new QVBoxLayout();
-	qvblMainLayout->addWidget(qwPreferencesWidget);
+	qvblMainLayout->addLayout(qhblPreferencesLayout);
 	qvblMainLayout->addWidget(qdbbButtons);
 	this->setLayout(qvblMainLayout);
 }
@@ -81,7 +82,10 @@ void QPreferencesDialog::setConnects()
 				SLOT(setCurrentIndex(int)));
 	for (int i=0; i<qswPreferencesWidgets->count(); i++)
 	{
-		QAbstractPreferencesPage* widget=qobject_cast<QAbstractPreferencesPage*>(qswPreferencesWidgets->widget(i));
+		QScrollArea *area=qobject_cast<QScrollArea*>(qswPreferencesWidgets->widget(i));
+		if (!area)
+			continue;
+		QAbstractPreferencesPage *widget=qobject_cast<QAbstractPreferencesPage*>(area->widget());
 		if (widget)
 			connect(widget,
 						SIGNAL(modified()),
@@ -107,7 +111,10 @@ void QPreferencesDialog::slotSavePreferences()
 {
 	for (int i=0; i<qswPreferencesWidgets->count(); i++)
 	{
-		QAbstractPreferencesPage* widget=qobject_cast<QAbstractPreferencesPage*>(qswPreferencesWidgets->widget(i));
+		QScrollArea *area=qobject_cast<QScrollArea*>(qswPreferencesWidgets->widget(i));
+		if (!area)
+			continue;
+		QAbstractPreferencesPage *widget=qobject_cast<QAbstractPreferencesPage*>(area->widget());
 		if (widget)
 			widget->saveSettings();
 	}
@@ -124,9 +131,19 @@ void QPreferencesDialog::slotSetDefaults()
 {
 	for (int i=0; i<qswPreferencesWidgets->count(); i++)
 	{
-		QAbstractPreferencesPage* widget=qobject_cast<QAbstractPreferencesPage*>(qswPreferencesWidgets->widget(i));
+		QScrollArea *area=qobject_cast<QScrollArea*>(qswPreferencesWidgets->widget(i));
+		if (!area)
+			continue;
+		QAbstractPreferencesPage *widget=qobject_cast<QAbstractPreferencesPage*>(area->widget());
 		if (widget)
 			widget->setDefaults();
 	}
+}
+//
+void QPreferencesDialog::resizeEvent(QResizeEvent *event)
+{
+	QScrollArea *area=qobject_cast<QScrollArea*> (qswPreferencesWidgets->currentWidget());
+	if (area && area->widget())
+		area->widget()->resize(area->viewport()->width(),area->widget()->height());
 }
 //

@@ -25,6 +25,8 @@ private:
 	void setLayouts();
 	void setConnects();
 	void setMaximumSizePreferencesList();
+protected:
+	void resizeEvent(QResizeEvent *event);
 public:
 	QPreferencesDialog(QSettings* qsSettings, QWidget * parent = 0, Qt::WFlags f = Qt::WindowSystemMenuHint);
 	~QPreferencesDialog();
