@@ -97,10 +97,20 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 	const DirSortItem* f1 = &n1;
 	const DirSortItem* f2 = &n2;
 
-	if ((sort_flags & QDir::DirsFirst) && (f1->item.isDir() != f2->item.isDir()))
-		return f1->item.isDir();
-	if ((sort_flags & QDir::DirsLast) && (f1->item.isDir() != f2->item.isDir()))
-		return !f1->item.isDir();
+	if(f1->item.isDir() || f2->item.isDir())
+	{
+		bool bDot1 = (f1->item.fileName() == QLatin1String(".") || f1->item.fileName() == QLatin1String(".."));
+		bool bDot2 = (f2->item.fileName() == QLatin1String(".") || f2->item.fileName() == QLatin1String(".."));
+		if(sort_flags & QDir::DirsFirst)
+			return (bDot1 && bDot2 ? f1->item.fileName() == QLatin1String(".") : bDot1);
+		if(sort_flags & QDir::DirsLast)
+			return (bDot1 && bDot2 ? f1->item.fileName() != QLatin1String(".") : !bDot1);
+
+		if((sort_flags & QDir::DirsFirst) && (f1->item.isDir() != f2->item.isDir()))
+			return f1->item.isDir();
+		if((sort_flags & QDir::DirsLast) && (f1->item.isDir() != f2->item.isDir()))
+			return !f1->item.isDir();
+	}
 
 	int r = 0;
 	int sortBy = (sort_flags & QDir::SortByMask) | (sort_flags & QDir::Type);
@@ -159,15 +169,15 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 QFileInfoList Dir::sortFileList(QFileInfoList& infos, QDir::SortFlags sort)
 {
 	QFileInfoList ret;
-	if(!infos.isEmpty())
+	int n = infos.size();
+	if(n > 0)
 	{
-		if((sort & QDir::SortByMask) == QDir::Unsorted)
+		if(n == 1 || ((sort & QDir::SortByMask) == QDir::Unsorted))
 		{
 			ret = infos;
 		}
 		else
 		{
-			int n = infos.size();
 			DirSortItem* si= new DirSortItem[n];
 			for(int i = 0; i < n; ++i)
 				si[i].item = infos.at(i);
