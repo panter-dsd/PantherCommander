@@ -1,10 +1,10 @@
 #ifndef QABSTRACTPREFERENCESPAGE_H
 #define QABSTRACTPREFERENCESPAGE_H
 
+#include <QtGui/QWidget>
 #include <QtCore/QSettings>
 
-#include <QtGui/QWidget>
-
+class QSettings;
 class QString;
 
 class QAbstractPreferencesPage : public QWidget
