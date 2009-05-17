@@ -1034,6 +1034,7 @@ void MainWindowImpl::dropEvent(QDropEvent* event)
 	QWidget* widget = childAt(event->pos());
 	if (widget == qpbRunConsole)
 	{
+		qWarning() << event->mimeData()->urls();
 #ifndef Q_CC_MSVC
 	#warning "dnd for F2 not implemented yet"
 #endif
