@@ -27,6 +27,7 @@
 PantherViewer::PantherViewer(QWidget* parent,Qt::WFlags f)
 		:QMainWindow(parent,f)
 {
+	appSettings=AppSettings::getInstance();
 	this->setWindowTitle(tr("PantherViewer"));
 	createControls();
 	setLayouts();
@@ -133,28 +134,24 @@ void PantherViewer::createToolBar()
 //
 void PantherViewer::loadSettings()
 {
-	QSettings* settings=new QSettings(this);
-	this->move(settings->value("PantherViewer/pos",QPoint(0,0)).toPoint());
-	this->resize(settings->value("PantherViewer/size",QSize(640,480)).toSize());
-	bool bIsMaximized=settings->value("PantherViewer/IsMaximized",false).toBool();
+	this->move(appSettings->value("PantherViewer/pos",QPoint(0,0)).toPoint());
+	this->resize(appSettings->value("PantherViewer/size",QSize(640,480)).toSize());
+	bool bIsMaximized=appSettings->value("PantherViewer/IsMaximized",false).toBool();
 	if (bIsMaximized)
 		this->setWindowState(Qt::WindowMaximized);
-	delete settings;
 }
 //
 void PantherViewer::saveSettings()
 {
-	QSettings* settings=new QSettings(this);
 	if (this->windowState()!=Qt::WindowMaximized)
 	{
-		settings->setValue("PantherViewer/pos",this->pos());
-		settings->setValue("PantherViewer/size",this->size());
-		settings->setValue("PantherViewer/IsMaximized",false);
+		appSettings->setValue("PantherViewer/pos",this->pos());
+		appSettings->setValue("PantherViewer/size",this->size());
+		appSettings->setValue("PantherViewer/IsMaximized",false);
 	}
 	else
-		settings->setValue("PantherViewer/IsMaximized",true);
-	settings->sync();
-	delete settings;
+		appSettings->setValue("PantherViewer/IsMaximized",true);
+	appSettings->sync();
 }
 //
 void PantherViewer::viewFile(const QString& fileName)

@@ -22,12 +22,12 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-#include <QtCore/QSettings>
 #include <QtCore/QTextCodec>
 
 #include <QtGui/QApplication>
 
 #include "mainwindowimpl.h"
+#include "appsettings.h"
 
 #define ApplicationVersion "0.0.0.6"
 
@@ -45,6 +45,8 @@ int main(int argc, char **argv)
 	app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
 
 	QSettings::setDefaultFormat(QSettings::IniFormat);
+	AppSettings *appSettings=AppSettings::getInstance();
+	appSettings->setSettings(new QSettings());
 
 	MainWindowImpl win;
 	win.setWindowTitle(app.applicationName()+" "+app.applicationVersion());

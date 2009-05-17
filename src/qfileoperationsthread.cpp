@@ -53,11 +53,11 @@ void copyDirTime(const QString& sourceDir,const QString& destDir);
 //
 QFileOperationsThread::QFileOperationsThread(QObject* parent) : QThread(parent)
 {
-	QSettings settings;
-	settings.beginGroup("Global");
-	iLocalBufferSize = settings.value("LocalBufferSize", 10485760).toInt();
-	iNoLocalBufferSize = settings.value("NoLocalBufferSize", 65536).toInt();
-	settings.endGroup();
+	appSettings=AppSettings::getInstance();
+	appSettings->beginGroup("Global");
+	iLocalBufferSize = appSettings->value("LocalBufferSize", 10485760).toInt();
+	iNoLocalBufferSize = appSettings->value("NoLocalBufferSize", 65536).toInt();
+	appSettings->endGroup();
 
 	bStopped=false;
 	isPaused=false;

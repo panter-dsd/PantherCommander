@@ -2,7 +2,7 @@
 #define QDRIVEBAR_H
 //
 #include <QFrame>
-
+#include "appsettings.h"
 //
 class QActionGroup;
 //
@@ -14,6 +14,7 @@ private:
 	QActionGroup*		qagDrives;
 	QString					qsCurrentPath;
 	int				timerID;
+	AppSettings					*appSettings;
 public:
 	QDriveBar(QWidget* parent = 0);
 

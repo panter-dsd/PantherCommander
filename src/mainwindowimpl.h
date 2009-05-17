@@ -46,6 +46,7 @@ class PantherViewer;
 //
 #include "qfileoperationsthread.h"
 #include "Preferences/qtoolbuttonpreference.h"
+#include "appsettings.h"
 //
 class MainWindowImpl : public QMainWindow
 {
@@ -67,6 +68,7 @@ private:
 	QList<QFileOperationsDialog*> qlQueueList;
 	QMap<QString,SToolBarButton>		qmToolBarButtons;
 	QList<QToolBar*>						qltbToolBarList;
+	AppSettings					*appSettings;
 
 	QPushButton*								qpbRunConsole;
 	QPushButton*								qpbView;

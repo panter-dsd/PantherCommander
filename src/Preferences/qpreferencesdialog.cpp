@@ -4,11 +4,10 @@
 #include "qpreferenceglobal.h"
 #include "qinterfacepreference.h"
 //
-QPreferencesDialog::QPreferencesDialog(QSettings* qsSettings,QWidget * parent, Qt::WFlags f)
+QPreferencesDialog::QPreferencesDialog(QWidget * parent, Qt::WFlags f)
 	: QDialog(parent,f)
 {
 	this->setWindowTitle(tr("Preferences"));
-	qsetAppSettings=qsSettings;
 	createControls();
 	setLayouts();
 	setConnects();
@@ -33,9 +32,10 @@ void QPreferencesDialog::createControls()
 
 	QScrollArea *area;
 	qswPreferencesWidgets=new QStackedWidget();
-	qswPreferencesWidgets->addWidget(new QPreferenceGlobal(qsetAppSettings,qswPreferencesWidgets));
+	qswPreferencesWidgets->addWidget(new QPreferenceGlobal(qswPreferencesWidgets));
 	area=new QScrollArea(this);
-	area->setWidget(new QInterfacePreference(qsetAppSettings,qswPreferencesWidgets));
+	area->setWidgetResizable(true);
+	area->setWidget(new QInterfacePreference(qswPreferencesWidgets));
 	qswPreferencesWidgets->addWidget(area);
 
 	qdbbButtons=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Apply|QDialogButtonBox::Cancel,
@@ -118,7 +118,6 @@ void QPreferencesDialog::slotSavePreferences()
 		if (widget)
 			widget->saveSettings();
 	}
-	qsetAppSettings->sync();
 	qdbbButtons->button(QDialogButtonBox::Apply)->setEnabled(false);
 }
 //
@@ -140,10 +139,4 @@ void QPreferencesDialog::slotSetDefaults()
 	}
 }
 //
-void QPreferencesDialog::resizeEvent(QResizeEvent *event)
-{
-	QScrollArea *area=qobject_cast<QScrollArea*> (qswPreferencesWidgets->currentWidget());
-	if (area && area->widget())
-		area->widget()->resize(area->viewport()->width(),area->widget()->height());
-}
-//
+

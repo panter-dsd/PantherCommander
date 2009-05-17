@@ -37,6 +37,7 @@ MainWindowImpl::MainWindowImpl(QWidget* parent, Qt::WFlags f)
 	: QMainWindow(parent, f)
 	, qlConsolePath(0)
 {
+	appSettings=AppSettings::getInstance();
 	resize(640, 480);
 	setAcceptDrops(true);
 
@@ -153,21 +154,21 @@ void MainWindowImpl::createActions()
 	actionCpCurFileName2Cmd = new QAction(this);
 	actionCpCurFileName2Cmd->setText(tr("Copy current file name to command string"));
 	actionCpCurFileName2Cmd->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return));
-	connect(actionCpCurFileName2Cmd, SIGNAL(triggered(bool)), 
+	connect(actionCpCurFileName2Cmd, SIGNAL(triggered(bool)),
 			this, SLOT(slotCpCurFileName2Cmd()));
 	addAction(actionCpCurFileName2Cmd);
 
 	actionCpCurFileNameWhithPath2Cmd = new QAction(this);
 	actionCpCurFileNameWhithPath2Cmd->setText(tr("Copy current file name whith path to command string"));
 	actionCpCurFileNameWhithPath2Cmd->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Return));
-	connect(actionCpCurFileNameWhithPath2Cmd, SIGNAL(triggered(bool)), 
+	connect(actionCpCurFileNameWhithPath2Cmd, SIGNAL(triggered(bool)),
 			this, SLOT(slotCpCurFileNameWhithPath2Cmd()));
 	addAction(actionCpCurFileNameWhithPath2Cmd);
 
 	actionClearCmd = new QAction(this);
 	actionClearCmd->setText(tr("Clear command string"));
 	actionClearCmd->setShortcut(QKeySequence(Qt::Key_Escape));
-	connect(actionClearCmd, SIGNAL(triggered(bool)), 
+	connect(actionClearCmd, SIGNAL(triggered(bool)),
 			qcbConsoleCommand->lineEdit(), SLOT(clear()));
 	addAction(actionClearCmd);
 
@@ -175,63 +176,63 @@ void MainWindowImpl::createActions()
 	actionRunConsole = new QAction(this);
 	actionRunConsole->setText(tr("Run console"));
 	actionRunConsole->setShortcut(QKeySequence(Qt::Key_F2));
-	connect(actionRunConsole, SIGNAL(triggered(bool)), 
+	connect(actionRunConsole, SIGNAL(triggered(bool)),
 			this, SLOT(slotRunConsole()));
 	addAction(actionRunConsole);
 
 	actionView = new QAction(this);
 	actionView->setText(tr("View"));
 	actionView->setShortcut(QKeySequence(Qt::Key_F3));
-	connect(actionView, SIGNAL(triggered(bool)), 
+	connect(actionView, SIGNAL(triggered(bool)),
 			this, SLOT(slotView()));
 	addAction(actionView);
 
 	actionEdit = new QAction(this);
 	actionEdit->setText(tr("Edit"));
 	actionEdit->setShortcut(QKeySequence(Qt::Key_F4));
-//	connect(actionEdit, SIGNAL(triggered(bool)), 
+//	connect(actionEdit, SIGNAL(triggered(bool)),
 //			this, SLOT(slotView()));
 	addAction(actionEdit);
 
 	actionCopy = new QAction(this);
 	actionCopy->setText(tr("Copy"));
 	actionCopy->setShortcut(QKeySequence(Qt::Key_F5));
-	connect(actionCopy, SIGNAL(triggered(bool)), 
+	connect(actionCopy, SIGNAL(triggered(bool)),
 			this, SLOT(slotCopy()));
 	addAction(actionCopy);
 
 	actionMove = new QAction(this);
 	actionMove->setText(tr("Move"));
 	actionMove->setShortcut(QKeySequence(Qt::Key_F6));
-	connect(actionMove, SIGNAL(triggered(bool)), 
+	connect(actionMove, SIGNAL(triggered(bool)),
 			this, SLOT(slotMove()));
 	addAction(actionMove);
 
 	actionRename = new QAction(this);
 	actionRename->setText(tr("Rename"));
 	actionRename->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_F6));
-	connect(actionRename, SIGNAL(triggered(bool)), 
+	connect(actionRename, SIGNAL(triggered(bool)),
 			this, SLOT(slotRename()));
 	addAction(actionRename);
 
 	actionMkDir = new QAction(this);
 	actionMkDir->setText(tr("Create Dir"));
 	actionMkDir->setShortcut(QKeySequence(Qt::Key_F7));
-	connect(actionMkDir, SIGNAL(triggered(bool)), 
+	connect(actionMkDir, SIGNAL(triggered(bool)),
 			this, SLOT(slotMkDir()));
 	addAction(actionMkDir);
 
 	actionRemove = new QAction(this);
 	actionRemove->setText(tr("Remove"));
 	actionRemove->setShortcut(QKeySequence(Qt::Key_F8));
-	connect(actionRemove, SIGNAL(triggered(bool)), 
+	connect(actionRemove, SIGNAL(triggered(bool)),
 			this, SLOT(slotRemove()));
 	addAction(actionRemove);
 
 	actionExit = new QAction(this);
 	actionExit->setText(tr("Exit"));
 	actionExit->setShortcut(QKeySequence(Qt::ALT + Qt::Key_X));
-	connect(actionExit, SIGNAL(triggered(bool)), 
+	connect(actionExit, SIGNAL(triggered(bool)),
 			qApp, SLOT(quit()));
 	addAction(actionExit);
 
@@ -239,7 +240,7 @@ void MainWindowImpl::createActions()
 	actionFindFiles = new QAction(this);
 	actionFindFiles->setText(tr("Find Files"));
 //	actionFindFiles->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
-	connect(actionFindFiles, SIGNAL(triggered(bool)), 
+	connect(actionFindFiles, SIGNAL(triggered(bool)),
 			this, SLOT(slotFindFiles()));
 	addAction(actionFindFiles);
 
@@ -247,7 +248,7 @@ void MainWindowImpl::createActions()
 	actionPreferences = new QAction(this);
 	actionPreferences->setText(tr("Preferences"));
 //	actionPreferences->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_O));
-	connect(actionPreferences, SIGNAL(triggered(bool)), 
+	connect(actionPreferences, SIGNAL(triggered(bool)),
 			this, SLOT(slotPreferences()));
 	addAction(actionPreferences);
 }
@@ -372,44 +373,49 @@ void MainWindowImpl::createCommandButtons()
 //
 void MainWindowImpl::saveSettings()
 {
-	QSettings settings;
-	settings.beginGroup("MainWindow");
-	settings.setValue("IsMaximized", isMaximized());
+	appSettings->beginGroup("MainWindow");
+	appSettings->setValue("IsMaximized", isMaximized());
 	if(!isMaximized())
 	{
-		settings.setValue("pos", pos());
-		settings.setValue("size", size());
+		appSettings->setValue("pos", pos());
+		appSettings->setValue("size", size());
 	}
-	settings.setValue("Splitter", qsplitSplitter->saveState());
-	settings.endGroup();
+	appSettings->setValue("Splitter", qsplitSplitter->saveState());
+	appSettings->endGroup();
 
-	settings.beginGroup("Global");
-	settings.setValue("CommandHistory", commandHistory());
-	settings.endGroup();
+	appSettings->beginGroup("Global");
+	appSettings->setValue("CommandHistory", commandHistory());
+	appSettings->endGroup();
 
 	saveToolBars();
 }
 //
 void MainWindowImpl::loadSettings()
 {
-	QSettings settings;
-	settings.beginGroup("MainWindow");
-	move(settings.value("pos", QPoint(0, 0)).toPoint());
-	resize(settings.value("size", QSize(640, 480)).toSize());
-	if(settings.value("IsMaximized", false).toBool())
+	appSettings->beginGroup("MainWindow");
+	move(appSettings->value("pos", QPoint(0, 0)).toPoint());
+	resize(appSettings->value("size", QSize(640, 480)).toSize());
+	if(appSettings->value("IsMaximized", false).toBool())
 		showMaximized();
-	qsplitSplitter->restoreState(settings.value("Splitter").toByteArray());
-	settings.endGroup();
+	qsplitSplitter->restoreState(appSettings->value("Splitter").toByteArray());
+	appSettings->endGroup();
 
-	settings.beginGroup("Global");
-	setCommandHistory(settings.value("CommandHistory").toStringList());
-	QStringList toolBarNames = settings.value("ToolBars").toStringList();
-	settings.endGroup();
+	appSettings->beginGroup("Global");
+	setCommandHistory(appSettings->value("CommandHistory").toStringList());
+	QStringList toolBarNames = appSettings->value("ToolBars").toStringList();
+	appSettings->endGroup();
 
 	if(toolBarNames.isEmpty())
 		toolBarNames.append("MainToolbar");
 	foreach(const QString& toolBarName, toolBarNames)
 		loadToolBar(toolBarName);
+
+	qdbDriveBarLeft->setVisible(appSettings->value("Interface/ShowDriveBar", true).toBool());
+	qdbDriveBarRight->setVisible(appSettings->value("Interface/ShowTwoDriveBar", true).toBool()
+				&& qdbDriveBarLeft->isVisible());
+	qlConsolePath->setVisible(appSettings->value("Interface/ShowCommandLine", true).toBool());
+	qcbConsoleCommand->setVisible(qlConsolePath->isVisible());
+	qfCommandButtons->setVisible(appSettings->value("Interface/ShowFunctionButtons", true).toBool());
 }
 //
 void MainWindowImpl::showSplitterContextMenu(const QPoint& pos)
@@ -800,8 +806,7 @@ void MainWindowImpl::slotMkDir()
 	QComboBox* qcbDirName=new QComboBox(qdMkDirDialog);
 	qcbDirName->setEditable(true);
 //Load history
-	QSettings* settings=new QSettings(this);
-	qcbDirName->addItems(settings->value("Global/MkDirHistory",QStringList()).toStringList());
+	qcbDirName->addItems(appSettings->value("Global/MkDirHistory",QStringList()).toStringList());
 	qcbDirName->setCurrentIndex(-1);
 //
 	QString fileName=qfpFocusedFilePanel->currentFileName();
@@ -850,12 +855,11 @@ void MainWindowImpl::slotMkDir()
 			QStringList qslMkDirHistory;
 			for (int i=0; i<qcbDirName->count(); i++)
 				qslMkDirHistory << qcbDirName->itemText(i);
-			settings->setValue("Global/MkDirHistory",qslMkDirHistory);
-			settings->sync();
+			appSettings->setValue("Global/MkDirHistory",qslMkDirHistory);
+			appSettings->sync();
 			//
 		}
 	}
-	delete settings;
 	delete qdMkDirDialog;
 }
 //
@@ -872,19 +876,18 @@ void MainWindowImpl::loadToolBar(const QString& toolBarName)
 	qltbToolBarList << qtbToolBar;
 	if (toolBarName.isEmpty())
 		return;
-	QSettings* settings=new QSettings(this);
-	int buttonsCount=settings->value("ToolBar_"+toolBarName+"/ButtonsCount",0).toInt();
+	int buttonsCount=appSettings->value("ToolBar_"+toolBarName+"/ButtonsCount",0).toInt();
 	QAction* action;
 	for (int i=0; i<buttonsCount; i++)
 	{
 		SToolBarButton button;
-		button.qsCommand=settings->value("ToolBar_"+toolBarName+"/Command_"+QString::number(i),"").toString();
-		button.qsParams=settings->value("ToolBar_"+toolBarName+"/Params_"+QString::number(i),"").toString();
-		button.qsWorkDir=settings->value("ToolBar_"+toolBarName+"/WorkDir_"+QString::number(i),"").toString();
-		button.qsIconFile=settings->value("ToolBar_"+toolBarName+"/IconFile_"+QString::number(i),"").toString();
-		button.qiIcon=settings->value("ToolBar_"+toolBarName+"/Icon_"+QString::number(i),"").value<QIcon>();
-		button.iconNumber=settings->value("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),-1).toInt();
-		button.qsCaption=settings->value("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),"").toString();
+		button.qsCommand=appSettings->value("ToolBar_"+toolBarName+"/Command_"+QString::number(i),"").toString();
+		button.qsParams=appSettings->value("ToolBar_"+toolBarName+"/Params_"+QString::number(i),"").toString();
+		button.qsWorkDir=appSettings->value("ToolBar_"+toolBarName+"/WorkDir_"+QString::number(i),"").toString();
+		button.qsIconFile=appSettings->value("ToolBar_"+toolBarName+"/IconFile_"+QString::number(i),"").toString();
+		button.qiIcon=appSettings->value("ToolBar_"+toolBarName+"/Icon_"+QString::number(i),"").value<QIcon>();
+		button.iconNumber=appSettings->value("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),-1).toInt();
+		button.qsCaption=appSettings->value("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),"").toString();
 
 		action=new QAction(button.qiIcon,button.qsCaption,this);
 		button.qaAction=action;
@@ -896,37 +899,34 @@ void MainWindowImpl::loadToolBar(const QString& toolBarName)
 		qmToolBarButtons.insert(toolBarName+QString::number(i),button);
 		qtbToolBar->addAction(action);
 	}
-	delete settings;
 }
 //
 void MainWindowImpl::saveToolBars()
 {
-	QSettings* settings=new QSettings(this);
 	QStringList qslToolBars;
 	for (int i=0; i<qltbToolBarList.count(); i++)
 	{
 		QString toolBarName=qltbToolBarList.at(0)->objectName();
 		qslToolBars << toolBarName;
 		int actionsCount=qltbToolBarList.at(0)->actions().count();
-		settings->remove("ToolBar_"+toolBarName);
-		settings->setValue("ToolBar_"+
+		appSettings->remove("ToolBar_"+toolBarName);
+		appSettings->setValue("ToolBar_"+
 						toolBarName+
 						"/ButtonsCount",actionsCount);
 		for (int i=0; i<actionsCount; i++)
 		{
 			SToolBarButton button=qmToolBarButtons.value(toolBarName+QString::number(i));
-			settings->setValue("ToolBar_"+toolBarName+"/Command_"+QString::number(i),button.qsCommand);
-			settings->setValue("ToolBar_"+toolBarName+"/Params_"+QString::number(i),button.qsParams);
-			settings->setValue("ToolBar_"+toolBarName+"/WorkDir_"+QString::number(i),button.qsWorkDir);
-			settings->setValue("ToolBar_"+toolBarName+"/IconFile_"+QString::number(i),button.qsIconFile);
-			settings->setValue("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),button.iconNumber);
-			settings->setValue("ToolBar_"+toolBarName+"/Icon_"+QString::number(i),button.qiIcon);
-			settings->setValue("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),button.qsCaption);
+			appSettings->setValue("ToolBar_"+toolBarName+"/Command_"+QString::number(i),button.qsCommand);
+			appSettings->setValue("ToolBar_"+toolBarName+"/Params_"+QString::number(i),button.qsParams);
+			appSettings->setValue("ToolBar_"+toolBarName+"/WorkDir_"+QString::number(i),button.qsWorkDir);
+			appSettings->setValue("ToolBar_"+toolBarName+"/IconFile_"+QString::number(i),button.qsIconFile);
+			appSettings->setValue("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),button.iconNumber);
+			appSettings->setValue("ToolBar_"+toolBarName+"/Icon_"+QString::number(i),button.qiIcon);
+			appSettings->setValue("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),button.qsCaption);
 		}
 	}
-	settings->setValue("Global/ToolBars",qslToolBars);
-	settings->sync();
-	delete settings;
+	appSettings->setValue("Global/ToolBars",qslToolBars);
+	appSettings->sync();
 }
 //
 QStringList MainWindowImpl::commandHistory() const
@@ -1297,8 +1297,7 @@ void MainWindowImpl::slotFindFiles()
 //
 void MainWindowImpl::slotPreferences()
 {
-	QSettings settings;
-	QPreferencesDialog dialog(&settings, this);
+	QPreferencesDialog dialog(this);
 	dialog.exec();
 }
 //

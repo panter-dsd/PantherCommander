@@ -2,8 +2,8 @@
 
 #include <QtGui>
 //
-QPreferenceGlobal::QPreferenceGlobal(QSettings* qsetSettings, QWidget* parent)
-	: QAbstractPreferencesPage(qsetSettings, parent)
+QPreferenceGlobal::QPreferenceGlobal(QWidget* parent)
+	: QAbstractPreferencesPage(parent)
 {
 	createControls();
 	setConnects();

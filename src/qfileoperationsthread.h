@@ -29,6 +29,7 @@
 #include <QMutex>
 #include <QStringList>
 #include <QFile>
+#include "appsettings.h"
 //
 class QFileOperationsThread : public QThread
 {
@@ -87,6 +88,7 @@ private:
 	int							iPercent;
 	QString					lastErrorString;
 	bool							isSkipFile;
+	AppSettings					*appSettings;
 public:
 	FileOperationConfirmations confirmation;
 public:

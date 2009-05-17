@@ -35,6 +35,7 @@ class QListWidget;
 #include <QTime>
 #include "qfileoperationsthread.h"
 #include "qfileoperationsconfirmationdialog.h"
+#include "appsettings.h"
 //
 class QFileOperationsDialog : public QDialog
 {
@@ -77,6 +78,8 @@ private:
 
 	bool										isBlocked;
 	int										addingJobs;
+
+	AppSettings								*appSettings;
 public:
 	QFileOperationsDialog(QWidget * parent = 0,
 					Qt::WindowFlags f = Qt::Dialog|Qt::WindowSystemMenuHint|Qt::WindowMinimizeButtonHint);

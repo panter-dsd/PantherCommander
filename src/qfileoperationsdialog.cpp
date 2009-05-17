@@ -27,6 +27,7 @@
 QFileOperationsDialog::QFileOperationsDialog(QWidget * parent,Qt::WindowFlags f)
 		:QDialog(parent,f)
 {
+	appSettings=AppSettings::getInstance();
 	createControls();
 	setLayouts();
 	createActions();
@@ -396,20 +397,18 @@ void QFileOperationsDialog::slotShowHideJobList()
 //
 void QFileOperationsDialog::saveSettings()
 {
-	QSettings settings;
-	settings.beginGroup("FileOperationsDialog");
-	settings.setValue("size", size());
-	settings.setValue("ShowJobsList", actionShowHideJobList->isChecked());
-	settings.endGroup();
+	appSettings->beginGroup("FileOperationsDialog");
+	appSettings->setValue("size", size());
+	appSettings->setValue("ShowJobsList", actionShowHideJobList->isChecked());
+	appSettings->endGroup();
 }
 //
 void QFileOperationsDialog::loadSettings()
 {
-	QSettings settings;
-	settings.beginGroup("FileOperationsDialog");
-	resize(settings.value("size", QSize(200, 100)).toSize());
-	actionShowHideJobList->setChecked(settings.value("ShowJobsList", false).toBool());
-	settings.endGroup();
+	appSettings->beginGroup("FileOperationsDialog");
+	resize(appSettings->value("size", QSize(200, 100)).toSize());
+	actionShowHideJobList->setChecked(appSettings->value("ShowJobsList", false).toBool());
+	appSettings->endGroup();
 }
 //
 void QFileOperationsDialog::slotOperationError()

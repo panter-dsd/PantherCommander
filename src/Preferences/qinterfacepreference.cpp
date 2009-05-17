@@ -3,9 +3,10 @@
 #include <QtGui/QVBoxLayout>
 #include "qinterfacepreference.h"
 
-QInterfacePreference::QInterfacePreference( QSettings *qsetSettings, QWidget *parent)
-		:QAbstractPreferencesPage(qsetSettings,parent)
+QInterfacePreference::QInterfacePreference(QWidget *parent)
+		:QAbstractPreferencesPage(parent)
 {
+	appSettings=AppSettings::getInstance();
 	createControls();
 	setLayouts();
 	setConnects();
@@ -19,46 +20,46 @@ QInterfacePreference::~QInterfacePreference()
 //
 void QInterfacePreference::saveSettings()
 {
-	qsetAppSettings->setValue("Interface/ShowDriveBar", qchbShowDriveBar->isChecked());
-	qsetAppSettings->setValue("Interface/ShowTwoDriveBar", qchbShowTwoDriveBar->isChecked());
-	qsetAppSettings->setValue("Interface/ShowDriveButton", qchbShowDriveButton->isChecked());
-	qsetAppSettings->setValue("Interface/ShowTabs", qchbShowTabs->isChecked());
-	qsetAppSettings->setValue("Interface/ShowShowHeader", qchbShowHeader->isChecked());
-	qsetAppSettings->setValue("Interface/ShowDirInformation", qchbShowDirInformation->isChecked());
-	qsetAppSettings->setValue("Interface/ShowCommandLine", qchbShowCommandLine->isChecked());
-	qsetAppSettings->setValue("Interface/ShowFunctionButtons", qchbShowFunctionButtons->isChecked());
-	qsetAppSettings->setValue("Interface/ShowCurrentPathEditor", qgbCurrentPathEditor->isChecked());
-	qsetAppSettings->setValue("Interface/ShowHistory", qchbShowHistory->isChecked());
-	qsetAppSettings->setValue("Interface/ShowGotoRoot", qchbShowGotoRoot->isChecked());
-	qsetAppSettings->setValue("Interface/ShowGotoUp",qchbShowGotoUp ->isChecked());
-	qsetAppSettings->setValue("Interface/ShowGotoHome", qchbShowGotoHome->isChecked());
-	qsetAppSettings->setValue("Interface/FlatInterface", qgbFlatInterface->isChecked());
-	qsetAppSettings->setValue("Interface/FlatToolBar", qchbFlatToolBar->isChecked());
-	qsetAppSettings->setValue("Interface/FlatDriveBar", qchbFlatDriveBar->isChecked());
-	qsetAppSettings->setValue("Interface/FlatDriveButtons", qchbFlatDriveButtons->isChecked());
-	qsetAppSettings->setValue("Interface/FlatFunctionButtons", qchbFlatFunctionButtons->isChecked());
+	appSettings->setValue("Interface/ShowDriveBar", qchbShowDriveBar->isChecked());
+	appSettings->setValue("Interface/ShowTwoDriveBar", qchbShowTwoDriveBar->isChecked());
+	appSettings->setValue("Interface/ShowDriveButton", qchbShowDriveButton->isChecked());
+	appSettings->setValue("Interface/ShowTabs", qchbShowTabs->isChecked());
+	appSettings->setValue("Interface/ShowHeader", qchbShowHeader->isChecked());
+	appSettings->setValue("Interface/ShowDirInformation", qchbShowDirInformation->isChecked());
+	appSettings->setValue("Interface/ShowCommandLine", qchbShowCommandLine->isChecked());
+	appSettings->setValue("Interface/ShowFunctionButtons", qchbShowFunctionButtons->isChecked());
+	appSettings->setValue("Interface/ShowCurrentPathEditor", qgbCurrentPathEditor->isChecked());
+	appSettings->setValue("Interface/ShowHistory", qchbShowHistory->isChecked());
+	appSettings->setValue("Interface/ShowGotoRoot", qchbShowGotoRoot->isChecked());
+	appSettings->setValue("Interface/ShowGotoUp",qchbShowGotoUp ->isChecked());
+	appSettings->setValue("Interface/ShowGotoHome", qchbShowGotoHome->isChecked());
+	appSettings->setValue("Interface/FlatInterface", qgbFlatInterface->isChecked());
+	appSettings->setValue("Interface/FlatToolBar", qchbFlatToolBar->isChecked());
+	appSettings->setValue("Interface/FlatDriveBar", qchbFlatDriveBar->isChecked());
+	appSettings->setValue("Interface/FlatDriveButtons", qchbFlatDriveButtons->isChecked());
+	appSettings->setValue("Interface/FlatFunctionButtons", qchbFlatFunctionButtons->isChecked());
 }
 //
 void QInterfacePreference::loadSettings()
 {
-	qchbShowDriveBar->setChecked(qsetAppSettings->value("Interface/ShowDriveBar", true).toBool());
-	qchbShowTwoDriveBar->setChecked(qsetAppSettings->value("Interface/ShowTwoDriveBar", true).toBool());
-	qchbShowDriveButton->setChecked(qsetAppSettings->value("Interface/ShowDriveButton", true).toBool());
-	qchbShowTabs->setChecked(qsetAppSettings->value("Interface/ShowTabs", true).toBool());
-	qchbShowHeader->setChecked(qsetAppSettings->value("Interface/ShowShowHeader", true).toBool());
-	qchbShowDirInformation->setChecked(qsetAppSettings->value("Interface/ShowDirInformation", true).toBool());
-	qchbShowCommandLine->setChecked(qsetAppSettings->value("Interface/ShowCommandLine", true).toBool());
-	qchbShowFunctionButtons->setChecked(qsetAppSettings->value("Interface/ShowFunctionButtons", true).toBool());
-	qgbCurrentPathEditor->setChecked(qsetAppSettings->value("Interface/ShowCurrentPathEditor", true).toBool());
-	qchbShowHistory->setChecked(qsetAppSettings->value("Interface/ShowHistory", true).toBool());
-	qchbShowGotoRoot->setChecked(qsetAppSettings->value("Interface/ShowGotoRoot", true).toBool());
-	qchbShowGotoUp->setChecked(qsetAppSettings->value("Interface/ShowGotoUp", true).toBool());
-	qchbShowGotoHome->setChecked(qsetAppSettings->value("Interface/ShowGotoHome", true).toBool());
-	qgbFlatInterface->setChecked(qsetAppSettings->value("Interface/FlatInterface", true).toBool());
-	qchbFlatToolBar->setChecked(qsetAppSettings->value("Interface/FlatToolBar", true).toBool());
-	qchbFlatDriveBar->setChecked(qsetAppSettings->value("Interface/FlatDriveBar", true).toBool());
-	qchbFlatDriveButtons->setChecked(qsetAppSettings->value("Interface/FlatDriveButtons", true).toBool());
-	qchbFlatFunctionButtons->setChecked(qsetAppSettings->value("Interface/FlatFunctionButtons", true).toBool());
+	qchbShowDriveBar->setChecked(appSettings->value("Interface/ShowDriveBar", true).toBool());
+	qchbShowTwoDriveBar->setChecked(appSettings->value("Interface/ShowTwoDriveBar", true).toBool());
+	qchbShowDriveButton->setChecked(appSettings->value("Interface/ShowDriveButton", true).toBool());
+	qchbShowTabs->setChecked(appSettings->value("Interface/ShowTabs", true).toBool());
+	qchbShowHeader->setChecked(appSettings->value("Interface/ShowHeader", true).toBool());
+	qchbShowDirInformation->setChecked(appSettings->value("Interface/ShowDirInformation", true).toBool());
+	qchbShowCommandLine->setChecked(appSettings->value("Interface/ShowCommandLine", true).toBool());
+	qchbShowFunctionButtons->setChecked(appSettings->value("Interface/ShowFunctionButtons", true).toBool());
+	qgbCurrentPathEditor->setChecked(appSettings->value("Interface/ShowCurrentPathEditor", true).toBool());
+	qchbShowHistory->setChecked(appSettings->value("Interface/ShowHistory", true).toBool());
+	qchbShowGotoRoot->setChecked(appSettings->value("Interface/ShowGotoRoot", true).toBool());
+	qchbShowGotoUp->setChecked(appSettings->value("Interface/ShowGotoUp", true).toBool());
+	qchbShowGotoHome->setChecked(appSettings->value("Interface/ShowGotoHome", true).toBool());
+	qgbFlatInterface->setChecked(appSettings->value("Interface/FlatInterface", true).toBool());
+	qchbFlatToolBar->setChecked(appSettings->value("Interface/FlatToolBar", true).toBool());
+	qchbFlatDriveBar->setChecked(appSettings->value("Interface/FlatDriveBar", true).toBool());
+	qchbFlatDriveButtons->setChecked(appSettings->value("Interface/FlatDriveButtons", true).toBool());
+	qchbFlatFunctionButtons->setChecked(appSettings->value("Interface/FlatFunctionButtons", true).toBool());
 }
 //
 void QInterfacePreference::setDefaults()

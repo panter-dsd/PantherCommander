@@ -33,7 +33,7 @@ class QPushButton;
 class QToolButton;
 //
 #include <QWidget>
-
+#include "appsettings.h"
 class FileWidget;
 //
 class QFilePanel : public QWidget
@@ -45,6 +45,7 @@ private:
 	FileWidget*						qflvCurrentFileList;
 	QLabel*							qlDiscInformation;
 	QToolButton*					qtbDriveButton;
+	AppSettings					*appSettings;
 
 	QAction*						actionAddTab;
 

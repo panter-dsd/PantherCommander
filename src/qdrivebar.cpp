@@ -1,4 +1,3 @@
-#include <QtCore/QSettings>
 #include <QtGui/QAction>
 #include <QtGui/QActionGroup>
 #include <QtCore/QFileInfo>
@@ -16,6 +15,7 @@
 QDriveBar::QDriveBar(QWidget* parent)
 		:QFrame(parent)
 {
+	appSettings=AppSettings::getInstance();
 	qaLastChecked=0;
 	qagDrives=new QActionGroup(this);
 
@@ -26,9 +26,7 @@ QDriveBar::QDriveBar(QWidget* parent)
 void QDriveBar::slotRefresh()
 {
 	blockSignals(true);
-	QSettings* settings=new QSettings(this);
-	const QStringList qslIgnoreList = settings->value("Global/IgnoredDrives").toStringList();
-	delete settings;
+	const QStringList qslIgnoreList = appSettings->value("Global/IgnoredDrives").toStringList();
 	QList<QAction*> qalDrives=qagDrives->actions();
 	QFileIconProvider provider;
 #ifdef Q_WS_WIN
@@ -159,6 +157,7 @@ void QDriveBar::slotSetDisc(const QString& path)
 //
 void QDriveBar::timerEvent(QTimerEvent *event)
 {
+	Q_UNUSED(event);
 	slotRefresh();
 }
 //

@@ -3,7 +3,6 @@
 //
 class QListWidget;
 class QStackedWidget;
-class QSettings;
 class QDialogButtonBox;
 class QPushButton;
 //
@@ -18,17 +17,14 @@ private:
 	QListWidget*					qlwPreferencesList;
 	QStackedWidget*			qswPreferencesWidgets;
 	QDialogButtonBox*		qdbbButtons;
-	QSettings*						qsetAppSettings;
 	QPushButton*					qpbSetDefaults;
 private:
 	void createControls();
 	void setLayouts();
 	void setConnects();
 	void setMaximumSizePreferencesList();
-protected:
-	void resizeEvent(QResizeEvent *event);
 public:
-	QPreferencesDialog(QSettings* qsSettings, QWidget * parent = 0, Qt::WFlags f = Qt::WindowSystemMenuHint);
+	QPreferencesDialog(QWidget * parent = 0, Qt::WFlags f = Qt::WindowSystemMenuHint);
 	~QPreferencesDialog();
 private slots:
 	void slotSavePreferences();

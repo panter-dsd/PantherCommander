@@ -12,7 +12,7 @@ class QPreferenceGlobal : public QAbstractPreferencesPage
 	Q_OBJECT
 
 public:
-	QPreferenceGlobal(QSettings* qsetSettings, QWidget* parent = 0);
+	QPreferenceGlobal(QWidget* parent = 0);
 	~QPreferenceGlobal();
 
 	void saveSettings();

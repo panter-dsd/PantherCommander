@@ -2,9 +2,8 @@
 #define QABSTRACTPREFERENCESPAGE_H
 
 #include <QtGui/QWidget>
-#include <QtCore/QSettings>
+#include "appsettings.h"
 
-class QSettings;
 class QString;
 
 class QAbstractPreferencesPage : public QWidget
@@ -12,7 +11,7 @@ class QAbstractPreferencesPage : public QWidget
 	Q_OBJECT
 
 public:
-	QAbstractPreferencesPage(QSettings* qsetSettings, QWidget* parent = 0);
+	QAbstractPreferencesPage(QWidget* parent = 0);
 
 	virtual void saveSettings() = 0;
 	virtual void loadSettings() = 0;
@@ -26,7 +25,7 @@ Q_SIGNALS:
 	void modified();
 
 protected:
-	QSettings* qsetAppSettings;
+	AppSettings		*appSettings;
 };
 
 #endif // QABSTRACTPREFERENCESPAGE_H
