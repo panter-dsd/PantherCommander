@@ -45,6 +45,17 @@
 
 #include "dirsorter.h"
 
+//TODO: implement in-text binary search algorithm
+//TODO: support regexp patterns in file mask and search text
+//TODO: search for dirs - not for files only
+//TODO: separate thread for searching (dir entries + entries sort + text search)
+//TODO: implement search configuration gui
+//TODO: QProgressDialog --> QLabel (or QProgressBar at very least)
+//TODO: QTableWidget --> QTreeView
+//NOTE: No settings load/save!!!
+//NOTE: Remember about QtCodingStyle ;)
+//NOTE: Text-only content searching for now
+
 static QFileInfoList enumerateDir(const QDir& dir, QDirIterator::IteratorFlags iteratorFlags)
 {
 	QFileInfoList entries;
@@ -76,6 +87,25 @@ static QFileInfoList enumerateDir(const QDir& dir, QDirIterator::IteratorFlags i
 	}
 
 	return entries;
+}
+
+static bool findText(const QFileInfo& fileInfo, const QString& text)
+{
+	if(!fileInfo.isFile())
+		return true;
+
+	QFile file(fileInfo.absoluteFilePath());
+	if(file.open(QIODevice::ReadOnly))
+	{
+		QTextStream in(&file);
+		while(!in.atEnd())
+		{
+			if(in.readLine().contains(text))
+				return true;
+		}
+	}
+
+	return false;
 }
 
 
@@ -218,8 +248,19 @@ QFileInfoList FindFilesDialog::findFiles(const QFileInfoList& files, const QStri
 {
 	QProgressDialog progressDialog(this);
 	progressDialog.setCancelButtonText(tr("&Cancel"));
-	progressDialog.setRange(0, files.size());
 	progressDialog.setWindowTitle(tr("Find Files"));
+	progressDialog.setRange(0, files.size());
+
+/*	// Create a QFutureWatcher and conncect signals and slots.
+	QFutureWatcher<QFileInfo> futureWatcher;
+	connect(&futureWatcher, SIGNAL(started()), &progressDialog, SLOT(exec()));
+	connect(&futureWatcher, SIGNAL(finished()), &progressDialog, SLOT(reset()));
+	connect(&futureWatcher, SIGNAL(progressRangeChanged(int, int)), &progressDialog, SLOT(setRange(int, int)));
+	connect(&futureWatcher, SIGNAL(progressValueChanged(int)), &progressDialog, SLOT(setValue(int)));
+	connect(&progressDialog, SIGNAL(canceled()), &futureWatcher, SLOT(cancel()));
+
+	futureWatcher.setFuture(QtConcurrent::filtered(files, findText));
+	futureWatcher.waitForFinished();*/
 
 	QFileInfoList foundFiles;
 	for(int i = 0, n = files.size(); i < n; ++i)
@@ -230,28 +271,8 @@ QFileInfoList FindFilesDialog::findFiles(const QFileInfoList& files, const QStri
 		if(progressDialog.wasCanceled())
 			break;
 
-		if(!files[i].isFile())
-		{
+		if(findText(files[i], text))
 			foundFiles.append(files[i]);
-			continue;
-		}
-
-		QFile file(files[i].absoluteFilePath());
-		if(file.open(QIODevice::ReadOnly)) {
-			QString line;
-			QTextStream in(&file);
-			while(!in.atEnd())
-			{
-				if(progressDialog.wasCanceled())
-					break;
-				line = in.readLine();
-				if(line.contains(text))
-				{
-					foundFiles.append(files[i]);
-					break;
-				}
-			}
-		}
 	}
 	return foundFiles;
 }
