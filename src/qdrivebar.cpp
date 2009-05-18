@@ -9,13 +9,12 @@
 #include <QtCore/QTextStream>
 #include "qdrivebar.h"
 #include "flowlayout.h"
+#include "appsettings.h"
 
 #define TIMER_INTERVAL 2500
 
-QDriveBar::QDriveBar(QWidget* parent)
-		:QFrame(parent)
+QDriveBar::QDriveBar(QWidget* parent) : QFrame(parent)
 {
-	appSettings=AppSettings::getInstance();
 	qaLastChecked=0;
 	qagDrives=new QActionGroup(this);
 
@@ -26,7 +25,8 @@ QDriveBar::QDriveBar(QWidget* parent)
 void QDriveBar::slotRefresh()
 {
 	blockSignals(true);
-	const QStringList qslIgnoreList = appSettings->value("Global/IgnoredDrives").toStringList();
+	QSettings* settings = AppSettings::instance();
+	QStringList qslIgnoreList = settings->value("Global/IgnoredDrives").toStringList();
 	QList<QAction*> qalDrives=qagDrives->actions();
 	QFileIconProvider provider;
 #ifdef Q_WS_WIN

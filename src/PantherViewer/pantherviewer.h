@@ -1,5 +1,3 @@
-#ifndef PANTHERVIEWER_H
-#define PANTHERVIEWER_H
 /********************************************************************
 * Copyright (C) PanteR
 *-------------------------------------------------------------------
@@ -23,6 +21,9 @@
 * Author:		PanteR
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
+
+#ifndef PANTHERVIEWER_H
+#define PANTHERVIEWER_H
 //
 class QTabWidget;
 class QMenuBar;
@@ -33,7 +34,6 @@ class QActionGroup;
 #include <QMainWindow>
 #include "plainview.h"
 #include "abstractview.h"
-#include "appsettings.h"
 //
 class PantherViewer : public QMainWindow
 {
@@ -47,7 +47,7 @@ private:
 
 	QAction*						actionExit;
 	QAction*						actionCloseCurrentTab;
-	AppSettings					*appSettings;
+
 public:
 	PantherViewer(QWidget* parent=0,Qt::WFlags f=0);
 	~PantherViewer();

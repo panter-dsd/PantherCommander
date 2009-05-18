@@ -24,18 +24,18 @@
 
 #ifndef QFILEPANEL_H
 #define QFILEPANEL_H
-//
+
+#include <QWidget>
+
 class QLabel;
 class QActionGroup;
 class QTabBar;
 class QAction;
 class QPushButton;
 class QToolButton;
-//
-#include <QWidget>
-#include "appsettings.h"
+
 class FileWidget;
-//
+
 class QFilePanel : public QWidget
 {
 	Q_OBJECT
@@ -45,7 +45,6 @@ private:
 	FileWidget*						qflvCurrentFileList;
 	QLabel*							qlDiscInformation;
 	QToolButton*					qtbDriveButton;
-	AppSettings					*appSettings;
 
 	QAction*						actionAddTab;
 

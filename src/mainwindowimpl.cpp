@@ -25,7 +25,16 @@
 #include "mainwindowimpl.h"
 
 #include <QtGui>
+#include <QtGui/QAction>
+#include <QtGui/QComboBox>
+#include <QtGui/QFrame>
+#include <QtGui/QLabel>
+#include <QtGui/QPushButton>
+#include <QtGui/QSplitter>
+#include <QtGui/QStandardItemModel>
+#include <QtGui/QToolBar>
 //
+#include "appsettings.h"
 #include "findfilesdialog.h"
 #include "pantherviewer.h"
 #include "qdrivebar.h"
@@ -33,11 +42,9 @@
 #include "qfileoperationsdialog.h"
 #include "qpreferencesdialog.h"
 //
-MainWindowImpl::MainWindowImpl(QWidget* parent, Qt::WFlags f)
-	: QMainWindow(parent, f)
+MainWindowImpl::MainWindowImpl(QWidget* parent, Qt::WFlags f) : QMainWindow(parent, f)
 	, qlConsolePath(0)
 {
-	appSettings=AppSettings::getInstance();
 	resize(640, 480);
 	setAcceptDrops(true);
 
@@ -373,49 +380,51 @@ void MainWindowImpl::createCommandButtons()
 //
 void MainWindowImpl::saveSettings()
 {
-	appSettings->beginGroup("MainWindow");
-	appSettings->setValue("IsMaximized", isMaximized());
+	QSettings* settings = AppSettings::instance();
+	settings->beginGroup("MainWindow");
+	settings->setValue("IsMaximized", isMaximized());
 	if(!isMaximized())
 	{
-		appSettings->setValue("pos", pos());
-		appSettings->setValue("size", size());
+		settings->setValue("pos", pos());
+		settings->setValue("size", size());
 	}
-	appSettings->setValue("Splitter", qsplitSplitter->saveState());
-	appSettings->endGroup();
+	settings->setValue("Splitter", qsplitSplitter->saveState());
+	settings->endGroup();
 
-	appSettings->beginGroup("Global");
-	appSettings->setValue("CommandHistory", commandHistory());
-	appSettings->endGroup();
+	settings->beginGroup("Global");
+	settings->setValue("CommandHistory", commandHistory());
+	settings->endGroup();
 
 	saveToolBars();
 }
 //
 void MainWindowImpl::loadSettings()
 {
-	appSettings->beginGroup("MainWindow");
-	move(appSettings->value("pos", QPoint(0, 0)).toPoint());
-	resize(appSettings->value("size", QSize(640, 480)).toSize());
-	if(appSettings->value("IsMaximized", false).toBool())
+	QSettings* settings = AppSettings::instance();
+	settings->beginGroup("MainWindow");
+	move(settings->value("pos", QPoint(0, 0)).toPoint());
+	resize(settings->value("size", QSize(640, 480)).toSize());
+	if(settings->value("IsMaximized", false).toBool())
 		showMaximized();
-	qsplitSplitter->restoreState(appSettings->value("Splitter").toByteArray());
-	appSettings->endGroup();
+	qsplitSplitter->restoreState(settings->value("Splitter").toByteArray());
+	settings->endGroup();
 
-	appSettings->beginGroup("Global");
-	setCommandHistory(appSettings->value("CommandHistory").toStringList());
-	QStringList toolBarNames = appSettings->value("ToolBars").toStringList();
-	appSettings->endGroup();
+	settings->beginGroup("Global");
+	setCommandHistory(settings->value("CommandHistory").toStringList());
+	QStringList toolBarNames = settings->value("ToolBars").toStringList();
+	settings->endGroup();
 
 	if(toolBarNames.isEmpty())
 		toolBarNames.append("MainToolbar");
 	foreach(const QString& toolBarName, toolBarNames)
 		loadToolBar(toolBarName);
 
-	qdbDriveBarLeft->setVisible(appSettings->value("Interface/ShowDriveBar", true).toBool());
-	qdbDriveBarRight->setVisible(appSettings->value("Interface/ShowTwoDriveBar", true).toBool()
+	qdbDriveBarLeft->setVisible(settings->value("Interface/ShowDriveBar", true).toBool());
+	qdbDriveBarRight->setVisible(settings->value("Interface/ShowTwoDriveBar", true).toBool()
 				&& qdbDriveBarLeft->isVisible());
-	qlConsolePath->setVisible(appSettings->value("Interface/ShowCommandLine", true).toBool());
+	qlConsolePath->setVisible(settings->value("Interface/ShowCommandLine", true).toBool());
 	qcbConsoleCommand->setVisible(qlConsolePath->isVisible());
-	qfCommandButtons->setVisible(appSettings->value("Interface/ShowFunctionButtons", true).toBool());
+	qfCommandButtons->setVisible(settings->value("Interface/ShowFunctionButtons", true).toBool());
 }
 //
 void MainWindowImpl::showSplitterContextMenu(const QPoint& pos)
@@ -806,7 +815,8 @@ void MainWindowImpl::slotMkDir()
 	QComboBox* qcbDirName=new QComboBox(qdMkDirDialog);
 	qcbDirName->setEditable(true);
 //Load history
-	qcbDirName->addItems(appSettings->value("Global/MkDirHistory",QStringList()).toStringList());
+	QSettings* settings = AppSettings::instance();
+	qcbDirName->addItems(settings->value("Global/MkDirHistory",QStringList()).toStringList());
 	qcbDirName->setCurrentIndex(-1);
 //
 	QString fileName=qfpFocusedFilePanel->currentFileName();
@@ -855,8 +865,8 @@ void MainWindowImpl::slotMkDir()
 			QStringList qslMkDirHistory;
 			for (int i=0; i<qcbDirName->count(); i++)
 				qslMkDirHistory << qcbDirName->itemText(i);
-			appSettings->setValue("Global/MkDirHistory",qslMkDirHistory);
-			appSettings->sync();
+			settings->setValue("Global/MkDirHistory",qslMkDirHistory);
+			settings->sync();
 			//
 		}
 	}
@@ -876,18 +886,19 @@ void MainWindowImpl::loadToolBar(const QString& toolBarName)
 	qltbToolBarList << qtbToolBar;
 	if (toolBarName.isEmpty())
 		return;
-	int buttonsCount=appSettings->value("ToolBar_"+toolBarName+"/ButtonsCount",0).toInt();
+	QSettings* settings = AppSettings::instance();
+	int buttonsCount=settings->value("ToolBar_"+toolBarName+"/ButtonsCount",0).toInt();
 	QAction* action;
 	for (int i=0; i<buttonsCount; i++)
 	{
 		SToolBarButton button;
-		button.qsCommand=appSettings->value("ToolBar_"+toolBarName+"/Command_"+QString::number(i),"").toString();
-		button.qsParams=appSettings->value("ToolBar_"+toolBarName+"/Params_"+QString::number(i),"").toString();
-		button.qsWorkDir=appSettings->value("ToolBar_"+toolBarName+"/WorkDir_"+QString::number(i),"").toString();
-		button.qsIconFile=appSettings->value("ToolBar_"+toolBarName+"/IconFile_"+QString::number(i),"").toString();
-		button.qiIcon=appSettings->value("ToolBar_"+toolBarName+"/Icon_"+QString::number(i),"").value<QIcon>();
-		button.iconNumber=appSettings->value("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),-1).toInt();
-		button.qsCaption=appSettings->value("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),"").toString();
+		button.qsCommand=settings->value("ToolBar_"+toolBarName+"/Command_"+QString::number(i),"").toString();
+		button.qsParams=settings->value("ToolBar_"+toolBarName+"/Params_"+QString::number(i),"").toString();
+		button.qsWorkDir=settings->value("ToolBar_"+toolBarName+"/WorkDir_"+QString::number(i),"").toString();
+		button.qsIconFile=settings->value("ToolBar_"+toolBarName+"/IconFile_"+QString::number(i),"").toString();
+		button.qiIcon=settings->value("ToolBar_"+toolBarName+"/Icon_"+QString::number(i),"").value<QIcon>();
+		button.iconNumber=settings->value("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),-1).toInt();
+		button.qsCaption=settings->value("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),"").toString();
 
 		action=new QAction(button.qiIcon,button.qsCaption,this);
 		button.qaAction=action;
@@ -903,30 +914,31 @@ void MainWindowImpl::loadToolBar(const QString& toolBarName)
 //
 void MainWindowImpl::saveToolBars()
 {
+	QSettings* settings = AppSettings::instance();
 	QStringList qslToolBars;
 	for (int i=0; i<qltbToolBarList.count(); i++)
 	{
 		QString toolBarName=qltbToolBarList.at(0)->objectName();
 		qslToolBars << toolBarName;
 		int actionsCount=qltbToolBarList.at(0)->actions().count();
-		appSettings->remove("ToolBar_"+toolBarName);
-		appSettings->setValue("ToolBar_"+
+		settings->remove("ToolBar_"+toolBarName);
+		settings->setValue("ToolBar_"+
 						toolBarName+
 						"/ButtonsCount",actionsCount);
 		for (int i=0; i<actionsCount; i++)
 		{
 			SToolBarButton button=qmToolBarButtons.value(toolBarName+QString::number(i));
-			appSettings->setValue("ToolBar_"+toolBarName+"/Command_"+QString::number(i),button.qsCommand);
-			appSettings->setValue("ToolBar_"+toolBarName+"/Params_"+QString::number(i),button.qsParams);
-			appSettings->setValue("ToolBar_"+toolBarName+"/WorkDir_"+QString::number(i),button.qsWorkDir);
-			appSettings->setValue("ToolBar_"+toolBarName+"/IconFile_"+QString::number(i),button.qsIconFile);
-			appSettings->setValue("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),button.iconNumber);
-			appSettings->setValue("ToolBar_"+toolBarName+"/Icon_"+QString::number(i),button.qiIcon);
-			appSettings->setValue("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),button.qsCaption);
+			settings->setValue("ToolBar_"+toolBarName+"/Command_"+QString::number(i),button.qsCommand);
+			settings->setValue("ToolBar_"+toolBarName+"/Params_"+QString::number(i),button.qsParams);
+			settings->setValue("ToolBar_"+toolBarName+"/WorkDir_"+QString::number(i),button.qsWorkDir);
+			settings->setValue("ToolBar_"+toolBarName+"/IconFile_"+QString::number(i),button.qsIconFile);
+			settings->setValue("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),button.iconNumber);
+			settings->setValue("ToolBar_"+toolBarName+"/Icon_"+QString::number(i),button.qiIcon);
+			settings->setValue("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),button.qsCaption);
 		}
 	}
-	appSettings->setValue("Global/ToolBars",qslToolBars);
-	appSettings->sync();
+	settings->setValue("Global/ToolBars",qslToolBars);
+	settings->sync();
 }
 //
 QStringList MainWindowImpl::commandHistory() const

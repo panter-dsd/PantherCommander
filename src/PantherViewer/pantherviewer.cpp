@@ -21,14 +21,16 @@
 * Author:		PanteR
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
-#include <QtGui>
+
 #include "pantherviewer.h"
 
-PantherViewer::PantherViewer(QWidget* parent,Qt::WFlags f)
-		:QMainWindow(parent,f)
+#include <QtGui>
+
+#include "appsettings.h"
+
+PantherViewer::PantherViewer(QWidget* parent, Qt::WFlags f) : QMainWindow(parent, f)
 {
-	appSettings=AppSettings::getInstance();
-	this->setWindowTitle(tr("PantherViewer"));
+	setWindowTitle(tr("PantherViewer"));
 	createControls();
 	setLayouts();
 	createActions();
@@ -134,24 +136,26 @@ void PantherViewer::createToolBar()
 //
 void PantherViewer::loadSettings()
 {
-	this->move(appSettings->value("PantherViewer/pos",QPoint(0,0)).toPoint());
-	this->resize(appSettings->value("PantherViewer/size",QSize(640,480)).toSize());
-	bool bIsMaximized=appSettings->value("PantherViewer/IsMaximized",false).toBool();
+	QSettings* settings = AppSettings::instance();
+	move(settings->value("PantherViewer/pos",QPoint(0,0)).toPoint());
+	resize(settings->value("PantherViewer/size",QSize(640,480)).toSize());
+	bool bIsMaximized = settings->value("PantherViewer/IsMaximized",false).toBool();
 	if (bIsMaximized)
-		this->setWindowState(Qt::WindowMaximized);
+		setWindowState(Qt::WindowMaximized);
 }
 //
 void PantherViewer::saveSettings()
 {
+	QSettings* settings = AppSettings::instance();
 	if (this->windowState()!=Qt::WindowMaximized)
 	{
-		appSettings->setValue("PantherViewer/pos",this->pos());
-		appSettings->setValue("PantherViewer/size",this->size());
-		appSettings->setValue("PantherViewer/IsMaximized",false);
+		settings->setValue("PantherViewer/pos",this->pos());
+		settings->setValue("PantherViewer/size",this->size());
+		settings->setValue("PantherViewer/IsMaximized",false);
 	}
 	else
-		appSettings->setValue("PantherViewer/IsMaximized",true);
-	appSettings->sync();
+		settings->setValue("PantherViewer/IsMaximized",true);
+	settings->sync();
 }
 //
 void PantherViewer::viewFile(const QString& fileName)

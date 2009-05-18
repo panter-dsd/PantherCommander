@@ -2,7 +2,6 @@
 #define QINTERFACEPREFERENCE_H
 //
 #include "qabstractpreferencespage.h"
-#include "appsettings.h"
 //
 class QCheckBox;
 class QGroupBox;
@@ -10,8 +9,8 @@ class QGroupBox;
 class QInterfacePreference : public QAbstractPreferencesPage
 {
 	Q_OBJECT
+
 private:
-	AppSettings						*appSettings;
 	QGroupBox							*qgbGlobal;
 	QCheckBox							*qchbShowDriveBar;
 	QCheckBox							*qchbShowTwoDriveBar;

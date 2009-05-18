@@ -1,27 +1,26 @@
 #ifndef APPSETTINGS_H
 #define APPSETTINGS_H
 
-#include <QSettings>
+#include <QtCore/QSettings>
 
 class AppSettings : public QSettings
 {
-//	Q_OBJECT
+	Q_OBJECT
+
 public:
-	static AppSettings *getInstance();
+	static AppSettings *instance();
 	virtual ~AppSettings();
-	void setSettings(QSettings *settings) {appSettings = settings;}
-	QSettings *settings() {return appSettings;}
+
 	void settingsChange();
 
-private:
-	AppSettings ();
-	static AppSettings *instance;
-
-private:
-	QSettings		*appSettings;
+protected:
+	AppSettings();
 
 signals:
 	void settingsChanged();
+
+private:
+	static AppSettings *pInstance;
 };
 
 #endif // APPSETTINGS_H

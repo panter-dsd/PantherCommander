@@ -24,9 +24,6 @@ public:
 
 Q_SIGNALS:
 	void modified();
-
-protected:
-	AppSettings		*appSettings;
 };
 
 #endif // QABSTRACTPREFERENCESPAGE_H

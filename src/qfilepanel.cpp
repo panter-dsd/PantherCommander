@@ -32,6 +32,7 @@
 #include "filewidget.h"
 #include "qfileoperationsthread.h"
 #include "qselectdiscdialog.h"
+#include "appsettings.h"
 
 #ifdef Q_WS_WIN
 	#include <windows.h>
@@ -41,7 +42,6 @@
 QFilePanel::QFilePanel(QWidget* parent) : QWidget(parent),
 	m_currentIndex(-1)
 {
-	appSettings=AppSettings::getInstance();
 	createWidgets();
 	createActions();
 
@@ -195,11 +195,12 @@ void QFilePanel::saveSettings()
 		1 - for every tab
 		2 - no history at all
 	*/
-	int historyType = appSettings->value("NavigationHistoryType", 0).toInt();
-	appSettings->remove(objectName());
-	appSettings->beginGroup(objectName());
-	appSettings->setValue("TabsCount", count);
-	appSettings->setValue("CurrentTab", currentIndex);
+	QSettings* settings = AppSettings::instance();
+	int historyType = settings->value("NavigationHistoryType", 0).toInt();
+	settings->remove(objectName());
+	settings->beginGroup(objectName());
+	settings->setValue("TabsCount", count);
+	settings->setValue("CurrentTab", currentIndex);
 	for(int i = 0; i < count; ++i)
 	{
 		// flush state to the current tab
@@ -236,16 +237,16 @@ void QFilePanel::saveSettings()
 			stream << lastVisitedDir;
 			stream << headerData;
 		}
-		appSettings->setValue(QString("Tab_%1").arg(i), data);*/
+		settings->setValue(QString("Tab_%1").arg(i), data);*/
 
 		if(historyType == 1)
-			appSettings->setValue(QString("History_%1").arg(i), history);
-		appSettings->setValue(QString("Path_%1").arg(i), lastVisitedDir);
-		appSettings->setValue(QString("State_%1").arg(i), headerData);
+			settings->setValue(QString("History_%1").arg(i), history);
+		settings->setValue(QString("Path_%1").arg(i), lastVisitedDir);
+		settings->setValue(QString("State_%1").arg(i), headerData);
 	}
 	if(historyType <= 0 || historyType > 2)
-		appSettings->setValue("History", qflvCurrentFileList->history());
-	appSettings->endGroup();
+		settings->setValue("History", qflvCurrentFileList->history());
+	settings->endGroup();
 }
 
 void QFilePanel::loadSettings()
@@ -255,10 +256,11 @@ void QFilePanel::loadSettings()
 		1 - for every tab
 		2 - no history at all
 	*/
-	int historyType = appSettings->value("NavigationHistoryType", 0).toInt();
-	appSettings->beginGroup(objectName());
-	int count = appSettings->value("TabsCount", 1).toInt();
-	int currentIndex = appSettings->value("CurrentTab", 0).toInt();
+	QSettings* settings = AppSettings::instance();
+	int historyType = settings->value("NavigationHistoryType", 0).toInt();
+	settings->beginGroup(objectName());
+	int count = settings->value("TabsCount", 1).toInt();
+	int currentIndex = settings->value("CurrentTab", 0).toInt();
 	for(int i = 0; i < count; ++i)
 	{
 		qint32 magic;
@@ -283,9 +285,9 @@ void QFilePanel::loadSettings()
 
 		history.clear();
 		if(historyType == 1)
-			history = appSettings->value(QString("History_%1").arg(i)).toStringList();
-		lastVisitedDir = appSettings->value(QString("Path_%1").arg(i)).toString();
-		headerData = appSettings->value(QString("State_%1").arg(i)).toByteArray();
+			history = settings->value(QString("History_%1").arg(i)).toStringList();
+		lastVisitedDir = settings->value(QString("Path_%1").arg(i)).toString();
+		headerData = settings->value(QString("State_%1").arg(i)).toByteArray();
 
 		QByteArray data;
 		{
@@ -320,11 +322,11 @@ void QFilePanel::loadSettings()
 		}
 	}
 	if(historyType <= 0 || historyType > 2)
-		qflvCurrentFileList->setHistory(appSettings->value("History").toStringList());
-	appSettings->endGroup();
+		qflvCurrentFileList->setHistory(settings->value("History").toStringList());
+	settings->endGroup();
 
-	qtbDriveButton->setVisible(appSettings->value("Interface/ShowDriveButton", true).toBool());
-	qtabbTabs->setVisible(appSettings->value("Interface/ShowTabs", true).toBool());
+	qtbDriveButton->setVisible(settings->value("Interface/ShowDriveButton", true).toBool());
+	qtabbTabs->setVisible(settings->value("Interface/ShowTabs", true).toBool());
 }
 //
 void QFilePanel::setDisc(const QString& name)

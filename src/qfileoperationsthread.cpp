@@ -50,14 +50,16 @@ void copyDirTime(const QString& sourceDir,const QString& destDir);
 #  define INVALID_FILE_ATTRIBUTES (DWORD (-1))
 #endif
 #endif
-//
+
+#include "appsettings.h"
+
 QFileOperationsThread::QFileOperationsThread(QObject* parent) : QThread(parent)
 {
-	appSettings=AppSettings::getInstance();
-	appSettings->beginGroup("Global");
-	iLocalBufferSize = appSettings->value("LocalBufferSize", 10485760).toInt();
-	iNoLocalBufferSize = appSettings->value("NoLocalBufferSize", 65536).toInt();
-	appSettings->endGroup();
+	QSettings* settings = AppSettings::instance();
+	settings->beginGroup("Global");
+	iLocalBufferSize = settings->value("LocalBufferSize", 10485760).toInt();
+	iNoLocalBufferSize = settings->value("NoLocalBufferSize", 65536).toInt();
+	settings->endGroup();
 
 	bStopped=false;
 	isPaused=false;

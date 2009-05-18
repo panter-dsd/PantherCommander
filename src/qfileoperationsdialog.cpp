@@ -21,13 +21,16 @@
 * Author:		PanteR
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
-#include  <QtGui>
+
 #include "qfileoperationsdialog.h"
+
+#include  <QtGui>
+
+#include "appsettings.h"
 
 QFileOperationsDialog::QFileOperationsDialog(QWidget * parent,Qt::WindowFlags f)
 		:QDialog(parent,f)
 {
-	appSettings=AppSettings::getInstance();
 	createControls();
 	setLayouts();
 	createActions();
@@ -397,18 +400,20 @@ void QFileOperationsDialog::slotShowHideJobList()
 //
 void QFileOperationsDialog::saveSettings()
 {
-	appSettings->beginGroup("FileOperationsDialog");
-	appSettings->setValue("size", size());
-	appSettings->setValue("ShowJobsList", actionShowHideJobList->isChecked());
-	appSettings->endGroup();
+	QSettings* settings = AppSettings::instance();
+	settings->beginGroup("FileOperationsDialog");
+	settings->setValue("size", size());
+	settings->setValue("ShowJobsList", actionShowHideJobList->isChecked());
+	settings->endGroup();
 }
 //
 void QFileOperationsDialog::loadSettings()
 {
-	appSettings->beginGroup("FileOperationsDialog");
-	resize(appSettings->value("size", QSize(200, 100)).toSize());
-	actionShowHideJobList->setChecked(appSettings->value("ShowJobsList", false).toBool());
-	appSettings->endGroup();
+	QSettings* settings = AppSettings::instance();
+	settings->beginGroup("FileOperationsDialog");
+	resize(settings->value("size", QSize(200, 100)).toSize());
+	actionShowHideJobList->setChecked(settings->value("ShowJobsList", false).toBool());
+	settings->endGroup();
 }
 //
 void QFileOperationsDialog::slotOperationError()
