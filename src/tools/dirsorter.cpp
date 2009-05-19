@@ -101,10 +101,10 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 	{
 		bool bDot1 = (f1->item.fileName() == QLatin1String(".") || f1->item.fileName() == QLatin1String(".."));
 		bool bDot2 = (f2->item.fileName() == QLatin1String(".") || f2->item.fileName() == QLatin1String(".."));
-		if(sort_flags & QDir::DirsFirst)
-			return (bDot1 && bDot2 ? f1->item.fileName() == QLatin1String(".") : bDot1);
-		if(sort_flags & QDir::DirsLast)
-			return (bDot1 && bDot2 ? f1->item.fileName() != QLatin1String(".") : !bDot1);
+		if((sort_flags & QDir::DirsFirst) && (bDot1 && bDot2))
+			return f1->item.fileName() == QLatin1String(".");
+		if((sort_flags & QDir::DirsFirst) && (bDot1 && bDot2))
+			return f1->item.fileName() != QLatin1String(".");
 
 		if((sort_flags & QDir::DirsFirst) && (f1->item.isDir() != f2->item.isDir()))
 			return f1->item.isDir();
