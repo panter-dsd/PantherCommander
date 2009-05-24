@@ -1346,7 +1346,6 @@ void MainWindowImpl::slotSetDisc(const QString& path)
 
 void MainWindowImpl::slotTestingFileDialog()
 {
-	QFileDialog* dialog = new QFileDialog(this);
-	dialog->exec();
-	delete dialog;
+	QFileDialog dialog(this);
+	dialog.exec();
 }
