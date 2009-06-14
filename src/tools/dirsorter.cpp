@@ -97,19 +97,19 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 	const DirSortItem* f1 = &n1;
 	const DirSortItem* f2 = &n2;
 
-	if(f1->item.isDir() || f2->item.isDir())
+	if((sort_flags & QDir::DirsFirst) && (f1->item.isDir() != f2->item.isDir()))
+		return f1->item.isDir();
+	if((sort_flags & QDir::DirsLast) && (f1->item.isDir() != f2->item.isDir()))
+		return !f1->item.isDir();
+
+	if((sort_flags & QDir::DirsFirst) || (sort_flags & QDir::DirsLast))
 	{
 		bool dotOrDotDot1 = (f1->item.fileName() == QLatin1String(".") || f1->item.fileName() == QLatin1String(".."));
 		bool dotOrDotDot2 = (f2->item.fileName() == QLatin1String(".") || f2->item.fileName() == QLatin1String(".."));
-		if((sort_flags & QDir::DirsFirst) && (dotOrDotDot1 == dotOrDotDot2))
-			return (f1->item.fileName() == QLatin1String("."));
-		if((sort_flags & QDir::DirsFirst) && (dotOrDotDot1 == dotOrDotDot2))
-			return (f1->item.fileName() != QLatin1String("."));
-
-		if((sort_flags & QDir::DirsFirst) && (f1->item.isDir() != f2->item.isDir()))
-			return f1->item.isDir();
-		if((sort_flags & QDir::DirsLast) && (f1->item.isDir() != f2->item.isDir()))
-			return !f1->item.isDir();
+		if(dotOrDotDot1 && dotOrDotDot2)
+			return !(sort_flags & QDir::Reversed) && f1->item.fileName().size() == 1;
+		else if(dotOrDotDot1 != dotOrDotDot2)
+			return !(sort_flags & QDir::Reversed) && dotOrDotDot1;
 	}
 
 	int r = 0;
@@ -160,6 +160,9 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 			: f1->filename_cache.compare(f2->filename_cache);
 	}
 
+	if (r == 0) // Enforce an order - the order the items appear in the array
+		r = (&n1) - (&n2);
+
 	if(sort_flags & QDir::Reversed)
 		return r > 0;
 
@@ -181,7 +184,7 @@ QFileInfoList Dir::sortFileList(QFileInfoList& infos, QDir::SortFlags sort)
 			DirSortItem* si= new DirSortItem[n];
 			for(int i = 0; i < n; ++i)
 				si[i].item = infos.at(i);
-			qStableSort(si, si + n, DirSortItemComparator(sort));
+			qSort(si, si + n, DirSortItemComparator(sort));
 			// put them back in the list(s)
 			for(int i = 0; i < n; ++i)
 				ret.append(si[i].item);
