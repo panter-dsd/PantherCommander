@@ -30,7 +30,7 @@
 #include <QtGui/QFileIconProvider>
 #include <QtCore/QDir>
 #include <QtCore/QFuture>
-#include <QtCore/QFSFileEngine>
+#include <QtCore/QAbstractFileEngine>
 #include <QtCore/QFileSystemWatcher>
 #ifdef Q_WS_WIN
 	#include <windows.h>
@@ -55,8 +55,10 @@ public:
 	}
 
 	bool isCaseSensitive() const {
-		QFSFileEngine fe(mFileInfo.absoluteFilePath());
-		return fe.caseSensitive();
+		QAbstractFileEngine* fe = QAbstractFileEngine::create(mFileInfo.absoluteFilePath());
+		bool cs = fe->caseSensitive();
+		delete fe;
+		return cs;
 	}
 	QFile::Permissions permissions() const {
 		return mPermissions;
@@ -137,6 +139,7 @@ public:
 		SIZE,
 		TIME_LAST_UPDATE,
 		ATTR};
+
 private:
 	QDir									qdCurrentDir;
 	QList<QPCFileInfo>			infoList;
@@ -144,47 +147,78 @@ private:
 	QIcon									qiFolderIcon;
 	QIcon									qiFileIcon;
 	QFileIconProvider*				provider;
-	QFileSystemWatcher			fileSystemWatcher;
+	QFileSystemWatcher*			fileSystemWatcher;
 	int										dirsCount;
 	int										filesCount;
 	qint64									filesSize;
 public:
-	QFileListModel(QObject *parent = 0);
-	~QFileListModel();
-	virtual void setNameFilterDisables(bool) {;}
+	explicit QFileListModel(QObject* parent = 0);
+	virtual ~QFileListModel();
+
+	void setNameFilterDisables(bool) {;}
+
+	QDir::Filters filter() const
+	{return qdCurrentDir.filter();}
 	void setFilter(QDir::Filters filters);
-	virtual void setReadOnly(bool) {;}
-	qint64 size(const QModelIndex& index) const;
-	QFile::Permissions permissions(const QModelIndex& index) const;
-	QString filePath(const QModelIndex& index) const;
-	QString fileName(const QModelIndex& index) const;
+
+	bool isReadOnly() const
+	{ return false; }
+	void setReadOnly(bool)
+	{}
+
+	QFileIconProvider* iconProvider() const
+	{ return provider; }
+	void setIconProvider(QFileIconProvider *iconProvider)
+	{ delete provider; provider = iconProvider; }
+
 	QDir rootDirectory() const;
-	QString rootPath() const {return qdCurrentDir.absolutePath();}
-	QVariant myComputer() const;
+	QString rootPath() const
+	{return qdCurrentDir.absolutePath();}
 	QModelIndex setRootPath(const QString& path);
-	QDir::Filters filter() const {return qdCurrentDir.filter();}
-	QFileIconProvider *iconProvider() const {return provider;}
-	void setIconProvider(QFileIconProvider *iconProvider) {delete provider; provider=iconProvider;}
+
 	QModelIndex index(const QString& fileName) const;
+	bool isDir(const QModelIndex& index) const;
+	QString fileName(const QModelIndex& index) const;
+	QString filePath(const QModelIndex& index) const;
+	QFile::Permissions permissions(const QModelIndex& index) const;
+	qint64 size(const QModelIndex& index) const;
+	QVariant myComputer() const;
+
+	QStringList mimeTypes() const;
+	QMimeData* mimeData(const QModelIndexList& indexes) const;
+	bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent);
+	Qt::DropActions supportedDropActions() const;
+
+	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+	bool setData(const QModelIndex& index, const QVariant& value, int role);
+	Qt::ItemFlags flags(const QModelIndex& index) const;
+	int columnCount(const QModelIndex& parent = QModelIndex()) const
+	{ return 5; }
+	int rowCount(const QModelIndex& parent = QModelIndex()) const
+	{ return infoList.count(); }
+
+	QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
+	QModelIndex parent(const QModelIndex& index) const;
 	bool hasChildren(const QModelIndex &parent) const;
 
+	int sortColumn() const
+	{return 1;}
+	Qt::SortOrder sortOrder() const
+	{return Qt::AscendingOrder;}
 
-	QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
-	QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
-	QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
-	bool setData(const QModelIndex &index, const QVariant &value,int role);
-	QModelIndex parent(const QModelIndex&) const;
-	Qt::ItemFlags flags ( const QModelIndex & index ) const;
-	int rowCount(const QModelIndex& =QModelIndex()) const {return infoList.count();}
-	int columnCount(const QModelIndex& =QModelIndex()) const {return 5;}
-	int sortColumn() const {return 1;}
-	Qt::SortOrder sortOrder() const {return Qt::AscendingOrder;}
-	bool isDir(const QModelIndex& index) const;
-	QString getSizeStr(double size) const;
 private:
+	inline bool indexValid(const QModelIndex& index) const
+	{
+		return (index.isValid() && index.model() == this
+				&& index.row() < rowCount(index.parent())
+				&& index.column() < columnCount(index.parent()));
+	}
+	static QString size(qint64 bytes);
+
 	void getFileList();
-	static void getIcons(QList<QPCFileInfo>* info,QFileIconProvider* prov);
-	static void getInfoList(QFileInfoList *fileInfoList,const QDir& dir);
+	static void getIcons(QList<QPCFileInfo>* info, QFileIconProvider* prov);
+	static void getInfoList(const QDir& dir, QFileInfoList* infos);
 public slots:
 	void slotRefresh();
 signals:
