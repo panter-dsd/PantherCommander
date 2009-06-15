@@ -25,7 +25,6 @@ SOURCES	+= $$PWD/main.cpp \
 	$$PWD/qselectdiscdialog.cpp
 
 include( $$PWD/dialogs/dialogs.pri )
-#include( $$PWD/fileengines/fileengines.pri )
 include( $$PWD/models/models.pri )
 include( $$PWD/PantherViewer/pantherviewer.pri )
 include( $$PWD/Preferences/preferences.pri )
