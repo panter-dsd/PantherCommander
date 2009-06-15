@@ -29,6 +29,7 @@
 
 #include <QtGui/QAction>
 #include <QtGui/QAbstractProxyModel>
+//#include <QtGui/QFileSystemModel>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
 #include <QtGui/QTreeView>
@@ -147,7 +148,7 @@ public:
 	inline QModelIndex setCurrentIndex(const QModelIndex& sourceIndex) const;
 	inline QModelIndex select(const QModelIndex& sourceIndex) const;
 
-	static QString size(qint64 bytes);
+	QString size(qint64 bytes) const;
 	void updateDirInfo();
 
 	void _q_rowsInserted(const QModelIndex& parent, int start, int end);
@@ -166,6 +167,7 @@ public:
 
 	FileWidget* q_ptr;
 
+//	QFileSystemModel* model;
 	QFileListModel* model;
 	QAbstractProxyModel* proxyModel;
 	QTreeView* treeView;

@@ -31,7 +31,6 @@
 
 #include <QtGui/QActionGroup>
 #include <QtGui/QApplication>
-#include <QtGui/QFileSystemModel>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QHeaderView>
 #include <QtGui/QKeyEvent>
@@ -90,11 +89,11 @@ void FileWidgetPrivate::createWidgets()
 //	model = new QFileSystemModel(q);
 	model = new QFileListModel(q);
 	model->setObjectName(QLatin1String("_filesystem_model"));
-#ifdef Q_WS_MAC
+/*#ifdef Q_WS_MAC
 	model->setNameFilterDisables(true);
 #else
 	model->setNameFilterDisables(false);
-#endif
+#endif*/
 	QDir::Filters filters = QDir::AllDirs | QDir::Files | QDir::Drives;
 	filters |= QDir::Readable | QDir::Writable | QDir::Executable;
 	filters |= QDir::Modified | QDir::Hidden | QDir::System;
@@ -124,11 +123,10 @@ void FileWidgetPrivate::createWidgets()
 	//treeView->setEditTriggers(QAbstractItemView::AnyKeyPressed);//QAbstractItemView::SelectedClicked);
 	treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 #ifndef QT_NO_DRAGANDDROP
-//treeView->setSupportedDragActions(Qt::CopyAction | Qt::MoveAction | Qt::LinkAction);
-//	treeView->setAcceptDrops(true);
-//	treeView->setDragEnabled(true);
-//	treeView->setDragDropMode(QAbstractItemView::DragDrop);
-	treeView->setDragDropMode(QAbstractItemView::InternalMove);
+	treeView->setAcceptDrops(true);
+	treeView->setDragEnabled(true);
+	treeView->setDragDropMode(QAbstractItemView::DragDrop);
+//	treeView->setDragDropMode(QAbstractItemView::InternalMove);
 #endif
 //	treeView->setModel(proxyModel);
 	treeView->setModel(model);
@@ -402,8 +400,9 @@ QModelIndex FileWidgetPrivate::select(const QModelIndex& sourceIndex) const
 	return index;
 }
 
-QString FileWidgetPrivate::size(qint64 bytes)
+QString FileWidgetPrivate::size(qint64 bytes) const
 {
+	Q_Q(const FileWidget);
 	// According to the Si standard KB is 1000 bytes, KiB is 1024
 	// but on windows sizes are calculated by dividing by 1024 so we do what they do.
 	const qint64 kb = 1024;
@@ -411,14 +410,14 @@ QString FileWidgetPrivate::size(qint64 bytes)
 	const qint64 gb = 1024 * mb;
 	const qint64 tb = 1024 * gb;
 	if (bytes >= tb)
-		return QFileSystemModel::tr("%1 TB").arg(QLocale().toString(qreal(bytes) / tb, 'f', 3));
+		return QFileSystemModel::tr("%1 TB").arg(q->locale().toString(qreal(bytes) / tb, 'f', 3));
 	if (bytes >= gb)
-		return QFileSystemModel::tr("%1 GB").arg(QLocale().toString(qreal(bytes) / gb, 'f', 2));
+		return QFileSystemModel::tr("%1 GB").arg(q->locale().toString(qreal(bytes) / gb, 'f', 2));
 	if (bytes >= mb)
-		return QFileSystemModel::tr("%1 MB").arg(QLocale().toString(qreal(bytes) / mb, 'f', 1));
+		return QFileSystemModel::tr("%1 MB").arg(q->locale().toString(qreal(bytes) / mb, 'f', 1));
 	if (bytes >= kb)
-		return QFileSystemModel::tr("%1 KB").arg(QLocale().toString(bytes / kb));
-	return QFileSystemModel::tr("%1 bytes").arg(QLocale().toString(bytes));
+		return QFileSystemModel::tr("%1 KB").arg(q->locale().toString(bytes / kb));
+	return QFileSystemModel::tr("%1 bytes").arg(q->locale().toString(bytes));
 }
 
 void FileWidgetPrivate::updateDirInfo()
@@ -598,6 +597,12 @@ void FileWidgetPrivate::_q_pathChanged(const QString& newPath)
 
 	pathLineEdit->setText(path);
 
+/*	if(path.endsWith(QLatin1Char('/')))
+		d->completer->setCompletionPrefix(path);
+	else
+		d->completer->setCompletionPrefix(path + QLatin1Char('/'));
+*/
+
 	dirInfo.clear();
 
 	QDir dir(model->rootDirectory());
@@ -657,15 +662,11 @@ void FileWidgetPrivate::_q_navigateToParent()
 
 	QString newDirectory;
 	QDir dir(model->rootDirectory());
-	if(dir.isRoot())
-	{
-		newDirectory = model->myComputer().toString();
-	}
-	else
-	{
-		dir.cdUp();
+	if(!dir.isRoot() && dir.cdUp())
 		newDirectory = dir.absolutePath();
-	}
+	if(newDirectory.isEmpty())
+		newDirectory = model->myComputer().toString();
+
 	const QModelIndex idx = rootIndex();
 	q->setDirectory(newDirectory);
 	(void)setCurrentIndex(idx);
@@ -823,13 +824,11 @@ void FileWidget::setDirectory(const QString& directory)
 #ifdef Q_WS_WIN
 /*3*/	qt_ntfs_permission_lookup++;
 #endif
-	if(QFileOperationsThread::isLocalFileSystem(newDirectory))
-		newDirectory = QDir::toNativeSeparators(newDirectory);
 	QDir dir(newDirectory);
 	bool isReadable = dir.isReadable();
 #ifdef Q_WS_WIN
-	if(newDirectory.startsWith(QLatin1String("\\\\")))
-		isReadable |= (newDirectory.split(QLatin1Char('\\'), QString::SkipEmptyParts).count() == 1);
+	if(newDirectory.startsWith(QLatin1String("//")))
+		isReadable |= (newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1);
 #endif
 	if(!isReadable)
 	{
@@ -856,13 +855,7 @@ void FileWidget::setDirectory(const QString& directory)
 	d->newFolderAction->setEnabled(d->model->flags(root) & Qt::ItemIsDropEnabled);
 	if(root != d->rootIndex())
 	{
-/*		if(directory.endsWith(QLatin1Char('/')))
-			d->completer->setCompletionPrefix(newDirectory);
-		else
-			d->completer->setCompletionPrefix(newDirectory + QLatin1Char('/'));
-*/
 		d->setRootIndex(root);
-
 		emit directoryEntered(newDirectory);
 	}
 
