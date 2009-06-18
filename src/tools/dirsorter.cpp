@@ -92,6 +92,13 @@ public:
 	bool operator()(const DirSortItem&, const DirSortItem&);
 };
 
+static bool isDotOrDotDot(const QString& fname)
+{
+	const int fnameSize = fname.size();
+	return (fnameSize > 0 && fname[0] == QLatin1Char('.')
+			&& (fnameSize == 1 || (fnameSize == 2 && fname[1] == QLatin1Char('.'))));
+}
+
 bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem& n2)
 {
 	const DirSortItem* f1 = &n1;
@@ -104,8 +111,8 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 
 	if((sort_flags & QDir::DirsFirst) || (sort_flags & QDir::DirsLast))
 	{
-		bool dotOrDotDot1 = (f1->item.fileName() == QLatin1String(".") || f1->item.fileName() == QLatin1String(".."));
-		bool dotOrDotDot2 = (f2->item.fileName() == QLatin1String(".") || f2->item.fileName() == QLatin1String(".."));
+		bool dotOrDotDot1 = isDotOrDotDot(f1->item.fileName());
+		bool dotOrDotDot2 = isDotOrDotDot(f2->item.fileName());
 		if(dotOrDotDot1 && dotOrDotDot2)
 			return !(sort_flags & QDir::Reversed) && f1->item.fileName().size() == 1;
 		else if(dotOrDotDot1 != dotOrDotDot2)
