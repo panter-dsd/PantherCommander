@@ -410,14 +410,14 @@ QString FileWidgetPrivate::size(qint64 bytes) const
 	const qint64 gb = 1024 * mb;
 	const qint64 tb = 1024 * gb;
 	if (bytes >= tb)
-		return QFileSystemModel::tr("%1 TB").arg(q->locale().toString(qreal(bytes) / tb, 'f', 3));
+		return FileWidget::tr("%1 TB").arg(q->locale().toString(qreal(bytes) / tb, 'f', 3));
 	if (bytes >= gb)
-		return QFileSystemModel::tr("%1 GB").arg(q->locale().toString(qreal(bytes) / gb, 'f', 2));
+		return FileWidget::tr("%1 GB").arg(q->locale().toString(qreal(bytes) / gb, 'f', 2));
 	if (bytes >= mb)
-		return QFileSystemModel::tr("%1 MB").arg(q->locale().toString(qreal(bytes) / mb, 'f', 1));
+		return FileWidget::tr("%1 MB").arg(q->locale().toString(qreal(bytes) / mb, 'f', 1));
 	if (bytes >= kb)
-		return QFileSystemModel::tr("%1 KB").arg(q->locale().toString(bytes / kb));
-	return QFileSystemModel::tr("%1 bytes").arg(q->locale().toString(bytes));
+		return FileWidget::tr("%1 KB").arg(q->locale().toString(bytes / kb));
+	return FileWidget::tr("%1 bytes").arg(q->locale().toString(bytes));
 }
 
 void FileWidgetPrivate::updateDirInfo()
@@ -942,8 +942,8 @@ void FileWidget::slotRename()
 	}*/
 
 #ifndef Q_CC_MSVC
-	#warning "TODO: since neigher model nor view can not use editorForIndex"
 	#warning "TODO: shedule this work to custom delegate"
+	#warning "TODO: since neigher model nor view can not use editorForIndex"
 #endif
 /*1	QString qsFileName=qleRenameEditor->text();
 	int pos = qsFileName.lastIndexOf(".");
