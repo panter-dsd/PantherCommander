@@ -387,7 +387,7 @@ QZipReader::FileInfo& QZipReader::FileInfo::operator=(const FileInfo &other)
 
 bool QZipReader::FileInfo::isValid() const
 {
-	return (isDir || crc32);
+    return (isDir || isFile || isSymLink);
 }
 
 class QZipPrivate
