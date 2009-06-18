@@ -73,7 +73,7 @@ void QFileListModel::getFileList()
 //
 QModelIndex QFileListModel::index(int row, int column, const QModelIndex& parent) const
 {
-	if(!indexValid(parent))
+	if(row < 0 || column < 0 || row >= rowCount(parent) || column >= columnCount(parent))
 		return QModelIndex();
 	return createIndex(row, column);//, row * column + 1);
 }
@@ -302,7 +302,7 @@ void QFileListModel::slotRefresh()
 	{
 		if (infoList.count()<=i)
 		{
-			beginInsertRows(QModelIndex(), infoList.count(), infoList.count());
+			beginInsertRows(createIndex(0, 0), infoList.count(), infoList.count());
 			infoList.append(QPCFileInfo(infos.at(i)));
 			endInsertRows();
 			continue;
