@@ -50,10 +50,11 @@ class QZipReaderPrivate;
 class QZipReader
 {
 public:
-    QZipReader(const QString &fileName, QIODevice::OpenMode mode = QIODevice::ReadOnly );
-
+    QZipReader(const QString &fileName, QIODevice::OpenMode mode = QIODevice::ReadOnly);
     explicit QZipReader(QIODevice *device);
-    ~QZipReader();
+    virtual ~QZipReader();
+
+    QIODevice* device() const;
 
     bool isReadable() const;
     bool exists() const;

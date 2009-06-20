@@ -49,10 +49,12 @@ class QZipWriterPrivate;
 class QZipWriter
 {
 public:
-    QZipWriter(const QString &fileName, QIODevice::OpenMode mode = (QIODevice::WriteOnly | QIODevice::Truncate) );
+    QZipWriter(const QString &fileName, QIODevice::OpenMode mode = (QIODevice::WriteOnly | QIODevice::Truncate));
 
     explicit QZipWriter(QIODevice *device);
     ~QZipWriter();
+
+    QIODevice* device() const;
 
     bool isWritable() const;
     bool exists() const;
