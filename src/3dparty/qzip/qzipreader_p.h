@@ -73,7 +73,7 @@ public:
         QFile::Permissions permissions;
         uint crc32;
         qint64 size;
-        QDateTime dateTime;
+        QDateTime lastModified;
         void *d;
     };
 

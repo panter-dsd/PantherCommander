@@ -381,7 +381,7 @@ QZipReader::FileInfo& QZipReader::FileInfo::operator=(const FileInfo &other)
     permissions = other.permissions;
     crc32 = other.crc32;
     size = other.size;
-    dateTime = other.dateTime;
+    lastModified = other.lastModified;
     return *this;
 }
 
@@ -425,7 +425,7 @@ void QZipPrivate::fillFileInfo(int index, QZipReader::FileInfo &fileInfo) const
     fileInfo.permissions = modeToPermissions(mode);
     fileInfo.crc32 = readUInt(header.h.crc_32);
     fileInfo.size = readUInt(header.h.uncompressed_size);
-    fileInfo.dateTime = readMSDosDate(header.h.last_mod_file);
+    fileInfo.lastModified = readMSDosDate(header.h.last_mod_file);
 
     if (!fileInfo.isDir && !fileInfo.isFile && !fileInfo.isSymLink) {
         // from unzip-5.52:zipinfo.c:~90% ;P
