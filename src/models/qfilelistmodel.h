@@ -134,12 +134,16 @@ class QFileListModel : public QAbstractItemModel
 	Q_OBJECT
 
 public:
-	enum Columns {
-		NAME,
+	enum Columns
+	{
+		NAME = 0,
 		EXT,
 		SIZE,
 		TIME_LAST_UPDATE,
-		ATTR};
+		ATTR,
+
+		COLUMNS
+	};
 
 private:
 	QDir									qdCurrentDir;
@@ -150,9 +154,7 @@ private:
 	QIcon									qiFileIcon;
 	QFileIconProvider*				provider;
 	QFileSystemWatcher*			fileSystemWatcher;
-	int										dirsCount;
-	int										filesCount;
-	qint64									filesSize;
+
 public:
 	explicit QFileListModel(QObject* parent = 0);
 	virtual ~QFileListModel();
@@ -195,10 +197,8 @@ public:
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 	bool setData(const QModelIndex& index, const QVariant& value, int role);
 	Qt::ItemFlags flags(const QModelIndex& index) const;
-	int columnCount(const QModelIndex& parent = QModelIndex()) const
-	{ return 5; }
-	int rowCount(const QModelIndex& parent = QModelIndex()) const
-	{ return infoList.count(); }
+	int rowCount(const QModelIndex& parent = QModelIndex()) const;
+	int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
 	QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
 	QModelIndex parent(const QModelIndex& index) const;

@@ -848,7 +848,7 @@ void FileWidget::setDirectory(const QString& directory)
 #endif
 	d->lastVisitedDir = newDirectory;
 
-	setUpdatesEnabled(false);
+	//setUpdatesEnabled(false);
 
 	d->treeView->selectionModel()->clear();
 	const QModelIndex root = d->model->setRootPath(newDirectory);
@@ -859,7 +859,7 @@ void FileWidget::setDirectory(const QString& directory)
 		emit directoryEntered(newDirectory);
 	}
 
-	setUpdatesEnabled(true);
+	//setUpdatesEnabled(true);
 }
 
 void FileWidget::changeEvent(QEvent* event)
