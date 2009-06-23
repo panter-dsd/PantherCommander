@@ -30,6 +30,7 @@
 #include <QtGui/QFileIconProvider>
 #include <QtCore/QDir>
 #include <QtCore/QFuture>
+#include <QtCore/QFutureWatcher>
 #include <QtCore/QAbstractFileEngine>
 #include <QtCore/QFileSystemWatcher>
 #ifdef Q_WS_WIN
@@ -144,6 +145,7 @@ private:
 	QDir									qdCurrentDir;
 	QList<QPCFileInfo>			infoList;
 	QFuture<void>					future;
+	QFutureWatcher<void> futureWatcher;
 	QIcon									qiFolderIcon;
 	QIcon									qiFileIcon;
 	QFileIconProvider*				provider;
@@ -221,6 +223,8 @@ private:
 	static void getInfoList(const QDir& dir, QFileInfoList* infos);
 public slots:
 	void slotRefresh();
+private slots:
+	void finishedLoadIcons();
 signals:
 	void rootPathChanged(const QString&);
 	void rowsInserted(const QModelIndex &parent, int first, int last);

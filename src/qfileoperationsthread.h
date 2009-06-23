@@ -107,6 +107,7 @@ public:
 	static bool getDiskSpace(const QString& dirPath, qint64* total, qint64* free, qint64* available);
 	static QString rootPath(const QString& filePath);
 	static QString diskLabel(const QString& fileName);
+	static bool isRoot(const QString &path);
 
 	static bool execute(const QString& filePath);
 	static bool execute(const QString& filePath, const QStringList& arguments);

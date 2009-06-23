@@ -1056,3 +1056,9 @@ QStringList QFileOperationsThread::getDrivesList()
 
 	return list;
 }
+//
+bool QFileOperationsThread::isRoot(const QString &path)
+{
+	return path == rootPath(path);
+}
+//

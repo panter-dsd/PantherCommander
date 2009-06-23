@@ -28,12 +28,14 @@
 #include <QDebug>
 
 #include "dirsorter.h"
+#include "qfileoperationsthread.h"
 //
 QFileListModel::QFileListModel(QObject* parent) : QAbstractItemModel(parent)
 {
 	provider=new QFileIconProvider();
 	qiFolderIcon=provider->icon(QFileIconProvider::Folder);
 	qiFileIcon=provider->icon(QFileIconProvider::File);
+	connect(&futureWatcher, SIGNAL(finished()), this, SLOT(finishedLoadIcons()));
 	fileSystemWatcher = new QFileSystemWatcher(this);
 //	connect(fileSystemWatcher, SIGNAL(directoryChanged(const QString&)),
 //			this, SLOT(slotRefresh()));
@@ -69,6 +71,7 @@ void QFileListModel::getFileList()
 	endInsertRows();
 
 	future = QtConcurrent::run(getIcons, &infoList, provider);
+	futureWatcher.setFuture(future);
 }
 //
 QModelIndex QFileListModel::index(int row, int column, const QModelIndex& parent) const
@@ -400,7 +403,7 @@ void QFileListModel::getInfoList(const QDir& dir, QFileInfoList* infos)
 	{
 		it.next();
 		QFileInfo info(it.fileInfo());
-		if (info.fileName() != QLatin1String("."))
+		if ((info.fileName() != QLatin1String(".")) && !((info.fileName() == QLatin1String("..")) && QFileOperationsThread::isRoot(dir.absolutePath())))
 			infos->append(info);
 	}
 }
@@ -494,3 +497,9 @@ Qt::DropActions QFileListModel::supportedDropActions() const
 {
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
+//
+void QFileListModel::finishedLoadIcons()
+{
+	emit dataChanged(index(0,0),index(infoList.count()-1,0));
+}
+//
