@@ -1,5 +1,3 @@
-#ifndef QFILELISTMODEL_H
-#define QFILELISTMODEL_H
 /********************************************************************
 * Copyright (C) PanteR
 *-------------------------------------------------------------------
@@ -23,112 +21,16 @@
 * Author:		PanteR
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
-//
-#include <QtGui/QIcon>
-#include <QtCore/QDateTime>
+
+#ifndef QFILELISTMODEL_H
+#define QFILELISTMODEL_H
+
 #include <QtCore/QAbstractItemModel>
-#include <QtGui/QFileIconProvider>
 #include <QtCore/QDir>
-#include <QtCore/QFuture>
-#include <QtCore/QFutureWatcher>
-#include <QtCore/QAbstractFileEngine>
-#include <QtCore/QFileSystemWatcher>
-#ifdef Q_WS_WIN
-	#include <windows.h>
-#endif
-//
-class QPCFileInfo
-{
-public:
-	enum Type { Dir, File, System };
 
-	QPCFileInfo()
-	{}
-	QPCFileInfo(const QFileInfo &info) : mFileInfo(info)
-	{}
+class QFileIconProvider;
 
-	inline bool isDir() const { return type() == Dir; }
-	inline bool isFile() const { return type() == File; }
-	inline bool isSystem() const { return type() == System; }
-
-	bool operator ==(const QPCFileInfo &fileInfo) const {
-		return mFileInfo == fileInfo.mFileInfo && permissions() == fileInfo.permissions();
-	}
-
-	bool isCaseSensitive() const {
-		QAbstractFileEngine* fe = QAbstractFileEngine::create(mFileInfo.absoluteFilePath());
-		bool cs = fe->caseSensitive();
-		delete fe;
-		return cs;
-	}
-	QFile::Permissions permissions() const {
-		return mPermissions;
-	}
-
-	void setPermissions (QFile::Permissions permissions) {
-		mPermissions = permissions;
-	}
-
-	Type type() const {
-		if (mFileInfo.isDir()) {
-			return QPCFileInfo::Dir;
-		}
-		if (mFileInfo.isFile()) {
-			return QPCFileInfo::File;
-		}
-		if (!mFileInfo.exists() && mFileInfo.isSymLink()) {
-			return QPCFileInfo::System;
-		}
-		return QPCFileInfo::System;
-	}
-
-	bool isSymLink() const {
-		return mFileInfo.isSymLink();
-	}
-
-	bool isHidden() const {
-		return mFileInfo.isHidden();
-	}
-
-	QFileInfo fileInfo() const {
-		return mFileInfo;
-	}
-
-	QDateTime lastModified() const {
-		return mFileInfo.lastModified();
-	}
-
-	QDateTime created() const {
-		return mFileInfo.created();
-	}
-
-	QDateTime lastRead() const {
-		return mFileInfo.lastRead();
-	}
-
-	QString fileName() const{
-		return mFileInfo.fileName();
-	}
-
-	QString absoluteFilePath() const{
-		return mFileInfo.absoluteFilePath();
-	}
-
-	QString filePath() const{
-		return mFileInfo.filePath();
-	}
-
-	qint64 size() const {
-		return mFileInfo.size();
-	}
-
-	QIcon icon;
-
-private :
-	QFileInfo mFileInfo;
-	QFile::Permissions mPermissions;
-};
-//
+class QFileListModelPrivate;
 class QFileListModel : public QAbstractItemModel
 {
 	Q_OBJECT
@@ -145,24 +47,13 @@ public:
 		COLUMNS
 	};
 
-private:
-	QDir									qdCurrentDir;
-	QList<QPCFileInfo>			infoList;
-	QFuture<void>					future;
-	QFutureWatcher<void> futureWatcher;
-	QIcon									qiFolderIcon;
-	QIcon									qiFileIcon;
-	QFileIconProvider*				provider;
-	QFileSystemWatcher*			fileSystemWatcher;
-
 public:
 	explicit QFileListModel(QObject* parent = 0);
 	virtual ~QFileListModel();
 
 	void setNameFilterDisables(bool) {;}
 
-	QDir::Filters filter() const
-	{return qdCurrentDir.filter();}
+	QDir::Filters filter() const;
 	void setFilter(QDir::Filters filters);
 
 	bool isReadOnly() const
@@ -170,14 +61,11 @@ public:
 	void setReadOnly(bool)
 	{}
 
-	QFileIconProvider* iconProvider() const
-	{ return provider; }
-	void setIconProvider(QFileIconProvider *iconProvider)
-	{ delete provider; provider = iconProvider; }
+	QFileIconProvider* iconProvider() const;
+	void setIconProvider(QFileIconProvider* iconProvider);
 
 	QDir rootDirectory() const;
-	QString rootPath() const
-	{return qdCurrentDir.absolutePath();}
+	QString rootPath() const;
 	QModelIndex setRootPath(const QString& path);
 
 	QModelIndex index(const QString& fileName) const;
@@ -209,25 +97,14 @@ public:
 	Qt::SortOrder sortOrder() const
 	{return Qt::AscendingOrder;}
 
-private:
-	inline bool indexValid(const QModelIndex& index) const
-	{
-		return (index.isValid() && index.model() == this
-				&& index.row() < rowCount(index.parent())
-				&& index.column() < columnCount(index.parent()));
-	}
-	static QString size(qint64 bytes);
-
-	void getFileList();
-	static void getIcons(QList<QPCFileInfo>* info, QFileIconProvider* prov);
-	static void getInfoList(const QDir& dir, QFileInfoList* infos);
-public slots:
-	void slotRefresh();
-private slots:
-	void finishedLoadIcons();
 signals:
 	void rootPathChanged(const QString&);
-	void rowsInserted(const QModelIndex &parent, int first, int last);
-	void rowsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
+
+private:
+	Q_DISABLE_COPY(QFileListModel)
+	Q_DECLARE_PRIVATE(QFileListModel)
+	QFileListModelPrivate* const d_ptr;
+	Q_PRIVATE_SLOT(d_func(), void _q_refresh())
+	Q_PRIVATE_SLOT(d_func(), void _q_finishedLoadIcons())
 };
 #endif // QFILELISTMODEL_H
