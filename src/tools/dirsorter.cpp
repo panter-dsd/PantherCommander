@@ -183,6 +183,14 @@ static bool isDotOrDotDot(const QString& fname)
 			&& (fnameSize == 1 || (fnameSize == 2 && fname[1] == QLatin1Char('.'))));
 }
 
+static QString suffix(const QString& fname)
+{
+	int pos = fname.lastIndexOf(QLatin1Char('.'));
+	if(pos > 0 && pos < fname.size() - 1)
+		return fname.mid(pos + 1);
+	return QString();
+}
+
 bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem& n2)
 {
 	const DirSortItem* f1 = &n1;
@@ -227,11 +235,31 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 			bool ic = sort_flags & QDir::IgnoreCase;
 
 			if(f1->suffix_cache.isNull())
-				f1->suffix_cache = ic ? f1->item.suffix().toLower()
-									: f1->item.suffix();
+			{
+				if(sort_flags & 0x300/*QDir::Suffix*/)
+				{
+					f1->suffix_cache = ic ? suffix(f1->item.fileName()).toLower()
+										: suffix(f1->item.fileName());
+				}
+				else
+				{
+					f1->suffix_cache = ic ? f1->item.suffix().toLower()
+										: f1->item.suffix();
+				}
+			}
 			if(f2->suffix_cache.isNull())
-				f2->suffix_cache = ic ? f2->item.suffix().toLower()
-									: f2->item.suffix();
+			{
+				if(sort_flags & 0x300/*QDir::Suffix*/)
+				{
+					f2->suffix_cache = ic ? suffix(f2->item.fileName()).toLower()
+										: suffix(f2->item.fileName());
+				}
+				else
+				{
+					f2->suffix_cache = ic ? f2->item.suffix().toLower()
+										: f2->item.suffix();
+				}
+			}
 
 			if(sort_flags & 0x200/*QDir::Natural*/)
 			{
