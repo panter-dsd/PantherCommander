@@ -29,6 +29,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QtCore/QFuture>
 #include <QtCore/QFutureWatcher>
 #include <QtCore/QAbstractFileEngine>
@@ -161,6 +162,10 @@ public:
 	QDir qdCurrentDir;
 	QPCFileInfo root;
 	QList<QPCFileInfo*> infoList;
+
+	int sortColumn;
+	Qt::SortOrder sortOrder;
+	QDir::SortFlags sort;
 
 	QFuture<void> future;
 	QFutureWatcher<void> futureWatcher;

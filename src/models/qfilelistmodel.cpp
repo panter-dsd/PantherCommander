@@ -71,7 +71,8 @@ static void getIcons(QList<QPCFileInfo*>* infos, QFileIconProvider* prov)
 }
 
 
-QFileListModelPrivate::QFileListModelPrivate() : q_ptr(0)
+QFileListModelPrivate::QFileListModelPrivate() : q_ptr(0),
+	sortColumn(0), sortOrder(Qt::AscendingOrder), sort(QDir::DirsFirst | QDir::IgnoreCase | QDir::Name)
 {
 	provider = new QFileIconProvider();
 	qiFolderIcon = provider->icon(QFileIconProvider::Folder);
@@ -151,7 +152,7 @@ void QFileListModelPrivate::getFileList()
 	if(rowCount > 0)
 	{
 		//Sort file list
-		QFuture<QFileInfoList> sortFuture = QtConcurrent::run(Dir::sortFileList, infos, QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+		QFuture<QFileInfoList> sortFuture = QtConcurrent::run(Dir::sortFileList, infos, sort);
 		while(sortFuture.isRunning())
 			QCoreApplication::processEvents();
 		infos = sortFuture.result();
@@ -231,12 +232,13 @@ void QFileListModelPrivate::_q_refresh()
 		}
 
 		//Sort file list
-		QFuture<QFileInfoList> sortFuture = QtConcurrent::run(Dir::sortFileList, infos, QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+		QFuture<QFileInfoList> sortFuture = QtConcurrent::run(Dir::sortFileList, infos, sort);
 		while(sortFuture.isRunning())
 			QCoreApplication::processEvents();
 		infos = sortFuture.result();
 
 
+		qDeleteAll(infoList);
 		// update changed rows
 		for(int row = 0; row < rowCount; ++row)
 			infoList[row] = new QPCFileInfo(infos.at(row));
@@ -638,6 +640,61 @@ void QFileListModel::setIconProvider(QFileIconProvider* iconProvider)
 
 	delete d->provider;
 	d->provider = iconProvider;
+}
+
+void QFileListModel::sort(int column, Qt::SortOrder order)
+{
+	Q_D(QFileListModel);
+	if(d->sortColumn == column && d->sortOrder == order)
+		return;
+
+	emit layoutAboutToBeChanged();
+	QModelIndexList oldList = persistentIndexList();
+	QList<QPair<QPCFileInfo*, int> > oldNodes;
+	for(int i = 0, n = oldList.size(); i < n; ++i)
+	{
+		QPair<QPCFileInfo*, int> pair(d->node(oldList.at(i)), oldList.at(i).column());
+		oldNodes.append(pair);
+	}
+
+	d->sortColumn = column;
+	d->sortOrder = order;
+
+	d->sort = QDir::DirsFirst | QDir::IgnoreCase;
+	d->sort |= QDir::SortFlags(0x100 | 0x200 | 0x300);
+	if(d->sortColumn == NAME)
+		d->sort |= QDir::Name;
+	else if(d->sortColumn == EXT)
+		d->sort |= QDir::Type;
+	else if(d->sortColumn == SIZE)
+		d->sort |= QDir::Size;
+	else if(d->sortColumn == TIME_LAST_UPDATE)
+		d->sort |= QDir::Time;
+	if(d->sortOrder != Qt::AscendingOrder)
+		d->sort |= QDir::Reversed;
+
+	//Sort file list
+	QFileInfoList infos;
+	for(int i = 0, n = d->infoList.size(); i < n; ++i)
+		infos.append(d->infoList.at(i)->fileInfo());
+	QFuture<QFileInfoList> sortFuture = QtConcurrent::run(Dir::sortFileList, infos, d->sort);
+	while(sortFuture.isRunning())
+		QCoreApplication::processEvents();
+	infos = sortFuture.result();
+	qDeleteAll(d->infoList);
+	for(int i = 0, n = infos.size(); i < n; ++i)
+		d->infoList[i] = new QPCFileInfo(infos.at(i));
+
+
+	QModelIndexList newList;
+	for(int i = 0, n = oldNodes.size(); i < n; ++i)
+	{
+		QModelIndex idx = d->index(oldNodes.at(i).first);
+		idx = idx.sibling(idx.row(), oldNodes.at(i).second);
+		newList.append(idx);
+	}
+	changePersistentIndexList(oldList, newList);
+	emit layoutChanged();
 }
 
 /*!

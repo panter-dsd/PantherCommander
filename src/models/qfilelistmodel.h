@@ -92,10 +92,7 @@ public:
 	QModelIndex parent(const QModelIndex& index) const;
 	bool hasChildren(const QModelIndex &parent) const;
 
-	int sortColumn() const
-	{return 1;}
-	Qt::SortOrder sortOrder() const
-	{return Qt::AscendingOrder;}
+	void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 
 signals:
 	void rootPathChanged(const QString&);
