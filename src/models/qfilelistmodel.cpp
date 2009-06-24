@@ -37,8 +37,8 @@ QFileListModel::QFileListModel(QObject* parent) : QAbstractItemModel(parent)
 	qiFileIcon = provider->icon(QFileIconProvider::File);
 
 	fileSystemWatcher = new QFileSystemWatcher(this);
-//	connect(fileSystemWatcher, SIGNAL(directoryChanged(const QString&)),
-//			this, SLOT(slotRefresh()));
+	connect(fileSystemWatcher, SIGNAL(directoryChanged(const QString&)),
+			this, SLOT(slotRefresh()));
 
 	connect(&futureWatcher, SIGNAL(finished()), this, SLOT(finishedLoadIcons()));
 }
@@ -87,7 +87,7 @@ void QFileListModel::getFileList()
 		while(sortFuture.isRunning())
 			qApp->processEvents();
 		infos = sortFuture.result();
-qWarning() << rowCount << infos.size() << this->rowCount();
+
 
 		beginInsertRows(QModelIndex(), 0, rowCount - 1);
 
@@ -101,6 +101,9 @@ qWarning() << rowCount << infos.size() << this->rowCount();
 		futureWatcher.setFuture(future);
 	}
 
+	fetchMore();
+
+	reset();
 	fileSystemWatcher->blockSignals(blockWatcherSignals);
 }
 //
@@ -398,11 +401,12 @@ void QFileListModel::slotRefresh()
 			if(infoList.at(row).fileInfo() != infos.at(row))
 			{
 				infoList[row] = QPCFileInfo(infos.at(row));
-				for(int col = 0; col < COLUMNS; ++col)
+				emit dataChanged(index(row, 0), index(row, COLUMNS));
+				/*for(int col = 0; col < COLUMNS; ++col)
 				{
 					const QModelIndex idx = index(row, col);
 					emit dataChanged(idx, idx);
-				}
+				}*/
 			}
 		}
 
@@ -599,6 +603,6 @@ Qt::DropActions QFileListModel::supportedDropActions() const
 //
 void QFileListModel::finishedLoadIcons()
 {
-	emit dataChanged(index(0, NAME), index(infoList.count() - 1, NAME));
+	emit dataChanged(index(0, NAME), index(infoList.size() - 1, NAME));
 }
 //
