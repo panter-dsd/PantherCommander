@@ -809,6 +809,10 @@ void MainWindowImpl::slotQueueChanged()
 //
 void MainWindowImpl::slotMkDir()
 {
+	if (!qflvRightPanel->hasFocus() && !qflvLeftPanel->hasFocus())
+		return;
+	QFilePanel* sourcePanel=qflvRightPanel->hasFocus() ? qflvRightPanel : qflvLeftPanel;
+
 	QDialog* qdMkDirDialog=new QDialog(this);
 	qdMkDirDialog->setWindowTitle(tr("Creating directory"));
 
@@ -819,11 +823,11 @@ void MainWindowImpl::slotMkDir()
 	qcbDirName->addItems(settings->value("Global/MkDirHistory",QStringList()).toStringList());
 	qcbDirName->setCurrentIndex(-1);
 //
-	QString fileName=qfpFocusedFilePanel->currentFileName();
-	if (QFileInfo(qfpFocusedFilePanel->path()+fileName).isFile())
-		qcbDirName->setEditText(QFileInfo(qfpFocusedFilePanel->path()+fileName).baseName());
+	QString fileName=sourcePanel->currentFileName();
+	if (QFileInfo(sourcePanel->path()+fileName).isFile())
+		qcbDirName->setEditText(QFileInfo(sourcePanel->path()+fileName).baseName());
 	else
-		qcbDirName->setEditText(fileName);
+		qcbDirName->setEditText(QFileInfo(fileName).fileName());
 	qcbDirName->lineEdit()->selectAll();
 
 	QDialogButtonBox* qdbbButtons=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel,
@@ -845,7 +849,7 @@ void MainWindowImpl::slotMkDir()
 
 	if (qdMkDirDialog->exec())
 	{
-		if (!QDir().mkdir(qfpFocusedFilePanel->path()+qcbDirName->currentText()))
+		if (!QDir().mkdir(sourcePanel->path() + "/" + qcbDirName->currentText()))
 		{
 			QMessageBox::critical(this,qdMkDirDialog->windowTitle(),tr("Error creating directory"));
 		}
