@@ -298,18 +298,18 @@ bool QFileOperationsThread::removeFile(const QString& qsFileName)
 	QFile file(qsFileName);
 	QFileInfo fileInfo(file);
 
+	if (fileInfo.isHidden()
 #ifdef Q_WS_WIN
-	if (isSystemFile(qsFileName) || fileInfo.isHidden())
-#else
-	if (fileInfo.isHidden())
+		|| isSystemFile(qsFileName)
 #endif
+	)
 	{
 		lastError=FO_PERMISIONS_ERROR;
 		if (!error(params))
 			return false;
 	}
 #ifdef Q_WS_WIN
-	if(file.fileEngine()->fileFlags(QAbstractFileEngine::FlagsMask) & QAbstractFileEngine::LocalDiskFlag)
+	if(file.fileEngine()->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag)
 	{
 		// Set null attributes
 		QT_WA({
@@ -722,12 +722,18 @@ bool QFileOperationsThread::error(const QStringList& params)
 //
 bool QFileOperationsThread::isLocalFileSystem(const QString& filePath)
 {
+#if QT_VERSION < 0x040600
 	bool isLocalDisk = false;
 	QAbstractFileEngine* engine = QAbstractFileEngine::create(filePath);
-	isLocalDisk = (engine->fileFlags(QAbstractFileEngine::FlagsMask) & QAbstractFileEngine::LocalDiskFlag);
+	isLocalDisk = (engine->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
 	delete engine;
-
 	return isLocalDisk;
+#else
+	QAbstractFileEngine* engine = mFileInfo.fileEngine();
+	if(fe)
+		return (engine->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
+	return false;
+#endif
 }
 //
 bool QFileOperationsThread::isSameDisc(const QString& sourcePath, const QString& destPath)

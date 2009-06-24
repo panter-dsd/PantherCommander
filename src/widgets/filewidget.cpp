@@ -113,13 +113,14 @@ void FileWidgetPrivate::createWidgets()
 	proxyModel->setSourceModel(model);
 */
 
+//	treeView = new QTreeView(q);
 	treeView = new QFullView(q);
 	treeView->setRootIsDecorated(false);
 	treeView->setItemsExpandable(false);
 	treeView->setSortingEnabled(true);
 	treeView->setAllColumnsShowFocus(true);
 	treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
-	treeView->setSelectionMode(QAbstractItemView::MultiSelection);
+	treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 	//treeView->setEditTriggers(QAbstractItemView::AnyKeyPressed);//QAbstractItemView::SelectedClicked);
 	treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 #ifndef QT_NO_DRAGANDDROP

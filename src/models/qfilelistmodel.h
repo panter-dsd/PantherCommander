@@ -76,11 +76,6 @@ public:
 	qint64 size(const QModelIndex& index) const;
 	QVariant myComputer() const;
 
-	QStringList mimeTypes() const;
-	QMimeData* mimeData(const QModelIndexList& indexes) const;
-	bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent);
-	Qt::DropActions supportedDropActions() const;
-
 	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 	bool setData(const QModelIndex& index, const QVariant& value, int role);
@@ -93,6 +88,11 @@ public:
 	bool hasChildren(const QModelIndex &parent) const;
 
 	void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
+
+	QStringList mimeTypes() const;
+	QMimeData* mimeData(const QModelIndexList& indexes) const;
+	bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent);
+	Qt::DropActions supportedDropActions() const;
 
 signals:
 	void rootPathChanged(const QString&);

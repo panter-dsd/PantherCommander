@@ -44,91 +44,90 @@ class QPCFileInfo
 public:
 	enum Type { Dir, File, System };
 
-	QPCFileInfo()
+	QPCFileInfo() : m_permissions(0)
 	{}
-	QPCFileInfo(const QFileInfo &info) : mFileInfo(info)
+	QPCFileInfo(const QFileInfo& info) : m_fileInfo(info), m_permissions(0)
 	{}
 
-	inline bool isDir() const { return type() == Dir; }
-	inline bool isFile() const { return type() == File; }
-	inline bool isSystem() const { return type() == System; }
+	bool operator==(const QPCFileInfo& fileInfo) const
+	{ return m_fileInfo == fileInfo.m_fileInfo && m_permissions == fileInfo.m_permissions; }
 
-	bool operator ==(const QPCFileInfo &fileInfo) const {
-		return mFileInfo == fileInfo.mFileInfo && permissions() == fileInfo.permissions();
-	}
-
-	bool isCaseSensitive() const {
-		QAbstractFileEngine* fe = QAbstractFileEngine::create(mFileInfo.absoluteFilePath());
+	bool isCaseSensitive() const
+	{
+#if QT_VERSION < 0x040600
+		QAbstractFileEngine* fe = QAbstractFileEngine::create(m_fileInfo.absoluteFilePath());
 		bool cs = fe->caseSensitive();
 		delete fe;
 		return cs;
-	}
-	QFile::Permissions permissions() const {
-		return mPermissions;
+#else
+		QAbstractFileEngine* fe = m_fileInfo.fileEngine();
+		if(fe)
+			return fe->caseSensitive();
+#ifdef Q_WS_WIN
+		return false;
+#else
+		return true;
+#endif
+#endif
 	}
 
-	void setPermissions (QFile::Permissions permissions) {
-		mPermissions = permissions;
-	}
+	inline QFileInfo fileInfo() const
+	{ return m_fileInfo; }
 
-	Type type() const {
-		if (mFileInfo.isDir()) {
+	inline bool isDir() const
+	{ return m_fileInfo.isDir(); }
+	inline bool isFile() const
+	{ return m_fileInfo.isFile(); }
+	inline bool isSymLink() const
+	{ return m_fileInfo.isSymLink(); }
+
+	inline bool isHidden() const
+	{ return m_fileInfo.isHidden(); }
+	inline bool isSystem() const
+	{ return type() == System; }
+	Type type() const
+	{
+		if(m_fileInfo.isDir())
 			return QPCFileInfo::Dir;
-		}
-		if (mFileInfo.isFile()) {
+		if(m_fileInfo.isFile())
 			return QPCFileInfo::File;
-		}
-		if (!mFileInfo.exists() && mFileInfo.isSymLink()) {
+#ifdef Q_WS_WIN
+		//TODO: implement
+#else
+		//!isDir() && !isFile() can be omitted since they are checked above
+		if(m_fileInfo.exists() && !m_fileInfo.isSymLink())
 			return QPCFileInfo::System;
-		}
+#endif
 		return QPCFileInfo::System;
 	}
 
-	bool isSymLink() const {
-		return mFileInfo.isSymLink();
-	}
+	inline QString fileName() const
+	{ return m_fileInfo.fileName(); }
+	inline QString filePath() const
+	{ return m_fileInfo.filePath(); }
+	inline QString absoluteFilePath() const
+	{ return m_fileInfo.absoluteFilePath(); }
 
-	bool isHidden() const {
-		return mFileInfo.isHidden();
-	}
+	inline QDateTime created() const
+	{ return m_fileInfo.created(); }
+	inline QDateTime lastModified() const
+	{ return m_fileInfo.lastModified(); }
+	inline QDateTime lastRead() const
+	{ return m_fileInfo.lastRead(); }
 
-	QFileInfo fileInfo() const {
-		return mFileInfo;
-	}
+	inline qint64 size() const
+	{ return m_fileInfo.size(); }
 
-	QDateTime lastModified() const {
-		return mFileInfo.lastModified();
-	}
-
-	QDateTime created() const {
-		return mFileInfo.created();
-	}
-
-	QDateTime lastRead() const {
-		return mFileInfo.lastRead();
-	}
-
-	QString fileName() const{
-		return mFileInfo.fileName();
-	}
-
-	QString absoluteFilePath() const{
-		return mFileInfo.absoluteFilePath();
-	}
-
-	QString filePath() const{
-		return mFileInfo.filePath();
-	}
-
-	qint64 size() const {
-		return mFileInfo.size();
-	}
+	inline QFile::Permissions permissions() const
+	{ return m_permissions ? m_permissions : m_fileInfo.permissions(); }
+	inline void setPermissions(QFile::Permissions permissions)
+	{ m_permissions = permissions; }
 
 	QIcon icon;
 
-private :
-	QFileInfo mFileInfo;
-	QFile::Permissions mPermissions;
+private:
+	QFileInfo m_fileInfo;
+	QFile::Permissions m_permissions;
 };
 
 
