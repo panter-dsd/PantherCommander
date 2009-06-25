@@ -575,6 +575,7 @@ QModelIndex QFileListModel::setRootPath(const QString& path)
 	Q_D(QFileListModel);
 
 	d->rootDir.setPath(path);
+	d->root.setFileInfo(QFileInfo(path));
 	d->getFileList();
 
 	if(!d->fileSystemWatcher->directories().isEmpty())
@@ -681,6 +682,12 @@ void QFileListModel::sort(int column, Qt::SortOrder order)
 	}
 	changePersistentIndexList(oldList, newList);
 	emit layoutChanged();
+}
+
+void QFileListModel::refresh()
+{
+	Q_D(QFileListModel);
+	d->_q_refresh();
 }
 
 /*!

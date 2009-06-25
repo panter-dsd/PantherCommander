@@ -46,11 +46,16 @@ public:
 
 	QPCFileInfo() : m_permissions(0)
 	{}
-	QPCFileInfo(const QFileInfo& info) : m_fileInfo(info), m_permissions(0)
+	QPCFileInfo(const QFileInfo& fileInfo) : m_fileInfo(fileInfo), m_permissions(0)
 	{}
 
 	bool operator==(const QPCFileInfo& fileInfo) const
 	{ return m_fileInfo == fileInfo.m_fileInfo && m_permissions == fileInfo.m_permissions; }
+
+	inline QFileInfo fileInfo() const
+	{ return m_fileInfo; }
+	inline void setFileInfo(const QFileInfo& fileInfo)
+	{ m_fileInfo = fileInfo; }
 
 	bool isCaseSensitive() const
 	{
@@ -84,9 +89,6 @@ public:
 		return false;
 #endif
 	}
-
-	inline QFileInfo fileInfo() const
-	{ return m_fileInfo; }
 
 	inline bool isDir() const
 	{ return m_fileInfo.isDir(); }

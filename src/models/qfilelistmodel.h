@@ -61,8 +61,6 @@ public:
 	explicit QFileListModel(QObject* parent = 0);
 	virtual ~QFileListModel();
 
-	void setNameFilterDisables(bool) {;}
-
 	QDir::Filters filter() const;
 	void setFilter(QDir::Filters filters);
 
@@ -104,7 +102,10 @@ public:
 	bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent);
 	Qt::DropActions supportedDropActions() const;
 
-signals:
+public Q_SLOTS:
+	void refresh();
+
+Q_SIGNALS:
 	void rootPathChanged(const QString& path);
 
 private:

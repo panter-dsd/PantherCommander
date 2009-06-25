@@ -89,11 +89,6 @@ void FileWidgetPrivate::createWidgets()
 //	model = new QFileSystemModel(q);
 	model = new QFileListModel(q);
 	model->setObjectName(QLatin1String("_filesystem_model"));
-/*#ifdef Q_WS_MAC
-	model->setNameFilterDisables(true);
-#else
-	model->setNameFilterDisables(false);
-#endif*/
 	QDir::Filters filters = QDir::AllDirs | QDir::Files | QDir::Drives;
 	filters |= QDir::Readable | QDir::Writable | QDir::Executable;
 	filters |= QDir::Modified | QDir::Hidden | QDir::System;
