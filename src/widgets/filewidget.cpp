@@ -121,7 +121,7 @@ void FileWidgetPrivate::createWidgets()
 	treeView->setAllColumnsShowFocus(true);
 	treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	//treeView->setEditTriggers(QAbstractItemView::AnyKeyPressed);//QAbstractItemView::SelectedClicked);
+	treeView->setEditTriggers(QAbstractItemView::AnyKeyPressed);//QAbstractItemView::SelectedClicked);
 	treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 #ifndef QT_NO_DRAGANDDROP
 	treeView->setAcceptDrops(true);
@@ -525,13 +525,13 @@ void FileWidgetPrivate::_q_showContextMenu(const QPoint& position)
 	QAbstractItemView* view = 0;
 	view = treeView;
 	QModelIndex index = view->indexAt(position);
-	index = mapToSource(index.sibling(index.row(), 0));
+	index = mapToSource(index);
 
 	QMenu menu(view);
 	if(index.isValid())
 	{
 		// file context menu
-		QFile::Permissions p = model->permissions(index.parent());
+		QFile::Permissions p = model->permissions(index);
 		renameAction->setEnabled(p & QFile::WriteUser);
 		menu.addAction(renameAction);
 		deleteAction->setEnabled(p & QFile::WriteUser);

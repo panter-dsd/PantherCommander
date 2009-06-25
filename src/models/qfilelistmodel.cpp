@@ -62,11 +62,11 @@ static void getIcons(QList<QPCFileInfo*>* infos, QFileIconProvider* prov)
 	Q_ASSERT(infos);
 	Q_ASSERT(prov);
 
-	QList<QPCFileInfo*>::iterator it = infos->begin();
-	for(; it != infos->end(); ++it)
+	for(int i = 0, n = infos->size(); i < n; ++i)
 	{
-		if((*it)->icon.isNull())
-			(*it)->icon = prov->icon((*it)->fileInfo());
+		QPCFileInfo* info = (*infos)[i];
+		if(info->icon().isNull())
+			info->setIcon(prov->icon(info->fileInfo()));
 	}
 }
 
@@ -296,6 +296,11 @@ QModelIndex QFileListModel::index(int row, int column, const QModelIndex& parent
 	return createIndex(row, column, d->infoList.at(row));
 }
 
+QModelIndex QFileListModel::buddy(const QModelIndex& index) const
+{
+	return index.sibling(index.row(), NAME);
+}
+
 QModelIndex QFileListModel::parent(const QModelIndex& child) const
 {
 //	if(!child.isValid() || (child.row() == 0 && child.column() == 0))
@@ -337,25 +342,26 @@ int QFileListModel::columnCount(const QModelIndex& parent) const
 Qt::ItemFlags QFileListModel::flags(const QModelIndex& index) const
 {
 	Q_D(const QFileListModel);
-
-	if(!d->indexValid(index))
-		return 0;
-
-	Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 	QPCFileInfo* node = d->node(index);
-	if(node->fileName() != QLatin1String(".."))
+	if(!node)
+		return Qt::NoItemFlags;
+
+	Qt::ItemFlags flags = Qt::ItemIsEnabled;
+
+	bool dotDot = node->fileName() == QLatin1String("..");
+	if(!dotDot)
+		flags |= Qt::ItemIsSelectable;
+	QFile::Permissions perms = node->permissions();
+	if(!dotDot && perms & QFile::ReadUser)
+		flags |= Qt::ItemIsDragEnabled;
+	if(perms & QFile::WriteUser)
 	{
-		QFile::Permissions perms = node->permissions();
-		if(perms & QFile::ReadUser)
-			flags |= Qt::ItemIsDragEnabled;
-		if(perms & QFile::WriteUser)
-		{
-			if(node->isDir())
-				flags |= Qt::ItemIsDropEnabled;
-			if(index.column() == 0)
-				flags |= Qt::ItemIsEditable;
-		}
+		if(node->isDir())
+			flags |= Qt::ItemIsDropEnabled;
+		if(!dotDot && index.column() == 0)
+			flags |= Qt::ItemIsEditable;
 	}
+
 	return flags;
 }
 
@@ -389,7 +395,7 @@ QVariant QFileListModel::data(const QModelIndex& index, int role) const
 	Q_D(const QFileListModel);
 
 	QPCFileInfo* node = d->node(index);
-	if (role==Qt::DisplayRole)
+	if (role == Qt::DisplayRole)
 	{
 		int iTmp;
 		switch (index.column())
@@ -448,34 +454,23 @@ QVariant QFileListModel::data(const QModelIndex& index, int role) const
 				break;
 		}
 	}
-	if (role==Qt::DecorationRole && index.column() == NAME)
-	{
-		if (!node->icon.isNull())
-			return node->icon;
-		else
-			return (node->isDir() ? d->qiFolderIcon : d->qiFileIcon);
-	}
-	if (role == Qt::UserRole )
-	{
-		switch (index.column())
-		{
-			case SIZE:
-				return node->size();
-				break;
-		}
-	}
-	if (role == Qt::EditRole && index.column() == NAME)
+	else if (role == Qt::EditRole && index.column() == NAME)
 	{
 		return node->fileName();
 	}
-	if (role == Qt::TextAlignmentRole && index.column() == SIZE)
+	else if (role == Qt::TextAlignmentRole && index.column() == SIZE)
 	{
 		if (!isDir(index))
 			return Qt::AlignRight;
-		else
-			return Qt::AlignHCenter;
+		return Qt::AlignHCenter;
 	}
-	if (role == Qt::ToolTipRole)
+	else if (role == Qt::DecorationRole && index.column() == NAME)
+	{
+		if (!node->icon().isNull())
+			return node->icon();
+		return (node->isDir() ? d->qiFolderIcon : d->qiFileIcon);
+	}
+	else if (role == Qt::ToolTipRole)
 	{
 		switch(index.column())
 		{
@@ -486,11 +481,16 @@ QVariant QFileListModel::data(const QModelIndex& index, int role) const
 			default: return QVariant();
 		};
 	}
-	if (role==Qt::ForegroundRole)
+	else if (role == Qt::ForegroundRole)
 	{
 		if (node->lastModified().date().daysTo(QDate::currentDate())<=3)
 			return Qt::blue;
 	}
+	else if (role == Qt::UserRole && index.column() == SIZE)
+	{
+		return node->size();
+	}
+
 	return QVariant();
 }
 
@@ -723,11 +723,21 @@ QMimeData* QFileListModel::mimeData(const QModelIndexList& indexes) const
 	for(; it != indexes.constEnd(); ++it)
 	{
 		if((*it).column() == 0)
-			urls.append(QUrl(d->node(*it)->absoluteFilePath()));
+		{
+			QPCFileInfo* node = d->node(*it);
+			if(node->isLocalFile())
+				urls.append(QUrl::fromLocalFile(node->absoluteFilePath()));
+			else
+				urls.append(QUrl(node->absoluteFilePath()));
+		}
 	}
-	QMimeData* data = new QMimeData;
-	data->setUrls(urls);
-	return data;
+	if(!urls.isEmpty())
+	{
+		QMimeData* data = new QMimeData();
+		data->setUrls(urls);
+		return data;
+	}
+	return 0;
 }
 
 /*!
@@ -756,21 +766,21 @@ bool QFileListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, 
 		case Qt::CopyAction:
 			for(; it != urls.constEnd(); ++it)
 			{
-				QString path = (*it).toLocalFile();
+				QString path = (*it).scheme() == QLatin1String("file") ? (*it).toLocalFile() : (*it).toString();
 				success = QFile::copy(path, to + QFileInfo(path).fileName()) && success;
 			}
 			break;
 		case Qt::LinkAction:
 			for(; it != urls.constEnd(); ++it)
 			{
-				QString path = (*it).toLocalFile();
+				QString path = (*it).scheme() == QLatin1String("file") ? (*it).toLocalFile() : (*it).toString();
 				success = QFile::link(path, to + QFileInfo(path).fileName()) && success;
 			}
 			break;
 		case Qt::MoveAction:
 			for(; it != urls.constEnd(); ++it)
 			{
-				QString path = (*it).toLocalFile();
+				QString path = (*it).scheme() == QLatin1String("file") ? (*it).toLocalFile() : (*it).toString();
 				success = QFile::copy(path, to + QFileInfo(path).fileName()) && QFile::remove(path) && success;
 			}
 			break;

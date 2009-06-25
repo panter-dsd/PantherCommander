@@ -84,6 +84,7 @@ public:
 	int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
 	QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
+	QModelIndex buddy(const QModelIndex& index) const;
 	QModelIndex parent(const QModelIndex& index) const;
 	bool hasChildren(const QModelIndex &parent) const;
 

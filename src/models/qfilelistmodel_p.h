@@ -70,6 +70,20 @@ public:
 #endif
 #endif
 	}
+	bool isLocalFile() const
+	{
+#if QT_VERSION < 0x040600
+		QAbstractFileEngine* fe = QAbstractFileEngine::create(m_fileInfo.absoluteFilePath());
+		bool localDisc = (fe->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
+		delete fe;
+		return localDisc;
+#else
+		QAbstractFileEngine* fe = m_fileInfo.fileEngine();
+		if(fe)
+			return (fe->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
+		return false;
+#endif
+	}
 
 	inline QFileInfo fileInfo() const
 	{ return m_fileInfo; }
@@ -123,11 +137,15 @@ public:
 	inline void setPermissions(QFile::Permissions permissions)
 	{ m_permissions = permissions; }
 
-	QIcon icon;
+	inline QIcon icon() const
+	{ return m_icon; }
+	inline void setIcon(const QIcon& icon)
+	{ m_icon = icon; }
 
 private:
 	QFileInfo m_fileInfo;
 	QFile::Permissions m_permissions;
+	QIcon m_icon;
 };
 
 

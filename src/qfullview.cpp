@@ -27,10 +27,7 @@
 
 QFullView::QFullView(QWidget* parent) : QTreeView(parent)
 {
-	doubleClickTime=QTime::currentTime();
 	isRightMouseButtonPressed=false;
-
-	selectedFilesCount=selectedDirsCount=selectedFilesSize;
 }
 
 QFullView::~QFullView()
@@ -43,38 +40,71 @@ void QFullView::drawRow(QPainter* painter, const QStyleOptionViewItem& option, c
 
 	if(index.row() == currentIndex().row() && hasFocus())
 	{
+		QRect rect(visualRect(index));
+		rect.adjust(0, 0, -1, -1);
 		painter->setPen(Qt::green);
-		painter->drawRect(0, option.rect.y(), this->width() - 1, option.rect.height() - 1);
+		painter->drawRect(rect);
 	}
 }
 
-void QFullView::mousePressEvent ( QMouseEvent * ev)
+QRect QFullView::visualRect(const QModelIndex& index) const
+{
+	if(index.row() < 0 || index.column() < 0 || index.model() != model())
+		return QRect();
+
+	QModelIndex left = index.sibling(index.row(), 0);
+	QModelIndex right = index.sibling(index.row(), index.model()->columnCount(index.parent()) - 1);
+	return QRect(QTreeView::visualRect(left).topLeft(), QTreeView::visualRect(right).bottomRight());
+}
+
+#ifndef QT_NO_DRAGANDDROP
+/*!
+	Starts a drag by calling drag->exec() using the given \a supportedActions.
+*/
+void QFullView::startDrag(Qt::DropActions supportedActions)
+{
+	QModelIndexList indexes = selectedIndexes();
+/*	if(indexes.isEmpty())
+	{
+		//QModelIndex tl = model()->index(currentIndex().row(), 0, currentIndex().parent());
+		//QModelIndex br = model()->index(currentIndex().row(), model()->columnCount() - 1, currentIndex().parent());
+		QItemSelection selection(currentIndex(), currentIndex());
+		selectionModel()->select(selection, QItemSelectionModel::Select);
+		indexes = selectedIndexes();
+	}*/
+	for(int i = indexes.size() - 1 ; i >= 0; --i)
+	{
+		if(!(model()->flags(indexes.at(i)) & Qt::ItemIsDragEnabled))
+			indexes.removeAt(i);
+	}
+	QMimeData* data = model()->mimeData(indexes);
+	if(data)
+	{
+		QDrag* drag = new QDrag(this);
+		drag->setMimeData(data);
+		//drag->setPixmap(pixmap);
+		//drag->setHotSpot(d->pressedPosition - rect.topLeft());
+		Qt::DropAction defaultDropAction = Qt::IgnoreAction;
+		if((supportedActions & Qt::CopyAction) && dragDropMode() != QAbstractItemView::InternalMove)
+			defaultDropAction = Qt::CopyAction;
+		if(drag->exec(supportedActions, defaultDropAction) == Qt::MoveAction)
+			;//clearSelection();
+	}
+}
+#endif // QT_NO_DRAGANDDROP
+/*
+void QFullView::mousePressEvent ( QMouseEvent * event)
 {
 	if (ev->button()==Qt::LeftButton)
 	{
-		QModelIndex index=indexAt(ev->pos());
-		if (!index.isValid())
-			return;
-		if (index!=selectionModel()->currentIndex())
-		{
+		QModelIndex index=indexAt(event->pos());
+		if (index.isValid() && index!=selectionModel()->currentIndex())
 			selectionModel()->setCurrentIndex(index,QItemSelectionModel::NoUpdate);
-		}
-		else
-		{
-			if (doubleClickTime.msecsTo(QTime::currentTime())<=qApp->doubleClickInterval())
-			{
-				emit activated(index);
-			}
-		}
-		doubleClickTime=QTime::currentTime();
-//Drag
-		dragStartPosition = ev->pos();
-//
 	}
-	if (ev->button()==Qt::RightButton)
+	else if (event->button()==Qt::RightButton)
 	{
 		isRightMouseButtonPressed=true;
-		QModelIndex index=indexAt(ev->pos());
+		QModelIndex index=indexAt(event->pos());
 		selectionModel()->setCurrentIndex(index,QItemSelectionModel::NoUpdate);
 		if (index.data(Qt::DisplayRole).toString()!="..")
 		{
@@ -89,16 +119,16 @@ void QFullView::mousePressEvent ( QMouseEvent * ev)
 		else
 			isMouseSelect=false;
 	}
+
+	QWidget::mousePressEvent(event);
 }
 //
-void QFullView::mouseMoveEvent (QMouseEvent* ev)
+void QFullView::mouseMoveEvent (QMouseEvent* event)
 {
 	if (isRightMouseButtonPressed)
 	{
-		QModelIndex index=indexAt(ev->pos());
-		if (!index.isValid())
-			return;
-		if (index!=selectionModel()->currentIndex())
+		QModelIndex index=indexAt(event->pos());
+		if (index.isValid() && index!=selectionModel()->currentIndex())
 		{
 			selectionModel()->setCurrentIndex(index,QItemSelectionModel::NoUpdate);
 			if (index.data(Qt::DisplayRole).toString()!="..")
@@ -112,58 +142,23 @@ void QFullView::mouseMoveEvent (QMouseEvent* ev)
 			}
 		}
 	}
-	if ((ev->buttons() & Qt::LeftButton))
-	{
-		if ((ev->pos() - dragStartPosition).manhattanLength() < QApplication::startDragDistance())
-			return;
-		if (currentIndex().data(Qt::DisplayRole).toString()=="..")
-			return;
-		QDrag *drag = new QDrag(this);
 
-		QMimeData *mimeData = new QMimeData;
-
-		QList<QUrl> urlList;
-		//Если нет селекта, выделяем текущую строку
-		if (selectionModel()->selectedIndexes().isEmpty() && !selectionModel()->isSelected(currentIndex()))
-		{
-			QItemSelection selection(model()->index(currentIndex().row(),0),
-						model()->index(currentIndex().row(),model()->columnCount()-1));
-			selectionModel()->select(selection,QItemSelectionModel::Select);
-			connect(drag,
-					SIGNAL(destroyed()),
-					this,
-					SLOT(clearSelection()));
-		}
-		QList<QModelIndex> indexList=selectedIndexes();
-
-		QString dir=QDir::toNativeSeparators(QDir::currentPath());
-		if (dir.at(dir.length()-1)!=QDir::separator())
-			dir+=QDir::separator();
-
-		for (int i=0; i<indexList.count(); i++)
-		{
-			if (indexList.at(i).column()!=0)
-				continue;
-			urlList << QUrl::fromLocalFile(dir+indexList.at(i).data(Qt::EditRole).toString());
-		}
-		mimeData->setUrls(urlList);
-		drag->setMimeData(mimeData);
-
-		drag->start(Qt::CopyAction);
-	}
-	QWidget::mouseMoveEvent(ev);
+	QWidget::mouseMoveEvent(event);
 }
 //
-void QFullView::mouseReleaseEvent (QMouseEvent* ev)
+void QFullView::mouseReleaseEvent (QMouseEvent* event)
 {
-	if (ev->button()==Qt::RightButton)
+	if (event->button()==Qt::RightButton)
 	{
 		isRightMouseButtonPressed=false;
 	}
+	QTreeView::mouseReleaseEvent(event);
 }
-//
+
 void QFullView::focusInEvent (QFocusEvent* event)
 {
+	QTreeView::focusInEvent(event);
+
 	QPalette palette=this->palette();
 	palette.setColor(QPalette::Active,
 					QPalette::Highlight,
@@ -174,9 +169,11 @@ void QFullView::focusInEvent (QFocusEvent* event)
 		update(model()->index(currentIndex().row(),i));
 	}
 }
-//
+
 void QFullView::focusOutEvent (QFocusEvent* event)
 {
+	QTreeView::focusOutEvent(event);
+
 	QPalette palette=this->palette();
 	palette.setColor(QPalette::Active,
 					QPalette::Highlight,
@@ -187,7 +184,7 @@ void QFullView::focusOutEvent (QFocusEvent* event)
 		update(model()->index(currentIndex().row(),i));
 	}
 }
-//
+
 void QFullView::keyPressEvent (QKeyEvent* event)
 {
 	if (event->key()==Qt::Key_Insert)
@@ -203,7 +200,7 @@ void QFullView::keyPressEvent (QKeyEvent* event)
 			selectionModel()->setCurrentIndex(model()->index(row+1,0),
 														QItemSelectionModel::NoUpdate);
 	}
-	if (event->text()=="*")
+	else if (event->text()=="*")
 	{
 		selectionModel()->select(QItemSelection(model()->index(0,0),
 						model()->index(model()->rowCount()-1,model()->columnCount()-1)),
@@ -213,7 +210,7 @@ void QFullView::keyPressEvent (QKeyEvent* event)
 						model()->index(0,model()->columnCount()-1)),
 						QItemSelectionModel::Deselect);
 	}
-	if (event->key()==Qt::Key_Down && (event->modifiers() & Qt::SHIFT))
+	else if (event->key()==Qt::Key_Down && (event->modifiers() & Qt::SHIFT))
 	{
 		int row=currentIndex().row();
 		if (currentIndex().data(Qt::DisplayRole).toString()!="..")
@@ -225,9 +222,8 @@ void QFullView::keyPressEvent (QKeyEvent* event)
 		if (row<model()->rowCount()-1)
 			selectionModel()->setCurrentIndex(model()->index(row+1,0),
 														QItemSelectionModel::NoUpdate);
-		return;
 	}
-	if (event->key()==Qt::Key_Up && (event->modifiers() & Qt::SHIFT))
+	else if (event->key()==Qt::Key_Up && (event->modifiers() & Qt::SHIFT))
 	{
 		int row=currentIndex().row();
 		if (currentIndex().data(Qt::DisplayRole).toString()!="..")
@@ -239,8 +235,8 @@ void QFullView::keyPressEvent (QKeyEvent* event)
 		if (row>0)
 			selectionModel()->setCurrentIndex(model()->index(row-1,0),
 														QItemSelectionModel::NoUpdate);
-		return;
 	}
+
 	QTreeView::keyPressEvent(event);
 }
-//
+*/

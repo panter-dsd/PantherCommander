@@ -26,22 +26,15 @@
 #define QFULLVIEW_H
 
 #include <QTreeView>
-#include <QTime>
-#include <QPoint>
 
 class QFullView : public QTreeView
 {
 	Q_OBJECT
 private:
-	QTime					doubleClickTime;
 	bool						isRightMouseButtonPressed;
 	bool						isMouseSelect;
-	QPoint					dragStartPosition;
 
 	bool						bFocused;
-	int						selectedFilesCount;
-	int						selectedDirsCount;
-	int						selectedFilesSize;
 
 public:
 	explicit QFullView(QWidget* parent = 0);
@@ -49,6 +42,12 @@ public:
 
 protected:
 	void drawRow(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+	QRect visualRect(const QModelIndex& index) const;
+
+#ifndef QT_NO_DRAGANDDROP
+	void startDrag(Qt::DropActions supportedActions);
+#endif
+/*
 	void mousePressEvent (QMouseEvent* ev);
 	void mouseMoveEvent (QMouseEvent* ev);
 	void mouseReleaseEvent (QMouseEvent* ev);
@@ -57,7 +56,7 @@ protected:
 	//void dragMoveEvent (QDragMoveEvent* event);
 	void focusInEvent (QFocusEvent* event);
 	void focusOutEvent (QFocusEvent* event);
-	void keyPressEvent (QKeyEvent* event);
+	void keyPressEvent (QKeyEvent* event);*/
 };
 
 #endif // QFULLVIEW_H
