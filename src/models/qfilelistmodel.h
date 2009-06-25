@@ -38,16 +38,26 @@ class QFileListModel : public QAbstractItemModel
 public:
 	enum Columns
 	{
-		NAME = 0,
-		EXT,
-		SIZE,
-		TIME_LAST_UPDATE,
-		ATTR,
+		NameColumn = 0,
+		TypeColumn,
+		SizeColumn,
+		ModifiedTimeColumn,
+		OwnerColumn,
+		GroupColumn,
+		PermissionsColumn,
+		AttributesColumn,
 
-		COLUMNS
+		ColumnCount
 	};
 
-public:
+	enum Roles
+	{
+		FileIconRole = Qt::DecorationRole,
+		FilePathRole = Qt::UserRole + 1,
+		FileNameRole = Qt::UserRole + 2,
+		FilePermissions = Qt::UserRole + 3
+	};
+
 	explicit QFileListModel(QObject* parent = 0);
 	virtual ~QFileListModel();
 
@@ -69,24 +79,23 @@ public:
 	QModelIndex setRootPath(const QString& path);
 
 	QModelIndex index(const QString& fileName) const;
-	bool isDir(const QModelIndex& index) const;
 	QString fileName(const QModelIndex& index) const;
 	QString filePath(const QModelIndex& index) const;
+	bool isDir(const QModelIndex& index) const;
 	QFile::Permissions permissions(const QModelIndex& index) const;
 	qint64 size(const QModelIndex& index) const;
 	QVariant myComputer() const;
-
-	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-	bool setData(const QModelIndex& index, const QVariant& value, int role);
-	Qt::ItemFlags flags(const QModelIndex& index) const;
-	int rowCount(const QModelIndex& parent = QModelIndex()) const;
-	int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
 	QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
 	QModelIndex buddy(const QModelIndex& index) const;
 	QModelIndex parent(const QModelIndex& index) const;
 	bool hasChildren(const QModelIndex &parent) const;
+	int rowCount(const QModelIndex& parent = QModelIndex()) const;
+	int columnCount(const QModelIndex& parent = QModelIndex()) const;
+	Qt::ItemFlags flags(const QModelIndex& index) const;
+	QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
+	bool setData(const QModelIndex& index, const QVariant& value, int role);
+	QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
 	void sort(int column, Qt::SortOrder order = Qt::AscendingOrder);
 
@@ -96,7 +105,7 @@ public:
 	Qt::DropActions supportedDropActions() const;
 
 signals:
-	void rootPathChanged(const QString&);
+	void rootPathChanged(const QString& path);
 
 private:
 	Q_DISABLE_COPY(QFileListModel)

@@ -105,13 +105,13 @@ public:
 			return QPCFileInfo::Dir;
 		if(m_fileInfo.isFile())
 			return QPCFileInfo::File;
-#ifdef Q_WS_WIN
+/*#ifdef Q_WS_WIN
 		//TODO: implement
 #else
 		//!isDir() && !isFile() can be omitted since they are checked above
 		if(m_fileInfo.exists() && !m_fileInfo.isSymLink())
 			return QPCFileInfo::System;
-#endif
+#endif*/
 		return QPCFileInfo::System;
 	}
 
@@ -122,6 +122,29 @@ public:
 	inline QString absoluteFilePath() const
 	{ return m_fileInfo.absoluteFilePath(); }
 
+	QString name() const
+	{
+		QString fname(m_fileInfo.fileName());
+		if(!fname.isEmpty() && !m_fileInfo.isDir())
+		{
+			int pos = fname.lastIndexOf(QLatin1Char('.'));
+			if(pos > 0 && pos < fname.size() - 1)
+				return fname.left(pos);
+		}
+		return fname;
+	}
+	QString ext() const
+	{
+		QString fname(m_fileInfo.fileName());
+		if(!fname.isEmpty() && !m_fileInfo.isDir())
+		{
+			int pos = fname.lastIndexOf(QLatin1Char('.'));
+			if(pos > 0 && pos < fname.size() - 1)
+				return fname.mid(pos + 1);
+		}
+		return QString();
+	}
+
 	inline QDateTime created() const
 	{ return m_fileInfo.created(); }
 	inline QDateTime lastModified() const
@@ -129,8 +152,15 @@ public:
 	inline QDateTime lastRead() const
 	{ return m_fileInfo.lastRead(); }
 
-	inline qint64 size() const
-	{ return m_fileInfo.size(); }
+	qint64 size() const
+	{
+		Type t = type();
+		if(t == File)
+			return m_fileInfo.size();
+		if(t == Dir)
+			return 0;
+		return -1;
+	}
 
 	inline QFile::Permissions permissions() const
 	{ return m_permissions ? m_permissions : m_fileInfo.permissions(); }
@@ -176,9 +206,9 @@ public:
 
 	QFileListModel* q_ptr;
 
-	QDir qdCurrentDir;
+	QDir rootDir;
 	QPCFileInfo root;
-	QList<QPCFileInfo*> infoList;
+	QList<QPCFileInfo*> nodes;
 
 	int sortColumn;
 	Qt::SortOrder sortOrder;
@@ -187,9 +217,7 @@ public:
 	QFuture<void> future;
 	QFutureWatcher<void> futureWatcher;
 
-	QFileIconProvider* provider;
-	QIcon qiFolderIcon;
-	QIcon qiFileIcon;
+	QFileIconProvider* iconProvider;
 
 	QFileSystemWatcher* fileSystemWatcher;
 };
