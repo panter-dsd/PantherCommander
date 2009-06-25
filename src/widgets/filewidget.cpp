@@ -817,14 +817,22 @@ void FileWidget::setDirectory(const QString& directory)
 	if(newDirectory.isEmpty() || d->rootPath() == newDirectory)
 		return;
 
-#ifdef Q_WS_WIN
-/*3*/	qt_ntfs_permission_lookup++;
-#endif
 	QDir dir(newDirectory);
 	bool isReadable = dir.isReadable();
 #ifdef Q_WS_WIN
-	if(newDirectory.startsWith(QLatin1String("//")))
-		isReadable |= (newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1);
+	if(!isReadable)
+	{
+		if(newDirectory.startsWith(QLatin1String("//")))
+			isReadable |= (newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1);
+/*3**/
+		if(!isReadable)
+		{
+			qt_ntfs_permission_lookup++;
+			isReadable = dir.isReadable();
+			qt_ntfs_permission_lookup--;
+		}
+/**3*/
+	}
 #endif
 	if(!isReadable)
 	{
@@ -834,14 +842,8 @@ void FileWidget::setDirectory(const QString& directory)
 #ifndef QT_NO_MESSAGEBOX
 		QMessageBox::critical(this, "", tr("You have no enought privilegies"));
 #endif
-#ifdef Q_WS_WIN
-/*3*/		qt_ntfs_permission_lookup--;
-#endif
 		return;
 	}
-#ifdef Q_WS_WIN
-/*3*/	qt_ntfs_permission_lookup--;
-#endif
 	d->lastVisitedDir = newDirectory;
 
 	//setUpdatesEnabled(false);
