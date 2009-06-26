@@ -120,10 +120,6 @@ void QFileListModelPrivate::fetchFileList()
 {
 	Q_Q(QFileListModel);
 
-#ifndef QT_NO_FILESYSTEMWATCHER
-	bool blockWatcherSignals = fileSystemWatcher->blockSignals(true);
-#endif
-
 	future.cancel();
 	future.waitForFinished();
 
@@ -170,19 +166,11 @@ void QFileListModelPrivate::fetchFileList()
 		future = QtConcurrent::run(getIcons, &nodes, iconProvider);
 		futureWatcher.setFuture(future);
 	}
-
-#ifndef QT_NO_FILESYSTEMWATCHER
-	fileSystemWatcher->blockSignals(blockWatcherSignals);
-#endif
 }
 
 void QFileListModelPrivate::updateFileList()
 {
 	Q_Q(QFileListModel);
-
-#ifndef QT_NO_FILESYSTEMWATCHER
-	bool blockWatcherSignals = fileSystemWatcher->blockSignals(true);
-#endif
 
 	future.cancel();
 	future.waitForFinished();
@@ -263,10 +251,6 @@ void QFileListModelPrivate::updateFileList()
 		future = QtConcurrent::run(getIcons, &nodes, iconProvider);
 		futureWatcher.setFuture(future);
 	}
-
-#ifndef QT_NO_FILESYSTEMWATCHER
-	fileSystemWatcher->blockSignals(blockWatcherSignals);
-#endif
 }
 
 void QFileListModelPrivate::_q_directoryChanged()
