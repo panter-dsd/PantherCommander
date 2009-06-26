@@ -105,6 +105,10 @@ public:
 public Q_SLOTS:
 	void refresh();
 
+protected:
+	bool event(QEvent* event);
+	void timerEvent(QTimerEvent* event);
+
 Q_SIGNALS:
 	void rootPathChanged(const QString& path);
 
@@ -112,7 +116,7 @@ private:
 	Q_DISABLE_COPY(QFileListModel)
 	Q_DECLARE_PRIVATE(QFileListModel)
 	QFileListModelPrivate* const d_ptr;
-	Q_PRIVATE_SLOT(d_func(), void _q_refresh())
+	Q_PRIVATE_SLOT(d_func(), void _q_directoryChanged())
 	Q_PRIVATE_SLOT(d_func(), void _q_finishedLoadIcons())
 };
 #endif // QFILELISTMODEL_H

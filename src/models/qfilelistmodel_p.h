@@ -27,17 +27,17 @@
 
 #include "qfilelistmodel.h"
 
+#include <QtCore/QAbstractFileEngine>
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QFileSystemWatcher>
 #include <QtCore/QFuture>
 #include <QtCore/QFutureWatcher>
-#include <QtCore/QAbstractFileEngine>
+#include <QtCore/QTimer>
 
 #include <QtGui/QIcon>
-
-class QFileIconProvider;
-class QFileSystemWatcher;
+#include <QtGui/QFileIconProvider>
 
 class QPCFileInfo
 {
@@ -192,6 +192,12 @@ public:
 	QPCFileInfo* node(const QModelIndex& index) const;
 	QModelIndex index(const QPCFileInfo* node) const;
 
+	void fetchFileList();
+	void updateFileList();
+
+	void _q_directoryChanged();
+	void _q_finishedLoadIcons();
+
 	inline bool indexValid(const QModelIndex& index) const
 	{
 		Q_Q(const QFileListModel);
@@ -199,12 +205,7 @@ public:
 				&& index.row() < q->rowCount(index.parent())
 				&& index.column() < q->columnCount(index.parent()));
 	}
-
-	void getFileList();
 	static QString size(qint64 bytes);
-
-	void _q_refresh();
-	void _q_finishedLoadIcons();
 
 	QFileListModel* q_ptr;
 
@@ -221,7 +222,10 @@ public:
 
 	QFileIconProvider* iconProvider;
 
+#ifndef QT_NO_FILESYSTEMWATCHER
 	QFileSystemWatcher* fileSystemWatcher;
+#endif
+	QBasicTimer pendingUpdateTimer;
 };
 
 #endif // QFILELISTMODEL_P_H

@@ -29,9 +29,6 @@
 #include <QDebug>
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QFileSystemWatcher>
-
-#include <QtGui/QFileIconProvider>
 
 #ifdef Q_WS_WIN
 #	include <windows.h>
@@ -76,7 +73,9 @@ QFileListModelPrivate::QFileListModelPrivate() : q_ptr(0),
 {
 	iconProvider = new QFileIconProvider();
 
+#ifndef QT_NO_FILESYSTEMWATCHER
 	fileSystemWatcher = new QFileSystemWatcher;
+#endif
 }
 
 QFileListModelPrivate::~QFileListModelPrivate()
@@ -90,8 +89,10 @@ QFileListModelPrivate::~QFileListModelPrivate()
 	delete iconProvider;
 	iconProvider = 0;
 
+#ifndef QT_NO_FILESYSTEMWATCHER
 	delete fileSystemWatcher;
 	fileSystemWatcher = 0;
+#endif
 }
 
 QPCFileInfo* QFileListModelPrivate::node(const QModelIndex& index) const
@@ -115,11 +116,13 @@ QModelIndex QFileListModelPrivate::index(const QPCFileInfo* node) const
 	return q_func()->createIndex(visualRow, 0, const_cast<QPCFileInfo*>(node));
 }
 
-void QFileListModelPrivate::getFileList()
+void QFileListModelPrivate::fetchFileList()
 {
 	Q_Q(QFileListModel);
 
+#ifndef QT_NO_FILESYSTEMWATCHER
 	bool blockWatcherSignals = fileSystemWatcher->blockSignals(true);
+#endif
 
 	future.cancel();
 	future.waitForFinished();
@@ -168,14 +171,18 @@ void QFileListModelPrivate::getFileList()
 		futureWatcher.setFuture(future);
 	}
 
+#ifndef QT_NO_FILESYSTEMWATCHER
 	fileSystemWatcher->blockSignals(blockWatcherSignals);
+#endif
 }
 
-void QFileListModelPrivate::_q_refresh()
+void QFileListModelPrivate::updateFileList()
 {
 	Q_Q(QFileListModel);
 
+#ifndef QT_NO_FILESYSTEMWATCHER
 	bool blockWatcherSignals = fileSystemWatcher->blockSignals(true);
+#endif
 
 	future.cancel();
 	future.waitForFinished();
@@ -257,7 +264,16 @@ void QFileListModelPrivate::_q_refresh()
 		futureWatcher.setFuture(future);
 	}
 
+#ifndef QT_NO_FILESYSTEMWATCHER
 	fileSystemWatcher->blockSignals(blockWatcherSignals);
+#endif
+}
+
+void QFileListModelPrivate::_q_directoryChanged()
+{
+	Q_Q(QFileListModel);
+	if(!pendingUpdateTimer.isActive())
+		pendingUpdateTimer.start(1500, q);
 }
 
 void QFileListModelPrivate::_q_finishedLoadIcons()
@@ -273,11 +289,12 @@ QFileListModel::QFileListModel(QObject* parent) : QAbstractItemModel(parent),
 {
 	d_ptr->q_ptr = this;
 
-	Q_D(QFileListModel);
-	connect(d->fileSystemWatcher, SIGNAL(directoryChanged(const QString&)),
-			this, SLOT(_q_refresh()));
+	connect(&d_ptr->futureWatcher, SIGNAL(finished()), this, SLOT(_q_finishedLoadIcons()));
 
-	connect(&d->futureWatcher, SIGNAL(finished()), this, SLOT(_q_finishedLoadIcons()));
+#ifndef QT_NO_FILESYSTEMWATCHER
+	connect(d_ptr->fileSystemWatcher, SIGNAL(directoryChanged(const QString&)),
+			this, SLOT(_q_directoryChanged()));
+#endif
 }
 
 QFileListModel::~QFileListModel()
@@ -576,11 +593,13 @@ QModelIndex QFileListModel::setRootPath(const QString& path)
 
 	d->rootDir.setPath(path);
 	d->root.setFileInfo(QFileInfo(path));
-	d->getFileList();
+	d->fetchFileList();
 
+#ifndef QT_NO_FILESYSTEMWATCHER
 	if(!d->fileSystemWatcher->directories().isEmpty())
 		d->fileSystemWatcher->removePaths(d->fileSystemWatcher->directories());
 	d->fileSystemWatcher->addPath(d->rootDir.absolutePath());
+#endif
 
 	emit rootPathChanged(d->rootDir.absolutePath());
 
@@ -609,7 +628,7 @@ void QFileListModel::setFilter(QDir::Filters filters)
 {
 	Q_D(QFileListModel);
 	d->rootDir.setFilter(filters);
-	d->getFileList();
+	d->fetchFileList();
 }
 
 QFileIconProvider* QFileListModel::iconProvider() const
@@ -687,7 +706,7 @@ void QFileListModel::sort(int column, Qt::SortOrder order)
 void QFileListModel::refresh()
 {
 	Q_D(QFileListModel);
-	d->_q_refresh();
+	d->pendingUpdateTimer.start(0, this);
 }
 
 /*!
@@ -790,6 +809,25 @@ bool QFileListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, 
 Qt::DropActions QFileListModel::supportedDropActions() const
 {
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
+}
+
+bool QFileListModel::event(QEvent* event)
+{
+	//Q_D(QFileListModel);
+	if(event->type() == QEvent::LanguageChange)
+	{
+	}
+	return QAbstractItemModel::event(event);
+}
+
+void QFileListModel::timerEvent(QTimerEvent *event)
+{
+	Q_D(QFileListModel);
+	if(event->timerId() == d->pendingUpdateTimer.timerId())
+	{
+		d->pendingUpdateTimer.stop();
+		d->updateFileList();
+	}
 }
 
 #include "moc_qfilelistmodel.cpp"
