@@ -701,9 +701,9 @@ FileWidget::FileWidget(const QString& path, QWidget* parent) : QWidget(parent),
 
 	//
 	// Set the inactive pallete
-	QPalette palette=d_func()->treeView->palette();
+	QPalette palette = d_func()->treeView->palette();
 	palette.setColor(QPalette::Active, QPalette::Highlight,
-					qApp->palette().color(QPalette::Inactive,QPalette::Highlight));
+					qApp->palette().color(QPalette::Inactive, QPalette::Highlight));
 	d_func()->treeView->setPalette(palette);
 	//
 
@@ -711,7 +711,7 @@ FileWidget::FileWidget(const QString& path, QWidget* parent) : QWidget(parent),
 	#warning "TODO: RenameEditor must have it's own settings"
 #endif
 /*1*///	selectOnlyFileName = true;
-/*1*///	qleRenameEditor=0;
+/*1*///	qleRenameEditor = 0;
 }
 
 FileWidget::~FileWidget()
@@ -877,18 +877,16 @@ bool FileWidget::eventFilter(QObject* object, QEvent* event)
 	if(object == d->pathLineEdit)
 		;
 
-/*1	if (object==qleRenameEditor)
+/*1	if(object == qleRenameEditor)
 	{
-		if (event->type()==QEvent::FocusOut)
+		if(event->type() == QEvent::FocusOut)
 		{
 			qleRenameEditor->close();
 		}
-		if (event->type()==QEvent::KeyRelease)
+		if(event->type() == QEvent::KeyRelease)
 		{
-			QKeyEvent* keyEvent=static_cast<QKeyEvent*>(event);
-			bool b=keyEvent &&
-				 (keyEvent->key()==Qt::Key_Escape);
-			if (b)
+			QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+			if(keyEvent->key() == Qt::Key_Escape)
 				qleRenameEditor->close();
 		}
 	}*/
@@ -912,28 +910,24 @@ void FileWidget::slotRename()
 	return;
 
 
-/*1	if (!qleRenameEditor)
+/*1	if(!qleRenameEditor)
 	{
-		qleRenameEditor=new QLineEdit(fi.fileName(), d->treeView);
+		qleRenameEditor = new QLineEdit(fi.fileName(), d->treeView);
 		qleRenameEditor->setAttribute(Qt::WA_DeleteOnClose);
-		connect(qleRenameEditor,
-				SIGNAL(destroyed()),
-				this,
-				SLOT(slotCloseEditor()));
-		connect(qleRenameEditor,
-				SIGNAL(returnPressed()),
-				this,
-				SLOT(slotRenameFile()));
+		connect(qleRenameEditor, SIGNAL(destroyed()),
+				this, SLOT(slotCloseEditor()));
+		connect(qleRenameEditor, SIGNAL(returnPressed()),
+				this, SLOT(slotRenameFile()));
 		qleRenameEditor->installEventFilter(this);
-		qleRenameEditor->move(d->treeView->visualRect(index).left()+d->treeView->iconSize().width(),
-								d->treeView->visualRect(index).top()+d->treeView->header()->height());
+		qleRenameEditor->move(d->treeView->visualRect(index).left() + d->treeView->iconSize().width(),
+								d->treeView->visualRect(index).top() + d->treeView->header()->height());
 		qleRenameEditor->resize(d->treeView->columnWidth(0) + d->treeView->columnWidth(1) -
 								d->treeView->iconSize().width(),
 								d->treeView->visualRect(index).height());
-		QPalette palette=qleRenameEditor->palette();
+		QPalette palette = qleRenameEditor->palette();
 		palette.setColor(QPalette::Active,
 						QPalette::Highlight,
-						qApp->palette().color(QPalette::Active,QPalette::Highlight));
+						qApp->palette().color(QPalette::Active, QPalette::Highlight));
 		qleRenameEditor->setPalette(palette);
 		qleRenameEditor->show();
 		qleRenameEditor->setFocus();
@@ -943,7 +937,7 @@ void FileWidget::slotRename()
 	#warning "TODO: shedule this work to custom delegate"
 	#warning "TODO: since neigher model nor view can not use editorForIndex"
 #endif
-/*1	QString qsFileName=qleRenameEditor->text();
+/*1	QString qsFileName = qleRenameEditor->text();
 	int pos = qsFileName.lastIndexOf(".");
 	if(!selectOnlyFileName || qleRenameEditor->selectedText() == qsFileName.left(pos) || qleRenameEditor->selectedText().isEmpty())
 		qleRenameEditor->selectAll();
@@ -953,7 +947,7 @@ void FileWidget::slotRename()
 
 /*1void FileWidget::slotCloseEditor()
 {
-	qleRenameEditor=0;
+	qleRenameEditor = 0;
 	d_func()->treeView->setFocus();
 }*/
 
