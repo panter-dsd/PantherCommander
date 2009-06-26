@@ -282,7 +282,14 @@ bool QFileOperationsThread::copyPermisions(const QString& qsSourceFileName,const
 		{rez=SetFileAttributesA(qsDestFileName.toLocal8Bit(),GetFileAttributesA(qsSourceFileName.toLocal8Bit()));})
 	return rez;
 #else
-	return QFile(qsDestFileName).setPermissions(QFile(qsSourceFileName).permissions());
+	QFile file(qsDestFileName);
+	bool ret = file.setPermissions(QFile(qsSourceFileName).permissions());
+#if QT_VERSION < 0x040600
+	// workaround for issue with QFSFileEngine::setPermissions() retval
+	if(!ret && file.errorString().isEmpty())
+		ret = true;
+#endif
+	return ret;
 #endif
 }
 //
