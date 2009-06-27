@@ -85,8 +85,7 @@ class DirSortItemComparator
 	int sort_flags;
 
 public:
-	DirSortItemComparator(int flags) :
-		sort_flags(flags)
+	DirSortItemComparator(int flags) : sort_flags(flags)
 	{}
 
 	int naturalCompare(const QString &s1, const QString &s2, Qt::CaseSensitivity cs);
@@ -95,21 +94,21 @@ public:
 
 static inline QChar getNextChar(const QString &s, int location)
 {
-    return (location < s.length()) ? s.at(location) : QChar();
+	return (location < s.length()) ? s.at(location) : QChar();
 }
 
 /*!
-    Natural number sort, skips spaces.
+	Natural number sort, skips spaces.
 
-    Examples:
-    1, 2, 10, 55, 100
-    01.jpg, 2.jpg, 10.jpg
+	Examples:
+	1, 2, 10, 55, 100
+	01.jpg, 2.jpg, 10.jpg
 
-    Note on the algorithm:
-    Only as many characters as necessary are looked at and at most they all
-    are looked at once.
+	Note on the algorithm:
+	Only as many characters as necessary are looked at and at most they all
+	are looked at once.
 
-    Slower then QString::compare() (of course)
+	Slower then QString::compare() (of course)
 */
 int DirSortItemComparator::naturalCompare(const QString& s1, const QString& s2, Qt::CaseSensitivity cs)
 {
