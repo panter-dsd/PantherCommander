@@ -225,7 +225,7 @@ public:
 #ifndef QT_NO_FILESYSTEMWATCHER
 	QFileSystemWatcher* fileSystemWatcher;
 #endif
-	QBasicTimer pendingUpdateTimer;
+	QBasicTimer updateTimer;
 };
 
 #endif // QFILELISTMODEL_P_H

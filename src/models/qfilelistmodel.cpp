@@ -256,8 +256,11 @@ void QFileListModelPrivate::updateFileList()
 void QFileListModelPrivate::_q_directoryChanged()
 {
 	Q_Q(QFileListModel);
-	if(!pendingUpdateTimer.isActive())
-		pendingUpdateTimer.start(1500, q);
+	if(!updateTimer.isActive())
+	{
+		updateTimer.start(1500, q);
+		updateFileList();
+	}
 }
 
 void QFileListModelPrivate::_q_finishedLoadIcons()
@@ -690,7 +693,8 @@ void QFileListModel::sort(int column, Qt::SortOrder order)
 void QFileListModel::refresh()
 {
 	Q_D(QFileListModel);
-	d->pendingUpdateTimer.start(0, this);
+	d->updateTimer.stop();
+	d->_q_directoryChanged();
 }
 
 /*!
@@ -804,14 +808,11 @@ bool QFileListModel::event(QEvent* event)
 	return QAbstractItemModel::event(event);
 }
 
-void QFileListModel::timerEvent(QTimerEvent *event)
+void QFileListModel::timerEvent(QTimerEvent* event)
 {
 	Q_D(QFileListModel);
-	if(event->timerId() == d->pendingUpdateTimer.timerId())
-	{
-		d->pendingUpdateTimer.stop();
-		d->updateFileList();
-	}
+	if(event->timerId() == d->updateTimer.timerId())
+		d->updateTimer.stop();
 }
 
 #include "moc_qfilelistmodel.cpp"
