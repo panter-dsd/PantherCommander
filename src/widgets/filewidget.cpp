@@ -889,17 +889,18 @@ bool FileWidget::eventFilter(QObject* object, QEvent* event)
 			{
 				case Qt::Key_Insert:
 				{
-					QKeyEvent e1(event->type(), Qt::Key_Space, Qt::NoModifier);
-					if(QCoreApplication::sendEvent(d->treeView, &e1) && e1.isAccepted())
+					QKeyEvent e1(event->type(), Qt::Key_Space, Qt::ControlModifier);
+					if(QCoreApplication::sendEvent(d->treeView, &e1))
 					{
 						QKeyEvent e2(event->type(), Qt::Key_Down, Qt::ControlModifier);
-						if(QCoreApplication::sendEvent(d->treeView, &e2) && e2.isAccepted())
+						if(QCoreApplication::sendEvent(d->treeView, &e2))
 						{
 							event->accept();
 							return true;
 						}
 					}
 				}
+					break;
 				case Qt::Key_Asterisk:
 					if(d->treeView->selectionModel())
 					{
@@ -910,43 +911,10 @@ bool FileWidget::eventFilter(QObject* object, QEvent* event)
 																	root);
 						QItemSelection selection(tl, br);
 						d->treeView->selectionModel()->select(selection, QItemSelectionModel::Toggle);
-					}
-					event->accept();
-					return true;
-/*				case Qt::Key_Down:
-					if (keyEvent->modifiers() & Qt::SHIFT)
-					{
-						QModelIndex currentIndex = d->treeView->currentIndex();
-						if(currentIndex.flags() & Qt::ItemIsSelectable)
-						{
-							d->treeView->selectionModel()->select(QItemSelection(d->treeView->model()->index(currentIndex.row(), 0),
-																	d->treeView->model()->index(currentIndex.row(), d->treeView->model()->columnCount()-1)),
-																	QItemSelectionModel::Toggle);
-						}
-						if (currentIndex.row() < d->treeView->model()->rowCount()-1)
-						{
-							d->treeView->selectionModel()->setCurrentIndex(d->treeView->model()->index(currentIndex.row()+1, 0),
-																			QItemSelectionModel::NoUpdate);
-						}
+						event->accept();
+						return true;
 					}
 					break;
-				case Qt::Key_Up:
-					if (keyEvent->modifiers() & Qt::SHIFT)
-					{
-						QModelIndex currentIndex = d->treeView->currentIndex();
-						if(currentIndex.flags() & Qt::ItemIsSelectable)
-						{
-							d->treeView->selectionModel()->select(QItemSelection(d->treeView->model()->index(currentIndex.row(), 0),
-																	d->treeView->model()->index(currentIndex.row(), d->treeView->model()->columnCount()-1)),
-																	QItemSelectionModel::Toggle);
-						}
-						if (currentIndex.row()>0)
-						{
-							d->treeView->selectionModel()->setCurrentIndex(d->treeView->model()->index(currentIndex.row()-1, 0),
-																			QItemSelectionModel::NoUpdate);
-						}
-					}
-					break;*/
 				default:
 					break;
 			}
