@@ -110,13 +110,16 @@ void FileWidgetPrivate::createWidgets()
 
 //	treeView = new QTreeView(q);
 	treeView = new QFullView(q);
+	treeView->installEventFilter(q);
 	treeView->setRootIsDecorated(false);
 	treeView->setItemsExpandable(false);
 	treeView->setSortingEnabled(true);
+	treeView->setUniformRowHeights(true);
 	treeView->setAllColumnsShowFocus(true);
 	treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	treeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-	treeView->setEditTriggers(QAbstractItemView::AnyKeyPressed);//QAbstractItemView::SelectedClicked);
+	//treeView->setEditTriggers(QAbstractItemView::SelectedClicked);
+	treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 #ifndef QT_NO_DRAGANDDROP
 	treeView->setAcceptDrops(true);
@@ -848,7 +851,7 @@ void FileWidget::setDirectory(const QString& directory)
 
 	//setUpdatesEnabled(false);
 
-	d->treeView->selectionModel()->clear();
+	d->treeView->clearSelection();
 	const QModelIndex root = d->model->setRootPath(newDirectory);
 	d->newFolderAction->setEnabled(d->model->flags(root) & Qt::ItemIsDropEnabled);
 	if(root != d->rootIndex())
@@ -875,9 +878,81 @@ bool FileWidget::eventFilter(QObject* object, QEvent* event)
 	Q_D(FileWidget);
 
 	if(object == d->pathLineEdit)
-		;
-
-/*1	if(object == qleRenameEditor)
+	{
+	}
+	else if(object == d->treeView)
+	{
+		if(event->type() == QEvent::KeyPress)
+		{
+			QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+			switch(keyEvent->key())
+			{
+				case Qt::Key_Insert:
+				{
+					QKeyEvent e1(event->type(), Qt::Key_Space, Qt::NoModifier);
+					if(QCoreApplication::sendEvent(d->treeView, &e1) && e1.isAccepted())
+					{
+						QKeyEvent e2(event->type(), Qt::Key_Down, Qt::ControlModifier);
+						if(QCoreApplication::sendEvent(d->treeView, &e2) && e2.isAccepted())
+						{
+							event->accept();
+							return true;
+						}
+					}
+				}
+				case Qt::Key_Asterisk:
+					if(d->treeView->selectionModel())
+					{
+						QModelIndex root = d->treeView->rootIndex();
+						QModelIndex tl = d->treeView->model()->index(0, 0, root);
+						QModelIndex br = d->treeView->model()->index(d->treeView->model()->rowCount(root) - 1,
+																	d->treeView->model()->columnCount(root) - 1,
+																	root);
+						QItemSelection selection(tl, br);
+						d->treeView->selectionModel()->select(selection, QItemSelectionModel::Toggle);
+					}
+					event->accept();
+					return true;
+/*				case Qt::Key_Down:
+					if (keyEvent->modifiers() & Qt::SHIFT)
+					{
+						QModelIndex currentIndex = d->treeView->currentIndex();
+						if(currentIndex.flags() & Qt::ItemIsSelectable)
+						{
+							d->treeView->selectionModel()->select(QItemSelection(d->treeView->model()->index(currentIndex.row(), 0),
+																	d->treeView->model()->index(currentIndex.row(), d->treeView->model()->columnCount()-1)),
+																	QItemSelectionModel::Toggle);
+						}
+						if (currentIndex.row() < d->treeView->model()->rowCount()-1)
+						{
+							d->treeView->selectionModel()->setCurrentIndex(d->treeView->model()->index(currentIndex.row()+1, 0),
+																			QItemSelectionModel::NoUpdate);
+						}
+					}
+					break;
+				case Qt::Key_Up:
+					if (keyEvent->modifiers() & Qt::SHIFT)
+					{
+						QModelIndex currentIndex = d->treeView->currentIndex();
+						if(currentIndex.flags() & Qt::ItemIsSelectable)
+						{
+							d->treeView->selectionModel()->select(QItemSelection(d->treeView->model()->index(currentIndex.row(), 0),
+																	d->treeView->model()->index(currentIndex.row(), d->treeView->model()->columnCount()-1)),
+																	QItemSelectionModel::Toggle);
+						}
+						if (currentIndex.row()>0)
+						{
+							d->treeView->selectionModel()->setCurrentIndex(d->treeView->model()->index(currentIndex.row()-1, 0),
+																			QItemSelectionModel::NoUpdate);
+						}
+					}
+					break;*/
+				default:
+					break;
+			}
+		}
+	}
+/*1	else if(object == qleRenameEditor)
 	{
 		if(event->type() == QEvent::FocusOut)
 		{
@@ -891,18 +966,17 @@ bool FileWidget::eventFilter(QObject* object, QEvent* event)
 		}
 	}*/
 
-	return QObject::eventFilter(object, event);
+	return QWidget::eventFilter(object, event);
 }
 
 void FileWidget::slotRename()
 {
 	Q_D(FileWidget);
 
-	QModelIndex index = d->treeView->selectionModel()->currentIndex();
+	QModelIndex index = d->treeView->currentIndex();
 	QString filePath = d->model->filePath(d->mapToSource(index));
 
-	QFileInfo fi(filePath);
-	if(fi.fileName() == QLatin1String(".."))
+	if(!(index.flags() & Qt::ItemIsEditable))
 		return;
 
 	index = d->treeView->model()->index(index.row(), 0, index.parent());
@@ -1069,7 +1143,7 @@ QString FileWidget::currentFile() const
 {
 	Q_D(const FileWidget);
 
-	const QModelIndex index = d->treeView->selectionModel()->currentIndex();
+	const QModelIndex index = d->treeView->currentIndex();
 	return d->model->filePath(d->mapToSource(index));
 }
 
@@ -1149,7 +1223,7 @@ void FileWidget::selectFile(const QString& fileName, bool clearSelection)
 	if(index.isValid())
 	{
 		if(clearSelection)
-			d->treeView->selectionModel()->clear();
+			d->treeView->clearSelection();
 		d->select(index);
 	}
 }
@@ -1164,7 +1238,7 @@ void FileWidget::clearSelection()
 	Q_D(FileWidget);
 
 	//QString curFile = currentFile();
-	d->treeView->selectionModel()->clear();
+	d->treeView->clearSelection();
 	//setCurrentFile(curFile);
 }
 
