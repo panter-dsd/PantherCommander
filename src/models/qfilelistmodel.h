@@ -27,6 +27,7 @@
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QDir>
+#include <QtCore/QVariant>
 
 class QFileIconProvider;
 

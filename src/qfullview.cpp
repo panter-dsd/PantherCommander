@@ -24,7 +24,9 @@
 
 #include "qfullview.h"
 
-#include <QtGui>
+#include <QtGui/QApplication>
+#include <QtGui/QDrag>
+#include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QStyle>
 

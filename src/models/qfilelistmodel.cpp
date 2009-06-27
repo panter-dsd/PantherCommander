@@ -25,10 +25,11 @@
 #include "qfilelistmodel.h"
 #include "qfilelistmodel_p.h"
 
-#include <QtGui>
-#include <QDebug>
-
 #include <QtCore/QCoreApplication>
+#include <QtCore/QDirIterator>
+#include <QtCore/QMimeData>
+#include <QtCore/QUrl>
+#include <QtCore/qtconcurrentrun.h>
 
 #ifdef Q_WS_WIN
 #	include <windows.h>
