@@ -1028,16 +1028,61 @@ bool QFileOperationsThread::isSystemFile(const QString& filePath)
 				findFileHandle = ::FindFirstFileA(fpath.toLocal8Bit(),
 													(WIN32_FIND_DATAA*)&findData);
 			});
-			if (findFileHandle != INVALID_HANDLE_VALUE) {
-				::FindClose(findFileHandle);
+			::FindClose(findFileHandle);
+			if (findFileHandle != INVALID_HANDLE_VALUE)
 				fileAttrib = findData.dwFileAttributes;
-			}
 		}
 
-		isSystem = (fileAttrib != INVALID_FILE_ATTRIBUTES && (fileAttrib & FILE_ATTRIBUTE_SYSTEM));
+		isSystem = (fileAttrib != INVALID_FILE_ATTRIBUTES) && (fileAttrib & FILE_ATTRIBUTE_SYSTEM);
 	}
 
 	return isSystem;
+}
+#endif
+#ifdef Q_WS_WIN
+bool QFileOperationsThread::isArchiveFile(const QString& filePath)
+{
+	bool isArchive = false;
+
+	if(isLocalFileSystem(filePath))
+	{
+		QString path = filePath;
+		if(path.length() == 2 && path.at(1) == QLatin1Char(':'))
+			path += QLatin1Char('\\');
+
+		DWORD fileAttrib = INVALID_FILE_ATTRIBUTES;
+		QT_WA({
+			fileAttrib = ::GetFileAttributesW((TCHAR*)path.utf16());
+		} , {
+			QString fpath = QFileInfo(path).absoluteFilePath();
+			fileAttrib = ::GetFileAttributesA(fpath.toLocal8Bit());
+		});
+		if(fileAttrib == INVALID_FILE_ATTRIBUTES)
+		{
+			// path for FindFirstFile should not be end in a trailing slash or slosh
+			while(path.endsWith(QLatin1Char('\\')))
+				path.resize(path.size() - 1);
+
+			HANDLE findFileHandle = INVALID_HANDLE_VALUE;
+			WIN32_FIND_DATA findData;
+			QT_WA({
+				findFileHandle = ::FindFirstFileW((TCHAR*)path.utf16(),
+													&findData);
+			} , {
+				// Cast is safe, since char is at end of WIN32_FIND_DATA
+				QString fpath = QFileInfo(path).absoluteFilePath();
+				findFileHandle = ::FindFirstFileA(fpath.toLocal8Bit(),
+													(WIN32_FIND_DATAA*)&findData);
+			});
+			::FindClose(findFileHandle);
+			if (findFileHandle != INVALID_HANDLE_VALUE)
+				fileAttrib = findData.dwFileAttributes;
+		}
+
+		isArchive = (fileAttrib != INVALID_FILE_ATTRIBUTES) && (fileAttrib & FILE_ATTRIBUTE_ARCHIVE);
+	}
+
+	return isArchive;
 }
 #endif
 //
