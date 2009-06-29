@@ -224,10 +224,10 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 	switch(sortBy)
 	{
 		case QDir::Time:
-			r = f1->item.lastModified().secsTo(f2->item.lastModified());
+			r = f2->item.lastModified().secsTo(f1->item.lastModified());
 			break;
 		case QDir::Size:
-			r = int(qBound<qint64>(-1, f2->item.size() - f1->item.size(), 1));
+			r = int(qBound<qint64>(-1, f1->item.size() - f2->item.size(), 1));
 			break;
 		case QDir::Type:
 		{
