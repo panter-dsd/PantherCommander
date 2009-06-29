@@ -58,7 +58,7 @@ static void getInfoList(const QDir& dir, QFileInfoList* infos)
 static void getIcons(QList<QPCFileInfo*>* infos, QFileIconProvider* iconProvider)
 {
 	Q_ASSERT(infos);
-	Q_ASSERT(prov);
+	Q_ASSERT(iconProvider);
 
 	for(int i = 0, n = infos->size(); i < n; ++i)
 	{
@@ -417,11 +417,11 @@ QVariant QFileListModel::data(const QModelIndex& index, int role) const
 #ifdef Q_WS_WIN
 				{
 					QString attr;
-/*					if (node->attr & FILE_ATTRIBUTE_READONLY)
-						attr+="r";
-					else
-						attr+="-";
-					if (node->attr & FILE_ATTRIBUTE_ARCHIVE)
+					attr += !(node->permissions() & QFile::WriteUser) ? "r" : "-";
+					attr += QFileOperationsThread::isArchiveFile(node->absoluteFilePath()) ? "a" : "-";
+					attr += node->isHidden() ? "h" : "-";
+					attr += QFileOperationsThread::isSystemFile(node->absoluteFilePath()) ? "s" : "-";
+/*					if (node->attr & FILE_ATTRIBUTE_ARCHIVE)
 						attr+="a";
 					else
 						attr+="-";
