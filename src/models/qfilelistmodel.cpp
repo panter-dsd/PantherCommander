@@ -416,17 +416,18 @@ QVariant QFileListModel::data(const QModelIndex& index, int role) const
 				case AttributesColumn:
 #ifdef Q_WS_WIN
 				{
-					QString attr;
-					qint64 attributes = QFileOperationsThread::getWinFileAttributes(node->absoluteFilePath());
-					if (attributes != INVALID_FILE_ATTRIBUTES) {
+					qint64 attributes = QFileOperationsThread::winFileAttributes(node->absoluteFilePath());
+					if (attributes != INVALID_FILE_ATTRIBUTES)
+					{
+						QString attr;
 						attr += (attributes & FILE_ATTRIBUTE_READONLY) ? "r" : "-";
 						attr += (attributes & FILE_ATTRIBUTE_ARCHIVE) ? "a" : "-";
 						attr += (attributes & FILE_ATTRIBUTE_HIDDEN) ? "h" : "-";
 						attr += (attributes & FILE_ATTRIBUTE_SYSTEM) ? "s" : "-";
 						attr += (attributes & FILE_ATTRIBUTE_COMPRESSED) ? "c" : "-";
 						attr += (attributes & FILE_ATTRIBUTE_ENCRYPTED) ? "e" : "-";
+						return attr;
 					}
-					return attr;
 				}
 #endif // Q_WS_WIN
 					break;
