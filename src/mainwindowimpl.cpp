@@ -469,8 +469,8 @@ void MainWindowImpl::slotChangedFocus()
 //
 void MainWindowImpl::slotPathChanged(const QString& path)
 {
-	qlConsolePath->setText(path);
-	qlConsolePath->setToolTip(path);
+	qlConsolePath->setText(QDir::toNativeSeparators(path));
+	qlConsolePath->setToolTip(QDir::toNativeSeparators(path));
 }
 //
 void MainWindowImpl::resizeEvent(QResizeEvent* event)
