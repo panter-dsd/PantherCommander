@@ -113,8 +113,6 @@ public:
 	static bool execute(const QString& filePath, const QStringList& arguments);
 	static bool execute(const QString& filePath, const QStringList& arguments, const QString& workingDirectory);
 #ifdef Q_WS_WIN
-	static bool isSystemFile(const QString& filePath);
-	static bool isArchiveFile(const QString& filePath);
 	static qint64 getWinFileAttributes (const QString& filePath);
 #endif
 	static QStringList getDrivesList();
