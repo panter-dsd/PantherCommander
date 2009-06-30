@@ -417,26 +417,12 @@ QVariant QFileListModel::data(const QModelIndex& index, int role) const
 #ifdef Q_WS_WIN
 				{
 					QString attr;
-					attr += !(node->permissions() & QFile::WriteUser) ? "r" : "-";
-					attr += QFileOperationsThread::isArchiveFile(node->absoluteFilePath()) ? "a" : "-";
-					attr += node->isHidden() ? "h" : "-";
-					attr += QFileOperationsThread::isSystemFile(node->absoluteFilePath()) ? "s" : "-";
-/*					if (node->attr & FILE_ATTRIBUTE_ARCHIVE)
-						attr+="a";
-					else
-						attr+="-";
-					if (node->attr & FILE_ATTRIBUTE_HIDDEN)
-						attr+="h";
-					else
-						attr+="-";
-					if (node->attr & FILE_ATTRIBUTE_SYSTEM)
-						attr+="s";
-					else
-						attr+="-";
-					if (node->attr & FILE_ATTRIBUTE_COMPRESSED)
-						attr+="c";
-					else
-						attr+="-";*/
+					qint64 attributes = QFileOperationsThread::getWinFileAttributes(node->absoluteFilePath());
+					attr += (attributes & FILE_ATTRIBUTE_READONLY) ? "r" : "-";
+					attr += (attributes & FILE_ATTRIBUTE_ARCHIVE) ? "a" : "-";
+					attr += (attributes & FILE_ATTRIBUTE_HIDDEN) ? "h" : "-";
+					attr += (attributes & FILE_ATTRIBUTE_SYSTEM) ? "s" : "-";
+					attr += (attributes & FILE_ATTRIBUTE_COMPRESSED) ? "c" : "-";
 					return attr;
 				}
 #endif // Q_WS_WIN

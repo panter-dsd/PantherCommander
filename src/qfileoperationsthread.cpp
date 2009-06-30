@@ -307,7 +307,7 @@ bool QFileOperationsThread::removeFile(const QString& qsFileName)
 
 	if (fileInfo.isHidden()
 #ifdef Q_WS_WIN
-		|| isSystemFile(qsFileName)
+		|| (QFileOperationsThread::getWinFileAttributes(qsFileName) & FILE_ATTRIBUTE_SYSTEM)
 #endif
 	)
 	{
@@ -1009,7 +1009,7 @@ qint64 QFileOperationsThread::getWinFileAttributes (const QString& filePath)
 			QString fpath = QFileInfo(path).absoluteFilePath();
 			fileAttrib = ::GetFileAttributesA(fpath.toLocal8Bit());
 		});
-		if(fileAttrib == INVALID_FILE_ATTRIBUTES) {
+		if (fileAttrib == INVALID_FILE_ATTRIBUTES) {
 			// path for FindFirstFile should not be end in a trailing slash or slosh
 			while(path.endsWith(QLatin1Char('\\')))
 				path.resize(path.size() - 1);
@@ -1030,7 +1030,6 @@ qint64 QFileOperationsThread::getWinFileAttributes (const QString& filePath)
 				fileAttrib = findData.dwFileAttributes;
 		}
 	}
-
 	return qint64(fileAttrib);
 }
 #endif
