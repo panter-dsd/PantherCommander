@@ -824,7 +824,7 @@ bool QFileOperationsThread::getDiskSpace(const QString& dirPath, qint64* total, 
 #endif
 #ifdef Q_OS_UNIX
 	struct statvfs fs;
-	res = (statvfs(QFile::encodeName(dirPath).data(), &fs) < 0);
+	res = (statvfs(QFile::encodeName(dirPath).data(), &fs) == 0);
 	if(res)
 	{
 		if(total)
