@@ -484,7 +484,6 @@ void MainWindowImpl::resizeEvent(QResizeEvent* event)
 void MainWindowImpl::slotRunCommand()
 {
 #ifndef Q_CC_MSVC
-	#warning "TODO: `cd _path_to_' command must not run consle - just navigate in panel"
 	#warning "TODO: `_localpath_ _params_' command must not run consle - just execute program"
 #endif
 	QString qsCommand=qcbConsoleCommand->currentText();
