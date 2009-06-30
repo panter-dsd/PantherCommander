@@ -1047,24 +1047,23 @@ QStringList QFileOperationsThread::getDrivesList()
 #ifdef Q_WS_WIN
 	foreach(const QFileInfo& fileInfo, QDir::drives())
 		list.append(fileInfo.absolutePath());
-#endif
-#ifdef Q_OS_UNIX
-	QFile file;
-	file.setFileName("/etc/mtab");
-	if (file.open(QIODevice::ReadOnly))
+#else
+	QFile file("/etc/mtab");
+	if(file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
 		QTextStream stream(&file);
-		QString buffer;
-		int i=-1;
 		while(!stream.atEnd())
 		{
-			buffer=stream.readLine();
-			QFileInfo fileInfo(buffer.split(" ").at(1));
-			if (fileInfo.isDir())
-				list.append(fileInfo.absoluteFilePath());
+			QStringList params = stream.readLine().split(QLatin1Char(' '));
+			if(params.size() > 1)
+			{
+				QDir dir(params.at(1));
+				if(dir.exists())
+					list.append(dir.absoluteFilePath());
+			}
 		}
+		file.close();
 	}
-	file.close();
 	list.removeDuplicates();
 #endif
 
