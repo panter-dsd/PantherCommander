@@ -892,13 +892,17 @@ QString QFileOperationsThread::diskLabel(const QString& fileName)
 	QT_WA({
 		TCHAR volumeLabel[101];
 		DWORD bufferSize = 100;
-		GetVolumeInformationW((TCHAR*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0);
-		label = QString::fromUtf16((ushort*)volumeLabel);
+		if (GetVolumeInformationW((TCHAR*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
+			label = QString::fromUtf16((ushort*)volumeLabel);
+		else
+			label = tr("_ERROR_GETTING_LABEL_");
 	} , {
 		char volumeLabel[101];
 		DWORD bufferSize = 100;
-		GetVolumeInformationA(path.toLocal8Bit(), volumeLabel, bufferSize, 0, 0, 0, 0, 0);
-		label = QString::fromLocal8Bit(volumeLabel);
+		if (GetVolumeInformationA(path.toLocal8Bit(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
+			label = QString::fromLocal8Bit(volumeLabel);
+		else
+			label = tr("_ERROR_GETTING_LABEL_");
 	});
 #endif
 	return label;
