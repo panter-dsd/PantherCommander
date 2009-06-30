@@ -504,6 +504,7 @@ void MainWindowImpl::slotRunCommand()
 		QDir dir(qlConsolePath->text());
 		dir.cd(qsCommand.remove(QRegExp("^cd ")));
 		qfpFocusedFilePanel->setPath(dir.absolutePath());
+		return;
 	}
 	myProcess->start(qsCommand);
 
