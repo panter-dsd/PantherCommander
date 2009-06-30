@@ -15,6 +15,7 @@ private:
 	QCheckBox							*qchbShowDriveBar;
 	QCheckBox							*qchbShowTwoDriveBar;
 	QCheckBox							*qchbShowDriveButton;
+	QCheckBox							*qchbShowDriveComboBox;
 	QCheckBox							*qchbShowTabs;
 	QCheckBox							*qchbShowHeader;
 	QCheckBox							*qchbShowDirInformation;

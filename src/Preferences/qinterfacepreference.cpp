@@ -26,6 +26,7 @@ void QInterfacePreference::saveSettings()
 	settings->setValue("Interface/ShowDriveBar", qchbShowDriveBar->isChecked());
 	settings->setValue("Interface/ShowTwoDriveBar", qchbShowTwoDriveBar->isChecked());
 	settings->setValue("Interface/ShowDriveButton", qchbShowDriveButton->isChecked());
+	settings->setValue("Interface/ShowDriveComboBox", qchbShowDriveComboBox->isChecked());
 	settings->setValue("Interface/ShowTabs", qchbShowTabs->isChecked());
 	settings->setValue("Interface/ShowHeader", qchbShowHeader->isChecked());
 	settings->setValue("Interface/ShowDirInformation", qchbShowDirInformation->isChecked());
@@ -49,6 +50,7 @@ void QInterfacePreference::loadSettings()
 	qchbShowDriveBar->setChecked(settings->value("Interface/ShowDriveBar", true).toBool());
 	qchbShowTwoDriveBar->setChecked(settings->value("Interface/ShowTwoDriveBar", true).toBool());
 	qchbShowDriveButton->setChecked(settings->value("Interface/ShowDriveButton", true).toBool());
+	qchbShowDriveComboBox->setChecked(settings->value("Interface/ShowDriveComboBox", true).toBool());
 	qchbShowTabs->setChecked(settings->value("Interface/ShowTabs", true).toBool());
 	qchbShowHeader->setChecked(settings->value("Interface/ShowHeader", true).toBool());
 	qchbShowDirInformation->setChecked(settings->value("Interface/ShowDirInformation", true).toBool());
@@ -76,6 +78,7 @@ void QInterfacePreference::createControls()
 	qchbShowDriveBar = new QCheckBox(tr("Show drive bars"), this);
 	qchbShowTwoDriveBar = new QCheckBox(tr("Show two drive bars"), this);
 	qchbShowDriveButton = new QCheckBox(tr("Show drive button"), this);
+	qchbShowDriveComboBox = new QCheckBox(tr("Show drive combobox"), this);
 	qchbShowTabs = new QCheckBox(tr("Show tabs"), this);
 	qchbShowHeader = new QCheckBox(tr("Show headers"), this);
 	qchbShowDirInformation = new QCheckBox(tr("Show dir information"), this);
@@ -103,6 +106,7 @@ void QInterfacePreference::setLayouts()
 	qvblGlobalLayout->addWidget(qchbShowDriveBar);
 	qvblGlobalLayout->addWidget(qchbShowTwoDriveBar);
 	qvblGlobalLayout->addWidget(qchbShowDriveButton);
+	qvblGlobalLayout->addWidget(qchbShowDriveComboBox);
 	qvblGlobalLayout->addWidget(qchbShowTabs);
 	qvblGlobalLayout->addWidget(qchbShowHeader);
 	qvblGlobalLayout->addWidget(qchbShowDirInformation);
