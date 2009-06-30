@@ -127,6 +127,7 @@ void QDriveBar::slotDiscChanged()
 		{
 			qaLastChecked=action;
 			emit discChanged(path);
+			qsCurrentPath = path;
 		}
 		else
 		{
