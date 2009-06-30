@@ -736,7 +736,8 @@ bool QFileOperationsThread::isLocalFileSystem(const QString& filePath)
 	delete engine;
 	return isLocalDisk;
 #else
-	QAbstractFileEngine* engine = mFileInfo.fileEngine();
+	QFileInfo fi(filePath);
+	QAbstractFileEngine* engine = fi.fileEngine();
 	if(fe)
 		return (engine->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
 	return false;
