@@ -854,11 +854,9 @@ void FileWidget::setDirectory(const QString& directory)
 	d->treeView->clearSelection();
 	const QModelIndex root = d->model->setRootPath(newDirectory);
 	d->newFolderAction->setEnabled(d->model->flags(root) & Qt::ItemIsDropEnabled);
-	emit directoryEntered(newDirectory);
 	if(root != d->rootIndex())
-	{
 		d->setRootIndex(root);
-	}
+	emit directoryEntered(newDirectory);
 
 	//setUpdatesEnabled(true);
 }
