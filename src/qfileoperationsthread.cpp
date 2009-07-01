@@ -307,7 +307,7 @@ bool QFileOperationsThread::removeFile(const QString& qsFileName)
 
 	if (fileInfo.isHidden()
 #ifdef Q_WS_WIN
-		|| isSystemFile(qsFileName)
+		|| (QFileOperationsThread::winFileAttributes(qsFileName) & FILE_ATTRIBUTE_SYSTEM)
 #endif
 	)
 	{
@@ -736,7 +736,8 @@ bool QFileOperationsThread::isLocalFileSystem(const QString& filePath)
 	delete engine;
 	return isLocalDisk;
 #else
-	QAbstractFileEngine* engine = mFileInfo.fileEngine();
+	QFileInfo fi(filePath);
+	QAbstractFileEngine* engine = fi.fileEngine();
 	if(fe)
 		return (engine->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
 	return false;
@@ -823,7 +824,7 @@ bool QFileOperationsThread::getDiskSpace(const QString& dirPath, qint64* total, 
 #endif
 #ifdef Q_OS_UNIX
 	struct statvfs fs;
-	res = (statvfs(QFile::encodeName(dirPath).data(), &fs) < 0);
+	res = (statvfs(QFile::encodeName(dirPath).data(), &fs) == 0);
 	if(res)
 	{
 		if(total)
@@ -891,13 +892,17 @@ QString QFileOperationsThread::diskLabel(const QString& fileName)
 	QT_WA({
 		TCHAR volumeLabel[101];
 		DWORD bufferSize = 100;
-		GetVolumeInformationW((TCHAR*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0);
-		label = QString::fromUtf16((ushort*)volumeLabel);
+		if (GetVolumeInformationW((TCHAR*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
+			label = QString::fromUtf16((ushort*)volumeLabel);
+		else
+			label = tr("_ERROR_GETTING_LABEL_");
 	} , {
 		char volumeLabel[101];
 		DWORD bufferSize = 100;
-		GetVolumeInformationA(path.toLocal8Bit(), volumeLabel, bufferSize, 0, 0, 0, 0, 0);
-		label = QString::fromLocal8Bit(volumeLabel);
+		if (GetVolumeInformationA(path.toLocal8Bit(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
+			label = QString::fromLocal8Bit(volumeLabel);
+		else
+			label = tr("_ERROR_GETTING_LABEL_");
 	});
 #endif
 	return label;
@@ -993,24 +998,22 @@ bool QFileOperationsThread::execute(const QString& filePath, const QStringList& 
 }
 //
 #ifdef Q_WS_WIN
-bool QFileOperationsThread::isSystemFile(const QString& filePath)
+qint64 QFileOperationsThread::winFileAttributes(const QString& filePath)
 {
-	bool isSystem = false;
-
+	DWORD fileAttrib = INVALID_FILE_ATTRIBUTES;
 	if(isLocalFileSystem(filePath))
 	{
-		QString path = filePath;
+		QString path = QDir::fromNativeSeparators(filePath);
 		if(path.length() == 2 && path.at(1) == QLatin1Char(':'))
 			path += QLatin1Char('\\');
 
-		DWORD fileAttrib = INVALID_FILE_ATTRIBUTES;
 		QT_WA({
 			fileAttrib = ::GetFileAttributesW((TCHAR*)path.utf16());
 		} , {
 			QString fpath = QFileInfo(path).absoluteFilePath();
 			fileAttrib = ::GetFileAttributesA(fpath.toLocal8Bit());
 		});
-		if(fileAttrib == INVALID_FILE_ATTRIBUTES)
+		if (fileAttrib == INVALID_FILE_ATTRIBUTES)
 		{
 			// path for FindFirstFile should not be end in a trailing slash or slosh
 			while(path.endsWith(QLatin1Char('\\')))
@@ -1027,16 +1030,14 @@ bool QFileOperationsThread::isSystemFile(const QString& filePath)
 				findFileHandle = ::FindFirstFileA(fpath.toLocal8Bit(),
 													(WIN32_FIND_DATAA*)&findData);
 			});
-			if (findFileHandle != INVALID_HANDLE_VALUE) {
+			if (findFileHandle != INVALID_HANDLE_VALUE)
+			{
 				::FindClose(findFileHandle);
 				fileAttrib = findData.dwFileAttributes;
 			}
 		}
-
-		isSystem = (fileAttrib != INVALID_FILE_ATTRIBUTES && (fileAttrib & FILE_ATTRIBUTE_SYSTEM));
 	}
-
-	return isSystem;
+	return qint64(fileAttrib);
 }
 #endif
 //
@@ -1046,24 +1047,23 @@ QStringList QFileOperationsThread::getDrivesList()
 #ifdef Q_WS_WIN
 	foreach(const QFileInfo& fileInfo, QDir::drives())
 		list.append(fileInfo.absolutePath());
-#endif
-#ifdef Q_OS_UNIX
-	QFile file;
-	file.setFileName("/etc/mtab");
-	if (file.open(QIODevice::ReadOnly))
+#else
+	QFile file("/etc/mtab");
+	if(file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
 		QTextStream stream(&file);
-		QString buffer;
-		int i=-1;
 		while(!stream.atEnd())
 		{
-			buffer=stream.readLine();
-			QFileInfo fileInfo(buffer.split(" ").at(1));
-			if (fileInfo.isDir())
-				list.append(fileInfo.absoluteFilePath());
+			QStringList params = stream.readLine().split(QLatin1Char(' '));
+			if(params.size() > 1)
+			{
+				QDir dir(params.at(1));
+				if(dir.exists())
+					list.append(dir.absoluteFilePath());
+			}
 		}
+		file.close();
 	}
-	file.close();
 	list.removeDuplicates();
 #endif
 

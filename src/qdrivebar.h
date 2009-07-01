@@ -13,6 +13,7 @@ private:
 	QActionGroup*		qagDrives;
 	QString					qsCurrentPath;
 	int				timerID;
+	int lastDrivesCount;
 
 public:
 	QDriveBar(QWidget* parent = 0);

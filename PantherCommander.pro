@@ -1,7 +1,7 @@
 TEMPLATE = app
 
 CONFIG += qt \
-	release \
+	debug-and-release \
 	warn_on
 QT += gui \
 	core

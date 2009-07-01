@@ -555,6 +555,11 @@ void FileWidgetPrivate::_q_addressChanged()
 	Q_Q(FileWidget);
 
 	q->setDirectory(pathLineEdit->text());
+
+	QString path = rootPath();
+	if(QFileOperationsThread::isLocalFileSystem(path))
+		path = QDir::toNativeSeparators(path);
+	pathLineEdit->setText(path);
 }
 
 /*!
@@ -796,7 +801,7 @@ QDir FileWidget::directory() const
 {
 	Q_D(const FileWidget);
 
-	return d->rootPath();
+	return QDir(d->rootPath());
 }
 
 /*!
@@ -823,19 +828,21 @@ void FileWidget::setDirectory(const QString& directory)
 	QDir dir(newDirectory);
 	bool isReadable = dir.isReadable();
 #ifdef Q_WS_WIN
-	if(!isReadable)
+/*3**/
+	if(isReadable)
 	{
 		if(newDirectory.startsWith(QLatin1String("//")))
-			isReadable |= (newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1);
-/*3**/
-		if(!isReadable)
+		{
+			isReadable = (newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1);
+		}
+		else
 		{
 			qt_ntfs_permission_lookup++;
 			isReadable = dir.isReadable();
 			qt_ntfs_permission_lookup--;
 		}
-/**3*/
 	}
+/**3*/
 #endif
 	if(!isReadable)
 	{
@@ -855,10 +862,8 @@ void FileWidget::setDirectory(const QString& directory)
 	const QModelIndex root = d->model->setRootPath(newDirectory);
 	d->newFolderAction->setEnabled(d->model->flags(root) & Qt::ItemIsDropEnabled);
 	if(root != d->rootIndex())
-	{
 		d->setRootIndex(root);
-		emit directoryEntered(newDirectory);
-	}
+	emit directoryEntered(newDirectory);
 
 	//setUpdatesEnabled(true);
 }

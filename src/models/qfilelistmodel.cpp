@@ -58,7 +58,7 @@ static void getInfoList(const QDir& dir, QFileInfoList* infos)
 static void getIcons(QList<QPCFileInfo*>* infos, QFileIconProvider* iconProvider)
 {
 	Q_ASSERT(infos);
-	Q_ASSERT(prov);
+	Q_ASSERT(iconProvider);
 
 	for(int i = 0, n = infos->size(); i < n; ++i)
 	{
@@ -416,28 +416,18 @@ QVariant QFileListModel::data(const QModelIndex& index, int role) const
 				case AttributesColumn:
 #ifdef Q_WS_WIN
 				{
-					QString attr;
-/*					if (node->attr & FILE_ATTRIBUTE_READONLY)
-						attr+="r";
-					else
-						attr+="-";
-					if (node->attr & FILE_ATTRIBUTE_ARCHIVE)
-						attr+="a";
-					else
-						attr+="-";
-					if (node->attr & FILE_ATTRIBUTE_HIDDEN)
-						attr+="h";
-					else
-						attr+="-";
-					if (node->attr & FILE_ATTRIBUTE_SYSTEM)
-						attr+="s";
-					else
-						attr+="-";
-					if (node->attr & FILE_ATTRIBUTE_COMPRESSED)
-						attr+="c";
-					else
-						attr+="-";*/
-					return attr;
+					qint64 attributes = QFileOperationsThread::winFileAttributes(node->absoluteFilePath());
+					if (attributes != INVALID_FILE_ATTRIBUTES)
+					{
+						QString attr;
+						attr += (attributes & FILE_ATTRIBUTE_READONLY) ? "r" : "-";
+						attr += (attributes & FILE_ATTRIBUTE_ARCHIVE) ? "a" : "-";
+						attr += (attributes & FILE_ATTRIBUTE_HIDDEN) ? "h" : "-";
+						attr += (attributes & FILE_ATTRIBUTE_SYSTEM) ? "s" : "-";
+						attr += (attributes & FILE_ATTRIBUTE_COMPRESSED) ? "c" : "-";
+						attr += (attributes & FILE_ATTRIBUTE_ENCRYPTED) ? "e" : "-";
+						return attr;
+					}
 				}
 #endif // Q_WS_WIN
 					break;

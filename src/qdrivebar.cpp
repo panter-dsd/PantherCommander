@@ -10,12 +10,14 @@
 #include "qdrivebar.h"
 #include "flowlayout.h"
 #include "appsettings.h"
+#include "qfileoperationsthread.h"
 
 #define TIMER_INTERVAL 2500
 
 QDriveBar::QDriveBar(QWidget* parent) : QFrame(parent)
 {
-	qaLastChecked=0;
+	qaLastChecked = 0;
+	lastDrivesCount = 0;
 	qagDrives=new QActionGroup(this);
 
 	slotRefresh();
@@ -127,6 +129,7 @@ void QDriveBar::slotDiscChanged()
 		{
 			qaLastChecked=action;
 			emit discChanged(path);
+			qsCurrentPath = path;
 		}
 		else
 		{
@@ -158,7 +161,11 @@ void QDriveBar::slotSetDisc(const QString& path)
 void QDriveBar::timerEvent(QTimerEvent *event)
 {
 	Q_UNUSED(event);
-	slotRefresh();
+	int count = QFileOperationsThread::getDrivesList().count();
+	if (lastDrivesCount != count) {
+		slotRefresh();
+		lastDrivesCount = count;
+	}
 }
 //
 

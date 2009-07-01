@@ -142,7 +142,11 @@ private slots:
 	void slotFindFiles();
 	void slotPreferences();
 
+	/* ** TESTING PURPOSES ONLY ** */
 	void slotTestingFileDialog();
+#ifdef Q_WS_WIN
+	void slotTestingEnableNTFSPermissionLookup(bool enable);
+#endif
 };
 
 #endif // MAINWINDOWIMPL_H
