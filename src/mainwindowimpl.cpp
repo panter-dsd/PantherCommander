@@ -33,7 +33,7 @@
 #include <QtGui/QSplitter>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QToolBar>
-//
+
 #include "appsettings.h"
 #include "findfilesdialog.h"
 #include "pantherviewer.h"
@@ -41,7 +41,7 @@
 #include "qfilepanel.h"
 #include "qfileoperationsdialog.h"
 #include "qpreferencesdialog.h"
-//
+
 MainWindowImpl::MainWindowImpl(QWidget* parent, Qt::WFlags f) : QMainWindow(parent, f)
 	, qlConsolePath(0)
 {
@@ -274,6 +274,9 @@ void MainWindowImpl::createMenus()
 
 	QMenu* qmTesting = menuBar()->addMenu("testing");
 	qmTesting->addAction("filedialog", this, SLOT(slotTestingFileDialog()));
+#ifdef Q_WS_WIN
+	qmTesting->addAction("ntfs_permission_lookup", this, SLOT(slotTestingEnableNTFSPermissionLookup(bool)));
+#endif
 }
 //
 void MainWindowImpl::createCommandButtons()
@@ -1353,3 +1356,15 @@ void MainWindowImpl::slotTestingFileDialog()
 	QFileDialog dialog(this);
 	dialog.exec();
 }
+
+#ifdef Q_WS_WIN
+extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
+
+void MainWindowImpl::slotTestingEnableNTFSPermissionLookup(bool enable)
+{
+	if(enable)
+		qt_ntfs_permission_lookup = 1;
+	else
+		qt_ntfs_permission_lookup = 0;
+}
+#endif
