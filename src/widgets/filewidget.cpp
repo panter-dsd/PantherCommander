@@ -831,9 +831,10 @@ void FileWidget::setDirectory(const QString& directory)
 /*3**/
 	if(isReadable)
 	{
-		if(newDirectory.startsWith(QLatin1String("//")))
+		if(newDirectory.startsWith(QLatin1String("//"))
+			&& newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1)
 		{
-			isReadable = (newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1);
+			isReadable = true;
 		}
 		else
 		{
