@@ -555,6 +555,11 @@ void FileWidgetPrivate::_q_addressChanged()
 	Q_Q(FileWidget);
 
 	q->setDirectory(pathLineEdit->text());
+
+	QString path = rootPath();
+	if(QFileOperationsThread::isLocalFileSystem(path))
+		path = QDir::toNativeSeparators(path);
+	pathLineEdit->setText(path);
 }
 
 /*!
@@ -796,7 +801,7 @@ QDir FileWidget::directory() const
 {
 	Q_D(const FileWidget);
 
-	return d->rootPath();
+	return QDir(d->rootPath());
 }
 
 /*!
