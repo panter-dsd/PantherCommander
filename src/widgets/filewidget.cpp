@@ -827,17 +827,22 @@ void FileWidget::setDirectory(const QString& directory)
 
 	QDir dir(newDirectory);
 	bool isReadable = false;
-#ifdef Q_WS_WIN
-/*3**/
-	qt_ntfs_permission_lookup++;
+#ifndef Q_WS_WIN
 	isReadable = dir.isReadable();
-	qt_ntfs_permission_lookup--;
-
-	if(newDirectory.startsWith(QLatin1String("//")))
-		isReadable |= (newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1);
-/**3*/
 #else
-	isReadable = dir.isReadable();
+/*3**/
+	if(newDirectory.startsWith(QLatin1String("//"))
+		&& newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1)
+	{
+		isReadable = true;
+	}
+	else
+	{
+		qt_ntfs_permission_lookup++;
+		isReadable = dir.isReadable();
+		qt_ntfs_permission_lookup--;
+	}
+/**3*/
 #endif
 	if(!isReadable)
 	{
