@@ -198,7 +198,8 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 {
 	if(!isLocalFileSystem(qsDestFileName))
 		return true;
-
+	const QString qsSource = QDir::toNativeSeparators(qsSourceFileName);
+	const QString qsDest = QDir::toNativeSeparators(qsDestFileName);
 #ifdef Q_WS_WIN
 	FILETIME time;
 	FILETIME time1;
@@ -206,7 +207,7 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 	HANDLE firstFileHandle = INVALID_HANDLE_VALUE;
 	HANDLE secondFileHandle = INVALID_HANDLE_VALUE;
 	QT_WA({
-		firstFileHandle = CreateFileW((TCHAR*)qsSourceFileName.utf16(),
+		firstFileHandle = CreateFileW((TCHAR*)qsSource.utf16(),
 							0,
 							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
 							0,
@@ -214,7 +215,7 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 							0,
 							0);
 	} , {
-		firstFileHandle = CreateFileA(qsSourceFileName.toLocal8Bit(),
+		firstFileHandle = CreateFileA(qsSource.toLocal8Bit(),
 							0,
 							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
 							0,
@@ -226,7 +227,7 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 		return false;
 
 	QT_WA({
-		secondFileHandle = CreateFileW((TCHAR*)qsDestFileName.utf16(),
+		secondFileHandle = CreateFileW((TCHAR*)qsDest.utf16(),
 							GENERIC_WRITE,
 							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
 							0,
@@ -234,7 +235,7 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 							0,
 							0);
 	} , {
-		secondFileHandle = CreateFileA(qsDestFileName.toLocal8Bit(),
+		secondFileHandle = CreateFileA(qsDest.toLocal8Bit(),
 							GENERIC_WRITE,
 							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
 							0,
@@ -248,23 +249,23 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 		return false;
 	}
 
-	if (!GetFileTime(firstFileHandle,&time,&time1,&time2) && !SetFileTime(secondFileHandle,&time,&time1,&time2))
+	if (!(GetFileTime(firstFileHandle,&time,&time1,&time2) && SetFileTime(secondFileHandle,&time,&time1,&time2)))
 	{
 		CloseHandle(firstFileHandle);
 		CloseHandle(secondFileHandle);
 		return false;
-	}
+	};
 	CloseHandle(firstFileHandle);
 	CloseHandle(secondFileHandle);
 #endif
 #ifdef Q_OS_UNIX
 	struct stat st;
-	if (stat(QFile::encodeName(qsSourceFileName).data(), &st) != 0)
+	if (stat(QFile::encodeName(qsSource).data(), &st) != 0)
 		return false;
 	struct utimbuf time;
 	time.actime = st.st_atime;
 	time.modtime = st.st_mtime;
-	if (utime(QFile::encodeName(qsDestFileName).data(), &time) != 0)
+	if (utime(QFile::encodeName(qsDest).data(), &time) != 0)
 		return false;
 #endif
 
