@@ -47,8 +47,11 @@ QFilePanel::QFilePanel(QWidget* parent) : QWidget(parent),
 
 	updateDiscInformation();
 	const QString path=qflvCurrentFileList->directory().absolutePath();
-	if (!path.startsWith("/"))
-		qtbDriveButton->setText(path.mid(0,1));
+	if(!path.isEmpty() && !path.startsWith("/"))
+	{
+		qtbDriveButton->setText(path[0]);
+		qcbDriveComboBox->setCurrentIndex(qcbDriveComboBox->findText(path[0], Qt::MatchContains));
+	}
 	timerID=startTimer(TIMER_INTERVAL);
 }
 
@@ -65,9 +68,15 @@ void QFilePanel::createWidgets()
 	qtbDriveButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 	qtbDriveButton->setAutoRaise(true);
 	qtbDriveButton->setFocusPolicy(Qt::NoFocus);
-	connect(qtbDriveButton, SIGNAL(clicked()),
-			this, SLOT(slotSelectDisc()));
+	connect(qtbDriveButton, SIGNAL(clicked()), this, SLOT(slotSelectDisc()));
 
+	qcbDriveComboBox = new QComboBox(this);
+	qcbDriveComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+	foreach(const QString& str, QFileOperationsThread::getDrivesList())
+	{
+		if(!str.isEmpty())
+			qcbDriveComboBox->addItem(QString("[-%1-]").arg(str[0]));
+	}
 
 	qlDiscInformation=new QLabel(this);
 
@@ -94,6 +103,7 @@ void QFilePanel::createWidgets()
 
 	QHBoxLayout* qhbDiscLayout = new QHBoxLayout;
 	qhbDiscLayout->addWidget(qtbDriveButton);
+	qhbDiscLayout->addWidget(qcbDriveComboBox);
 	qhbDiscLayout->addWidget(qlDiscInformation);
 
 	QVBoxLayout* layout = new QVBoxLayout;
@@ -110,6 +120,9 @@ void QFilePanel::createActions()
 {
 	actionAddTab = new QAction(this);
 	actionAddTab->setText(tr("Add copy of this tab"));
+#ifndef Q_CC_MSVC
+	#warning "TODO: this set only current path in new tab, but must set path from clicked tab"
+#endif
 	connect(actionAddTab, SIGNAL(triggered(bool)), this, SLOT(slotAddTab()));
 	qtabbTabs->addAction(actionAddTab);
 }
@@ -119,18 +132,24 @@ void QFilePanel::slotPathChanged(const QString& path)
 	updateDiscInformation();
 
 	QString tabText;
-#ifdef Q_WS_WIN
-	tabText = QDir(path).absolutePath().mid(0,2) + QDir(path).dirName();
-	if (!path.startsWith("/"))
-		qtbDriveButton->setText(path.mid(0,1));
-#else
 	QDir dir(path);
+#ifdef Q_WS_WIN
+	tabText = path.startsWith(QLatin1Char('/')) ? QLatin1String("\\:") : dir.absolutePath().mid(0,2);
+	tabText += dir.dirName();
+
+	if (!path.isEmpty() && !path.startsWith(QLatin1Char('/')))
+	{
+		qtbDriveButton->setText(path[0]);
+		qcbDriveComboBox->setCurrentIndex(qcbDriveComboBox->findText(path[0], Qt::MatchContains));
+	}
+#else
 	if(!dir.isRoot())
 		tabText = dir.dirName();
 	else
 		tabText = QLatin1String("/");
 #endif
 	qtabbTabs->setTabText(qtabbTabs->currentIndex(), tabText);
+	qtabbTabs->setTabToolTip(qtabbTabs->currentIndex(), QDir::toNativeSeparators(path));
 }
 //
 int QFilePanel::addTab(const QString& path, bool bSetCurrent)
@@ -142,10 +161,10 @@ int QFilePanel::addTab(const QString& path, bool bSetCurrent)
 		qsPath = QApplication::applicationDirPath();
 
 	QString tabText;
-#ifdef Q_WS_WIN
-	tabText = QDir(path).absolutePath().mid(0, 2) + QDir(path).dirName();
-#else
 	QDir dir(path);
+#ifdef Q_WS_WIN
+	tabText = dir.absolutePath().left(2) + dir.dirName();
+#else
 	if(!dir.isRoot())
 		tabText = dir.dirName();
 	else
@@ -153,6 +172,7 @@ int QFilePanel::addTab(const QString& path, bool bSetCurrent)
 #endif
 
 	int index = qtabbTabs->addTab(tabText);
+	qtabbTabs->setTabToolTip(index, QDir::toNativeSeparators(path));
 	if(bSetCurrent)
 	{
 		qtabbTabs->setCurrentIndex(index);
@@ -326,6 +346,7 @@ void QFilePanel::loadSettings()
 	settings->endGroup();
 
 	qtbDriveButton->setVisible(settings->value("Interface/ShowDriveButton", true).toBool());
+	qcbDriveComboBox->setVisible(settings->value("Interface/ShowDriveComboBox", true).toBool());
 	qtabbTabs->setVisible(settings->value("Interface/ShowTabs", true).toBool());
 }
 //
@@ -442,4 +463,3 @@ void QFilePanel::slotSelectDisc()
 		setPath(dialog->discName());
 	delete dialog;
 }
-//

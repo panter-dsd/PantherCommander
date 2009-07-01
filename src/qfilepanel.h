@@ -33,6 +33,7 @@ class QTabBar;
 class QAction;
 class QPushButton;
 class QToolButton;
+class QComboBox;
 
 class FileWidget;
 
@@ -45,6 +46,7 @@ private:
 	FileWidget*						qflvCurrentFileList;
 	QLabel*							qlDiscInformation;
 	QToolButton*					qtbDriveButton;
+	QComboBox* qcbDriveComboBox;
 
 	QAction*						actionAddTab;
 
