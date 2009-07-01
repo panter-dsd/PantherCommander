@@ -1059,7 +1059,7 @@ QStringList QFileOperationsThread::getDrivesList()
 			{
 				QDir dir(params.at(1));
 				if(dir.exists())
-					list.append(dir.absoluteFilePath());
+					list.append(dir.absolutePath());
 			}
 		}
 		file.close();
