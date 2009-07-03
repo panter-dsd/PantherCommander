@@ -26,6 +26,7 @@
 
 #include <QtGui/QApplication>
 #include <QtGui/QDrag>
+#include <QtGui/QHeaderView>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QStyle>
@@ -58,8 +59,8 @@ QRect QFullView::visualRect(const QModelIndex& index) const
 	if(index.row() < 0 || index.column() < 0 || index.model() != model())
 		return QRect();
 
-	QModelIndex left = index.sibling(index.row(), 0);
-	QModelIndex right = index.sibling(index.row(), index.model()->columnCount(index.parent()) - 1);
+	QModelIndex left = index.sibling(index.row(), header()->visualIndex(0));
+	QModelIndex right = index.sibling(index.row(), header()->visualIndex(index.model()->columnCount(index.parent()) - 1));
 	return QRect(QTreeView::visualRect(left).topLeft(), QTreeView::visualRect(right).bottomRight());
 }
 
