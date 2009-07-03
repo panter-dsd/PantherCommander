@@ -275,7 +275,8 @@ void MainWindowImpl::createMenus()
 	QMenu* qmTesting = menuBar()->addMenu("testing");
 	qmTesting->addAction("filedialog", this, SLOT(slotTestingFileDialog()));
 #ifdef Q_WS_WIN
-	qmTesting->addAction("ntfs_permission_lookup", this, SLOT(slotTestingEnableNTFSPermissionLookup(bool)));
+	QAction* action = qmTesting->addAction("ntfs_permission_lookup", this, SLOT(slotTestingEnableNTFSPermissionLookup(bool)));
+	action->setCheckable(true);
 #endif
 }
 //
