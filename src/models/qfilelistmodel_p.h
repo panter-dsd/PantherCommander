@@ -208,6 +208,7 @@ public:
 				&& index.column() < q->columnCount(index.parent()));
 	}
 	static QString size(qint64 bytes);
+	static QString permissions(QFile::Permissions perms);
 
 	QFileListModel* q_ptr;
 

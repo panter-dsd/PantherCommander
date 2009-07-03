@@ -427,6 +427,23 @@ QString QFileListModelPrivate::size(qint64 bytes)
 	return QFileListModel::tr("%1 bytes").arg(QLocale().toString(bytes));
 }
 
+QString QFileListModelPrivate::permissions(QFile::Permissions perms)
+{
+	QString ret;
+	ret.append((perms & QFile::ReadUser) ? "r" : "-");
+	ret.append((perms & QFile::WriteUser) ? "w" : "-");
+	ret.append((perms & QFile::ExeUser) ? "x" : "-");
+
+	ret.append((perms & QFile::ReadGroup) ? "r" : "-");
+	ret.append((perms & QFile::WriteGroup) ? "w" : "-");
+	ret.append((perms & QFile::ExeGroup) ? "x" : "-");
+
+	ret.append((perms & QFile::ReadOther) ? "r" : "-");
+	ret.append((perms & QFile::WriteOther) ? "w" : "-");
+	ret.append((perms & QFile::ExeOther) ? "x" : "-");
+	return ret;
+}
+
 QVariant QFileListModel::data(const QModelIndex& index, int role) const
 {
 	Q_D(const QFileListModel);
@@ -452,7 +469,7 @@ QVariant QFileListModel::data(const QModelIndex& index, int role) const
 				case ModifiedTimeColumn: return node->lastModified().toString("dd.MM.yy hh:mm:ss");
 				case OwnerColumn: return node->fileInfo().owner();
 				case GroupColumn: return node->fileInfo().group();
-				case PermissionsColumn: return QString();//d->permissions(node->permissions());
+				case PermissionsColumn: return d->permissions(node->permissions());
 				case AttributesColumn:
 #ifdef Q_WS_WIN
 				{
@@ -616,7 +633,10 @@ QModelIndex QFileListModel::setRootPath(const QString& path)
 #ifndef QT_NO_FILESYSTEMWATCHER
 	if(!d->fileSystemWatcher->directories().isEmpty())
 		d->fileSystemWatcher->removePaths(d->fileSystemWatcher->directories());
-	d->fileSystemWatcher->addPath(d->rootDir.absolutePath());
+#ifdef Q_WS_WIN
+	if(!d->rootDir.absolutePath().startsWith(QLatin1String("//")))
+#endif
+		d->fileSystemWatcher->addPath(d->rootDir.absolutePath());
 #endif
 
 	emit rootPathChanged(d->rootDir.absolutePath());
