@@ -191,6 +191,7 @@ public:
 
 	QPCFileInfo* node(const QModelIndex& index) const;
 	QModelIndex index(const QPCFileInfo* node) const;
+	QModelIndex index(const QString& fileName, int column) const;
 
 	void fetchFileList();
 	void updateFileList();

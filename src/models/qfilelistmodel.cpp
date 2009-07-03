@@ -117,6 +117,22 @@ QModelIndex QFileListModelPrivate::index(const QPCFileInfo* node) const
 	return q_func()->createIndex(visualRow, 0, const_cast<QPCFileInfo*>(node));
 }
 
+QModelIndex QFileListModelPrivate::index(const QString& fileName, int column) const
+{
+	if(fileName == root.fileName())
+		return QModelIndex();
+
+	// get the parent's row
+	for(int row = 0, n = nodes.size(); row < n; ++row)
+	{
+		QPCFileInfo* node = nodes.at(row);
+		if(fileName == node->fileName())
+			return q_func()->createIndex(row, column, node);
+	}
+
+	return QModelIndex();
+}
+
 void QFileListModelPrivate::fetchFileList()
 {
 	Q_Q(QFileListModel);
@@ -218,10 +234,10 @@ void QFileListModelPrivate::updateFileList()
 	{
 		emit q->layoutAboutToBeChanged();
 		QModelIndexList oldList = q->persistentIndexList();
-		QList<QPair<QPCFileInfo*, int> > oldNodes;
+		QList<QPair<QString, int> > oldNodes;
 		for(int i = 0, n = oldList.size(); i < n; ++i)
 		{
-			QPair<QPCFileInfo*, int> pair(node(oldList.at(i)), oldList.at(i).column());
+			QPair<QString, int> pair(node(oldList.at(i))->fileName(), oldList.at(i).column());
 			oldNodes.append(pair);
 		}
 
@@ -241,8 +257,7 @@ void QFileListModelPrivate::updateFileList()
 		QModelIndexList newList;
 		for(int i = 0, n = oldNodes.size(); i < n; ++i)
 		{
-			QModelIndex idx = index(oldNodes.at(i).first);
-			idx = idx.sibling(idx.row(), oldNodes.at(i).second);
+			QModelIndex idx = index(oldNodes.at(i).first, oldNodes.at(i).second);
 			newList.append(idx);
 		}
 		q->changePersistentIndexList(oldList, newList);
@@ -634,10 +649,10 @@ void QFileListModel::sort(int column, Qt::SortOrder order)
 
 	emit layoutAboutToBeChanged();
 	QModelIndexList oldList = persistentIndexList();
-	QList<QPair<QPCFileInfo*, int> > oldNodes;
+	QList<QPair<QString, int> > oldNodes;
 	for(int i = 0, n = oldList.size(); i < n; ++i)
 	{
-		QPair<QPCFileInfo*, int> pair(d->node(oldList.at(i)), oldList.at(i).column());
+		QPair<QString, int> pair(d->node(oldList.at(i))->fileName(), oldList.at(i).column());
 		oldNodes.append(pair);
 	}
 
@@ -673,8 +688,7 @@ void QFileListModel::sort(int column, Qt::SortOrder order)
 	QModelIndexList newList;
 	for(int i = 0, n = oldNodes.size(); i < n; ++i)
 	{
-		QModelIndex idx = d->index(oldNodes.at(i).first);
-		idx = idx.sibling(idx.row(), oldNodes.at(i).second);
+		QModelIndex idx = d->index(oldNodes.at(i).first, oldNodes.at(i).second);
 		newList.append(idx);
 	}
 	changePersistentIndexList(oldList, newList);
