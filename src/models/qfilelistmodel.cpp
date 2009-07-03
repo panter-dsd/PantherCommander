@@ -725,9 +725,11 @@ void QFileListModel::sort(int column, Qt::SortOrder order)
 	while(sortFuture.isRunning())
 		QCoreApplication::processEvents();
 	infos = sortFuture.result();
-	qDeleteAll(d->nodes);
 	for(int i = 0, n = infos.size(); i < n; ++i)
-		d->nodes[i] = new QPCFileInfo(infos.at(i));
+	{
+		int j = d->index(infos.at(i).fileName(), 0).row();
+		d->nodes.swap(i, j);
+	}
 
 
 	QModelIndexList newList;
