@@ -773,7 +773,7 @@ QFileOperationsDialog* MainWindowImpl::addJob(QFileOperationsDialog* queue, QFil
 {
 	if(!queue)
 	{
-		queue = new QFileOperationsDialog(this);
+		queue = new QFileOperationsDialog(0);
 		connect(queue, SIGNAL(finished(int)),
 				this, SLOT(slotQueueFinished()));
 		connect(queue, SIGNAL(jobChanged()),
