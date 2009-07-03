@@ -29,7 +29,6 @@
 
 #include <QtGui/QAction>
 #include <QtGui/QAbstractProxyModel>
-//#include <QtGui/QFileSystemModel>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
 #include <QtGui/QTreeView>
@@ -38,7 +37,6 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPaintEvent>
 
-//#include "abstractfilesystemmodel.h"
 #include "qfilelistmodel.h"
 
 class AddressLineEdit : public QLineEdit
@@ -167,7 +165,6 @@ public:
 
 	FileWidget* q_ptr;
 
-//	QFileSystemModel* model;
 	QFileListModel* model;
 	QAbstractProxyModel* proxyModel;
 	QTreeView* treeView;

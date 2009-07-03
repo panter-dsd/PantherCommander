@@ -41,17 +41,10 @@
 #include <QtGui/QToolButton>
 
 #include "qfileoperationsthread.h"
-#include "qfilelistsortfilterproxymodel.h"
+//#include "qfilelistsortfilterproxymodel.h"
 #include "qfullview.h"
 #include <QDebug>
 #include <QtGui/QMessageBox>
-
-#ifndef Q_CC_MSVC
-	#warning "TODO: rename to Q?FileSystem.*View"
-#endif
-#ifdef Q_WS_WIN
-/*3*/extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
-#endif
 
 inline static QString _helper_get_directory(const QString& path)
 {
@@ -86,7 +79,6 @@ void FileWidgetPrivate::createWidgets()
 {
 	Q_Q(FileWidget);
 
-//	model = new QFileSystemModel(q);
 	model = new QFileListModel(q);
 	model->setObjectName(QLatin1String("_filesystem_model"));
 	QDir::Filters filters = QDir::AllDirs | QDir::Files | QDir::Drives;
@@ -813,6 +805,9 @@ QDir FileWidget::directory() const
 /*!
 	Sets the file view's current \a directory.
 */
+#ifdef Q_WS_WIN
+/*3*/extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
+#endif
 void FileWidget::setDirectory(const QString& directory)
 {
 	if(directory.isEmpty())
