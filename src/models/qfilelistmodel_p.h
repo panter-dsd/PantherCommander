@@ -193,6 +193,7 @@ public:
 	QModelIndex index(const QPCFileInfo* node) const;
 	QModelIndex index(const QString& fileName, int column) const;
 
+	void abort();
 	void fetchFileList();
 	void updateFileList();
 
@@ -226,6 +227,9 @@ public:
 #ifndef QT_NO_FILESYSTEMWATCHER
 	QFileSystemWatcher* fileSystemWatcher;
 #endif
+
+	ushort inUpdate : 1;
+	ushort sheduledUpdate : 1;
 	QBasicTimer updateTimer;
 };
 

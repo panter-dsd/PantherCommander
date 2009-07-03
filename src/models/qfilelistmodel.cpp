@@ -70,7 +70,8 @@ static void getIcons(QList<QPCFileInfo*>* infos, QFileIconProvider* iconProvider
 
 
 QFileListModelPrivate::QFileListModelPrivate() : q_ptr(0),
-	sortColumn(0), sortOrder(Qt::AscendingOrder), sort(QDir::DirsFirst | QDir::IgnoreCase | QDir::Name)
+	sortColumn(0), sortOrder(Qt::AscendingOrder), sort(QDir::DirsFirst | QDir::IgnoreCase | QDir::Name),
+	inUpdate(false), sheduledUpdate(false)
 {
 	iconProvider = new QFileIconProvider();
 
@@ -81,8 +82,7 @@ QFileListModelPrivate::QFileListModelPrivate() : q_ptr(0),
 
 QFileListModelPrivate::~QFileListModelPrivate()
 {
-	future.cancel();
-	future.waitForFinished();
+	abort();
 
 	qDeleteAll(nodes);
 	nodes.clear();
@@ -94,6 +94,8 @@ QFileListModelPrivate::~QFileListModelPrivate()
 	delete fileSystemWatcher;
 	fileSystemWatcher = 0;
 #endif
+
+	q_ptr = 0;
 }
 
 QPCFileInfo* QFileListModelPrivate::node(const QModelIndex& index) const
@@ -133,12 +135,26 @@ QModelIndex QFileListModelPrivate::index(const QString& fileName, int column) co
 	return QModelIndex();
 }
 
+void QFileListModelPrivate::abort()
+{
+	future.cancel();
+	future.waitForFinished();
+	sheduledUpdate = false;
+}
+
 void QFileListModelPrivate::fetchFileList()
 {
 	Q_Q(QFileListModel);
 
-	future.cancel();
-	future.waitForFinished();
+	if(inUpdate)
+	{
+		sheduledUpdate = true;
+		return;
+	}
+
+	inUpdate = true;
+
+	abort();
 
 	rootDir.setFilter(QDir::AllEntries | QDir::Hidden | QDir::System);
 	rootDir.setSorting(QDir::Unsorted);
@@ -183,14 +199,23 @@ void QFileListModelPrivate::fetchFileList()
 		future = QtConcurrent::run(getIcons, &nodes, iconProvider);
 		futureWatcher.setFuture(future);
 	}
+
+	inUpdate = false;
 }
 
 void QFileListModelPrivate::updateFileList()
 {
 	Q_Q(QFileListModel);
 
-	future.cancel();
-	future.waitForFinished();
+	if(inUpdate)
+	{
+		sheduledUpdate = true;
+		return;
+	}
+
+	inUpdate = true;
+
+	abort();
 
 	rootDir.setFilter(QDir::AllEntries | QDir::Hidden | QDir::System);
 	rootDir.setSorting(QDir::Unsorted);
@@ -267,16 +292,16 @@ void QFileListModelPrivate::updateFileList()
 		future = QtConcurrent::run(getIcons, &nodes, iconProvider);
 		futureWatcher.setFuture(future);
 	}
+
+	inUpdate = false;
 }
 
 void QFileListModelPrivate::_q_directoryChanged()
 {
 	Q_Q(QFileListModel);
+	sheduledUpdate = true;
 	if(!updateTimer.isActive())
-	{
-		updateTimer.start(1500, q);
-		updateFileList();
-	}
+		updateTimer.start(300, q);
 }
 
 void QFileListModelPrivate::_q_finishedLoadIcons()
@@ -695,6 +720,13 @@ void QFileListModel::sort(int column, Qt::SortOrder order)
 	emit layoutChanged();
 }
 
+void QFileListModel::abort()
+{
+	Q_D(QFileListModel);
+	d->updateTimer.stop();
+	d->abort();
+}
+
 void QFileListModel::refresh()
 {
 	Q_D(QFileListModel);
@@ -817,7 +849,15 @@ void QFileListModel::timerEvent(QTimerEvent* event)
 {
 	Q_D(QFileListModel);
 	if(event->timerId() == d->updateTimer.timerId())
+	{
 		d->updateTimer.stop();
+		if(d->sheduledUpdate)
+		{
+			d->updateTimer.start(1500, this);
+			d->updateFileList();
+		}
+	}
+	QAbstractItemModel::timerEvent(event);
 }
 
 #include "moc_qfilelistmodel.cpp"

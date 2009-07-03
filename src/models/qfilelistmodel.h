@@ -104,6 +104,7 @@ public:
 	Qt::DropActions supportedDropActions() const;
 
 public Q_SLOTS:
+	void abort();
 	void refresh();
 
 protected:
