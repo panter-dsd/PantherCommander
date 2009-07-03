@@ -178,6 +178,7 @@ public:
 	QAction* navigateToHomeAction;
 	QAction* navigateToRootAction;
 	QAction* navigateHistoryAction;
+	QAction* refreshListAction;
 	QAction* newFolderAction;
 	QAction* renameAction;
 	QAction* deleteAction;

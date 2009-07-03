@@ -246,7 +246,7 @@ void FileWidgetPrivate::createActions()
 	navigateToHomeAction->setIcon(q->style()->standardIcon(QStyle::SP_DirHomeIcon, 0, q));
 	navigateToHomeAction->setText("~");
 #ifndef QT_NO_SHORTCUT
-//	navigateToHomeAction->setShortcut(Qt::CTRL + Qt::Key_H + Qt::SHIFT);
+//	navigateToHomeAction->setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_H);
 #endif
 	navigateToHomeAction->setEnabled(true);
 	QObject::connect(navigateToHomeAction, SIGNAL(triggered(bool)), q, SLOT(_q_navigateToHome()));
@@ -267,6 +267,17 @@ void FileWidgetPrivate::createActions()
 	navigateHistoryAction->setEnabled(false);
 //	QObject::connect(navigateHistoryAction, SIGNAL(triggered(bool)), q, SLOT());
 	q->addAction(navigateHistoryAction);
+
+	refreshListAction = new QAction(q);
+	refreshListAction->setObjectName(QLatin1String("_refresh_list_action"));
+	refreshListAction->setIcon(q->style()->standardIcon(QStyle::SP_BrowserReload, 0, q));
+	refreshListAction->setText("Refresh");
+#ifndef QT_NO_SHORTCUT
+	refreshListAction->setShortcut(Qt::CTRL + Qt::Key_R);
+#endif
+	refreshListAction->setEnabled(true);
+	QObject::connect(refreshListAction, SIGNAL(triggered(bool)), model, SLOT(refresh()));
+	q->addAction(refreshListAction);
 
 	// operation actions
 #ifndef Q_CC_MSVC
@@ -533,6 +544,10 @@ void FileWidgetPrivate::_q_showContextMenu(const QPoint& position)
 		newFolderAction->setEnabled(newFolderAction->isEnabled());
 		menu.addAction(newFolderAction);
 	}
+
+	menu.addSeparator();
+	menu.addAction(refreshListAction);
+
 	menu.exec(view->viewport()->mapToGlobal(position));
 #endif // QT_NO_MENU
 }
