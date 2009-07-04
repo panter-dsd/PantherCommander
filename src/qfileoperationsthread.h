@@ -106,8 +106,8 @@ public:
 	static bool isLocalFileSystem(const QString& filePath);
 	static bool isSameDisc(const QString& source, const QString& dest);
 	static bool getDiskSpace(const QString& dirPath, qint64* total, qint64* free, qint64* available);
-	static QString rootPath(const QString& filePath);
 	static QString diskLabel(const QString& fileName);
+	static QString rootPath(const QString& filePath);
 	static bool isRoot(const QString &path);
 
 	static bool execute(const QString& filePath);

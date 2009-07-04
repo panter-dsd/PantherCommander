@@ -33,12 +33,6 @@
 
 #include <QtGui/QDesktopServices>
 
-#ifdef Q_OS_UNIX
-#include <sys/statvfs.h>
-#include <utime.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#endif
 #ifdef Q_WS_WIN
 #include "qt_windows.h"
 #define stat64 _stati64
@@ -48,7 +42,12 @@ void copyDirTime(const QString& sourceDir,const QString& destDir);
 #ifndef INVALID_FILE_ATTRIBUTES
 #  define INVALID_FILE_ATTRIBUTES (DWORD (-1))
 #endif
-#endif
+#else
+#include <sys/statvfs.h>
+#include <utime.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#endif // Q_WS_WIN
 
 #include "appsettings.h"
 
@@ -65,7 +64,7 @@ QFileOperationsThread::QFileOperationsThread(QObject* parent) : QThread(parent)
 	isSkipFile=false;
 	dirSize=filesCount=dirsCount=iPercent=0;
 }
-//
+
 bool QFileOperationsThread::copyFile(const QString& qsSourceFileName,const QString& qsDestFileName)
 {
 	QStringList params;
@@ -192,7 +191,7 @@ bool QFileOperationsThread::copyFile(const QString& qsSourceFileName,const QStri
 	emit changedPercent(100);
 	return true;
 }
-//
+
 bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const QString& qsDestFileName)
 {
 	if(!isLocalFileSystem(qsDestFileName))
@@ -256,8 +255,7 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 	};
 	CloseHandle(firstFileHandle);
 	CloseHandle(secondFileHandle);
-#endif
-#ifdef Q_OS_UNIX
+#else
 	struct stat st;
 	if (stat(QFile::encodeName(qsSource).data(), &st) != 0)
 		return false;
@@ -266,11 +264,10 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 	time.modtime = st.st_mtime;
 	if (utime(QFile::encodeName(qsDest).data(), &time) != 0)
 		return false;
-#endif
-
+#endif // Q_WS_WIN
 	return true;
 }
-//
+
 bool QFileOperationsThread::copyPermisions(const QString& qsSourceFileName,const QString& qsDestFileName)
 {
 	if(!isLocalFileSystem(qsDestFileName))
@@ -290,9 +287,9 @@ bool QFileOperationsThread::copyPermisions(const QString& qsSourceFileName,const
 		ret = true;
 #endif
 	return ret;
-#endif
+#endif // Q_WS_WIN
 }
-//
+
 bool QFileOperationsThread::removeFile(const QString& qsFileName)
 {
 	QStringList params;
@@ -337,7 +334,7 @@ bool QFileOperationsThread::removeFile(const QString& qsFileName)
 	emit changedValue(1);
 	return true;
 }
-//
+
 void QFileOperationsThread::run()
 {
 	dirSize = filesCount = dirsCount = iPercent = 0;
@@ -370,7 +367,7 @@ void QFileOperationsThread::run()
 	}
 	bStopped = true;
 }
-//
+
 void QFileOperationsThread::calculateDirSize(const QString& qsDir)
 {
 	QDir dir(qsDir);
@@ -395,13 +392,13 @@ void QFileOperationsThread::calculateDirSize(const QString& qsDir)
 
 	emit changedDirSize(dirSize, dirsCount, filesCount);
 }
-//
+
 void QFileOperationsThread::setJob(FileOperation job, const QStringList& params)
 {
 	operation = job;
 	qslParametres = params;
 }
-//
+
 bool QFileOperationsThread::copyDir(const QString& qsDirName, const QString& qsDestDir)
 {
 	QDir sourceDir(qsDirName);
@@ -459,10 +456,9 @@ bool QFileOperationsThread::copyDir(const QString& qsDirName, const QString& qsD
 		SetFileAttributesA(destDir.absolutePath().toLocal8Bit(), GetFileAttributesA(sourceDir.absolutePath().toLocal8Bit()));
 	});
 #endif
-
 	return true;
 }
-//
+
 bool QFileOperationsThread::removeDir(const QString& qsDirName)
 {
 	QDir dir(qsDirName);
@@ -522,7 +518,7 @@ bool QFileOperationsThread::removeDir(const QString& qsDirName)
 	emit changedValue(1);
 	return true;
 }
-//
+
 #ifdef Q_WS_WIN
 void copyDirTime(const QString& sourceDir,const QString& destDir)
 {
@@ -552,7 +548,7 @@ void copyDirTime(const QString& sourceDir,const QString& destDir)
 		CloseHandle(hDir);
 	}
 }
-//
+
 bool SetDirTime(QString fileName, FILETIME* dtCreation, FILETIME* dtLastAccessTime, FILETIME* dtLastWriteTime)
 {
 	bool res = false;
@@ -579,8 +575,8 @@ bool SetDirTime(QString fileName, FILETIME* dtCreation, FILETIME* dtLastAccessTi
 	}
 	return res;
 }
-#endif
-//
+#endif // Q_WS_WIN
+
 bool QFileOperationsThread::moveFile(const QString& qsSourceFileName,const QString& qsDestFileName)
 {
 	if (!QFileInfo(qsDestFileName).exists() && isSameDisc(qsSourceFileName,qsDestFileName))
@@ -591,7 +587,7 @@ bool QFileOperationsThread::moveFile(const QString& qsSourceFileName,const QStri
 
 	return false;
 }
-//
+
 bool QFileOperationsThread::moveDir(const QString& qsSourceDir, const QString& qsDestDir)
 {
 	if (!QFileInfo(qsDestDir).exists() && isSameDisc(qsSourceDir, qsDestDir))
@@ -664,7 +660,7 @@ bool QFileOperationsThread::moveDir(const QString& qsSourceDir, const QString& q
 
 	return true;
 }
-//
+
 bool QFileOperationsThread::error(const QStringList& params)
 {
 	errorParams=params;
@@ -726,7 +722,7 @@ bool QFileOperationsThread::error(const QStringList& params)
 	}
 	return !bStopped;
 }
-//
+
 bool QFileOperationsThread::isLocalFileSystem(const QString& filePath)
 {
 #if QT_VERSION < 0x040600
@@ -743,7 +739,7 @@ bool QFileOperationsThread::isLocalFileSystem(const QString& filePath)
 	return false;
 #endif
 }
-//
+
 bool QFileOperationsThread::isSameDisc(const QString& sourcePath, const QString& destPath)
 {
 	//TODO: `source' and `dest' both must be absolutePath-ed and nativeSeparator-ed here
@@ -784,18 +780,17 @@ bool QFileOperationsThread::isSameDisc(const QString& sourcePath, const QString&
 	});
 
 	FreeLibrary(kernelHnd);
-#endif // Q_WS_WIN
-#ifdef Q_OS_UNIX
+#else
 	struct stat stSource;
 	struct stat stDest;
 	stat(QFile::encodeName(source).data(), &stSource);
 	stat(QFile::encodeName(dest).data(), &stDest);
 	res = (stSource.st_dev == stDest.st_dev);
-#endif
+#endif // Q_WS_WIN
 
 	return res;
 }
-//
+
 bool QFileOperationsThread::getDiskSpace(const QString& dirPath, qint64* total, qint64* free, qint64* available)
 {
 	bool res = false;
@@ -821,8 +816,7 @@ bool QFileOperationsThread::getDiskSpace(const QString& dirPath, qint64* total, 
 		if(available)
 			*available = bytesUserFree;
 	}
-#endif
-#ifdef Q_OS_UNIX
+#else
 	struct statvfs fs;
 	res = (statvfs(QFile::encodeName(dirPath).data(), &fs) == 0);
 	if(res)
@@ -834,11 +828,35 @@ bool QFileOperationsThread::getDiskSpace(const QString& dirPath, qint64* total, 
 		if(available)
 			*available = fs.f_frsize * fs.f_bavail;
 	}
-#endif
+#endif // Q_WS_WIN
 
 	return res;
 }
-//
+
+QString QFileOperationsThread::diskLabel(const QString& fileName)
+{
+	QString label;
+#ifdef Q_WS_WIN
+	QString path = QDir::toNativeSeparators(rootPath(fileName));
+	QT_WA({
+		TCHAR volumeLabel[101];
+		DWORD bufferSize = 100;
+		if (GetVolumeInformationW((TCHAR*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
+			label = QString::fromUtf16((ushort*)volumeLabel);
+		else
+			label = tr("_ERROR_GETTING_LABEL_");
+	} , {
+		char volumeLabel[101];
+		DWORD bufferSize = 100;
+		if (GetVolumeInformationA(path.toLocal8Bit(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
+			label = QString::fromLocal8Bit(volumeLabel);
+		else
+			label = tr("_ERROR_GETTING_LABEL_");
+	});
+#endif
+	return label;
+}
+
 QString QFileOperationsThread::rootPath(const QString& filePath)
 {
 	QString rootPath;
@@ -879,35 +897,15 @@ QString QFileOperationsThread::rootPath(const QString& filePath)
 		rootPath = QDir::rootPath();
 #else
 	rootPath = QDir::rootPath();
-#endif
-
+#endif // Q_WS_WIN
 	return rootPath;
 }
-//
-QString QFileOperationsThread::diskLabel(const QString& fileName)
+
+bool QFileOperationsThread::isRoot(const QString &path)
 {
-	QString label;
-#ifdef Q_WS_WIN
-	QString path = QDir::toNativeSeparators(rootPath(fileName));
-	QT_WA({
-		TCHAR volumeLabel[101];
-		DWORD bufferSize = 100;
-		if (GetVolumeInformationW((TCHAR*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
-			label = QString::fromUtf16((ushort*)volumeLabel);
-		else
-			label = tr("_ERROR_GETTING_LABEL_");
-	} , {
-		char volumeLabel[101];
-		DWORD bufferSize = 100;
-		if (GetVolumeInformationA(path.toLocal8Bit(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
-			label = QString::fromLocal8Bit(volumeLabel);
-		else
-			label = tr("_ERROR_GETTING_LABEL_");
-	});
-#endif
-	return label;
+	return path == rootPath(path);
 }
-//
+
 bool QFileOperationsThread::execute(const QString& filePath)
 {
 	return execute(filePath, QStringList(), QDir::currentPath());
@@ -992,11 +990,10 @@ bool QFileOperationsThread::execute(const QString& filePath, const QStringList& 
 		if(QProcess::startDetached(fi.absoluteFilePath(), arguments, workingDirectory))
 			return true;
 	}
-#endif
-
+#endif // Q_WS_WIN
 	return QDesktopServices::openUrl(QUrl(filePath));
 }
-//
+
 #ifdef Q_WS_WIN
 qint64 QFileOperationsThread::winFileAttributes(const QString& filePath)
 {
@@ -1039,8 +1036,8 @@ qint64 QFileOperationsThread::winFileAttributes(const QString& filePath)
 	}
 	return qint64(fileAttrib);
 }
-#endif
-//
+#endif // Q_WS_WIN
+
 QFileInfoList QFileOperationsThread::volumes()
 {
 	QFileInfoList ret;
@@ -1063,12 +1060,6 @@ QFileInfoList QFileOperationsThread::volumes()
 		}
 		file.close();
 	}
-#endif
+#endif // Q_WS_WIN
 	return ret;
 }
-//
-bool QFileOperationsThread::isRoot(const QString &path)
-{
-	return path == rootPath(path);
-}
-//
