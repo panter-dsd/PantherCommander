@@ -42,15 +42,13 @@ static void getInfoList(const QDir& dir, QFileInfoList* infos)
 {
 	Q_ASSERT(infos);
 
-	bool isRoot = QFileOperationsThread::isRoot(dir.absolutePath());
-
 	QDirIterator it(dir);
 	while(it.hasNext())
 	{
 		it.next();
 
 		QFileInfo info(it.fileInfo());
-		if(info.fileName() != QLatin1String(".") && !(isRoot && info.fileName() == QLatin1String("..")))
+		if(info.fileName() != QLatin1String(".") && !(info.isRoot() && info.fileName() == QLatin1String("..")))
 			infos->append(info);
 	}
 }

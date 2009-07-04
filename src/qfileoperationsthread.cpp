@@ -24,6 +24,9 @@
 
 #include "qfileoperationsthread.h"
 
+#ifdef Q_WS_WIN
+#  define _WIN32_WINNT 0x0501
+#endif
 #include <qplatformdefs.h>
 
 #include <QtCore>
@@ -34,7 +37,6 @@
 #include <QtGui/QDesktopServices>
 
 #ifdef Q_WS_WIN
-#include "qt_windows.h"
 #define stat64 _stati64
 bool SetDirTime(QString fileName, FILETIME* dtCreation, FILETIME* dtLastAccessTime, FILETIME* dtLastWriteTime);
 void copyDirTime(const QString& sourceDir,const QString& destDir);
@@ -751,18 +753,32 @@ bool QFileOperationsThread::getDiskSpace(const QString& dirPath, qint64* total, 
 	return res;
 }
 
+#ifdef Q_WS_WIN
+static QString _rootPath(const QString& fileName)
+{
+	wchar_t volume[256];
+	DWORD bufferSize = 255;
+	if(GetVolumePathName((wchar_t*)fileName.utf16(), volume, bufferSize))
+		return QString::fromWCharArray(volume);
+	return QString();
+}
+#endif // Q_WS_WIN
+
 QString QFileOperationsThread::diskLabel(const QString& fileName)
 {
 	QString label;
-#ifndef Q_WS_WIN
-	QString path = QDir::toNativeSeparators(rootPath(fileName));
+#ifdef Q_WS_WIN
+	if(isLocalFileSystem(fileName))
+	{
+		QString path = _rootPath(fileName);
 
-	wchar_t volumeLabel[101];
-	DWORD bufferSize = 100;
-	if (GetVolumeInformation((wchar_t*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
-		label = QString::fromWCharArray(volumeLabel);
-	else
-		label = tr("_ERROR_GETTING_LABEL_");
+		wchar_t volumeLabel[101];
+		DWORD bufferSize = 100;
+		if (GetVolumeInformation((wchar_t*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
+			label = QString::fromWCharArray(volumeLabel);
+		else
+			label = tr("_ERROR_GETTING_LABEL_");
+	}
 #endif
 	return label;
 }
