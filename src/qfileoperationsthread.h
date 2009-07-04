@@ -24,12 +24,13 @@
 
 #ifndef QFILEOPERATIONSTHREAD_H
 #define QFILEOPERATIONSTHREAD_H
-//
-#include <QThread>
+
+#include <QFileInfo>
+#include <QList>
 #include <QMutex>
 #include <QStringList>
-#include <QFile>
-//
+#include <QThread>
+
 class QFileOperationsThread : public QThread
 {
 	Q_OBJECT
@@ -115,7 +116,7 @@ public:
 #ifdef Q_WS_WIN
 	static qint64 winFileAttributes(const QString& filePath);
 #endif
-	static QStringList getDrivesList();
+	static QFileInfoList volumes();
 private:
 	bool copyFile(const QString& qsSourceFileName,const QString& qsDestFileName);
 	bool removeFile(const QString& qsFileName);

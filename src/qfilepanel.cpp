@@ -58,7 +58,14 @@ QFilePanel::QFilePanel(QWidget* parent) : QWidget(parent),
 QFilePanel::~QFilePanel()
 {
 }
-//
+
+static bool isDrive(const QString& path)
+{
+	int length = path.length();
+	return ((length == 1 && path.at(0) == QLatin1Char('/'))
+			|| (length >= 2 && length <= 3 && path.at(0).isLetter() && path.at(1) == QLatin1Char(':')));
+}
+
 void QFilePanel::createWidgets()
 {
 	setContextMenuPolicy(Qt::PreventContextMenu);
@@ -72,10 +79,10 @@ void QFilePanel::createWidgets()
 
 	qcbDriveComboBox = new QComboBox(this);
 	qcbDriveComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-	foreach(const QString& str, QFileOperationsThread::getDrivesList())
+	foreach(const QFileInfo& fi, QFileOperationsThread::volumes())
 	{
-		if(!str.isEmpty())
-			qcbDriveComboBox->addItem(QString("[-%1-]").arg(str[0]));
+		QString path = fi.absoluteFilePath();
+		qcbDriveComboBox->addItem(QString("[-%1-]").arg(isDrive(path) ? path.left(1) : fi.fileName()));
 	}
 
 	qlDiscInformation=new QLabel(this);

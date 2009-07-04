@@ -30,7 +30,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QDirIterator>
 #include <QtCore/QFile>
-#include <QtCore/QFileInfo>
 
 #include <QtGui/QDesktopServices>
 
@@ -1042,12 +1041,12 @@ qint64 QFileOperationsThread::winFileAttributes(const QString& filePath)
 }
 #endif
 //
-QStringList QFileOperationsThread::getDrivesList()
+QFileInfoList QFileOperationsThread::volumes()
 {
-	QStringList list;
+	QFileInfoList ret;
 #ifdef Q_WS_WIN
-	foreach(const QFileInfo& fileInfo, QDir::drives())
-		list.append(fileInfo.absolutePath());
+	foreach(const QFileInfo& fi, QDir::drives())
+		ret.append(fi);
 #else
 	QFile file("/etc/mtab");
 	if(file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -1058,17 +1057,14 @@ QStringList QFileOperationsThread::getDrivesList()
 			QStringList params = stream.readLine().split(QLatin1Char(' '));
 			if(params.size() > 1)
 			{
-				QDir dir(params.at(1));
-				if(dir.exists())
-					list.append(dir.absolutePath());
+				QFileInfo fi(params.at(1));
+				ret.append(fi);
 			}
 		}
 		file.close();
 	}
-	list.removeDuplicates();
 #endif
-
-	return list;
+	return ret;
 }
 //
 bool QFileOperationsThread::isRoot(const QString &path)

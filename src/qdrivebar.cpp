@@ -14,6 +14,13 @@
 
 #define TIMER_INTERVAL 2500
 
+static bool isDrive(const QString& path)
+{
+	int length = path.length();
+	return ((length == 1 && path.at(0) == QLatin1Char('/'))
+			|| (length >= 2 && length <= 3 && path.at(0).isLetter() && path.at(1) == QLatin1Char(':')));
+}
+
 QDriveBar::QDriveBar(QWidget* parent) : QFrame(parent)
 {
 	qaLastChecked = 0;
@@ -31,73 +38,43 @@ void QDriveBar::slotRefresh()
 	QStringList qslIgnoreList = settings->value("Global/IgnoredDrives").toStringList();
 	QList<QAction*> qalDrives=qagDrives->actions();
 	QFileIconProvider provider;
-#ifdef Q_WS_WIN
-	const QList<QFileInfo>& fileInfoList = QDir::drives();
-	for (int i=0; i<fileInfoList.count(); i++)
+
+	const QList<QFileInfo>& volumes = QFileOperationsThread::volumes();
+	for(int i = 0; i < volumes.count(); ++i)
 	{
-		QString path(fileInfoList[i].absolutePath());
-		if (qslIgnoreList.contains(path))
+		const QFileInfo& fi = volumes[i];
+		QString path = fi.absoluteFilePath();
+
+		if (!fi.isDir() || qslIgnoreList.contains(path))
 			continue;
 
-		if (qalDrives.count()>i && qalDrives.at(i)->data().toString()==path) // weird too
+		if (qalDrives.count() > i && qalDrives.at(i)->data().toString() == path) //TODO: rework this sux
 			continue;
-		QAction* action=new QAction(path.mid(0,1),this);
-		action->setIcon(provider.icon(fileInfoList[i]));
+
+		QAction* action = new QAction(this);
+		action->setText(isDrive(path) ? path.left(1) : fi.fileName());
+#ifdef Q_WS_WIN
+		action->setIcon(provider.icon(fi));
+#else
+		action->setIcon(provider.icon(QFileIconProvider::Drive));
+#endif
+		action->setToolTip(QDir::toNativeSeparators(path));
 		action->setData(path);
 		action->setCheckable(true);
 		connect(action, SIGNAL(triggered(bool)), this, SLOT(slotDiscChanged()));
 		if (qalDrives.count() > i)
-			qalDrives.insert(i,action);
+			qalDrives.insert(i, action);
 		else
 			qalDrives.append(action);
 		qagDrives->addAction(action);
 	}
-	while(qalDrives.count()>fileInfoList.count())
-	{
-		QAction* action=qalDrives.last();
-		qalDrives.removeLast();
-		delete action;
-	}
-#endif
-#ifdef Q_WS_X11
-	QFile file;
-	file.setFileName("/etc/mtab");
-	if (file.open(QIODevice::ReadOnly))
-	{
-		QTextStream stream(&file);
-		QString buffer;
-		int i=-1;
-		while(!stream.atEnd())
-		{
-			buffer=stream.readLine();
-			QFileInfo fileInfo(buffer.split(" ").at(1));
-			if (!fileInfo.isDir() || fileInfo.isRoot() || qslIgnoreList.contains(fileInfo.absoluteFilePath()))
-				continue;
-			i++;
-			if (qalDrives.count()>i && qalDrives.at(i)->text()==fileInfo.fileName())
-				continue;
-			QAction* action=new QAction(fileInfo.fileName(),this);
-			action->setCheckable(true);
-			action->setToolTip(fileInfo.absoluteFilePath());
-			action->setIcon(provider.icon(QFileIconProvider::Drive));
-			action->setData(fileInfo.absoluteFilePath());
-			connect(action, SIGNAL(triggered(bool)), this, SLOT(slotDiscChanged()));
-			qagDrives->addAction(action);
-		}
-		file.close();
-		while(qalDrives.count()>(i+1))
-		{
-			QAction* action=qalDrives.last();
-			qalDrives.removeLast();
-			delete action;
-		}
-	}
-#endif
+	while(qalDrives.count() > volumes.count())
+		delete qalDrives.takeLast();
+
 //Remove toolButtons
-	QToolButton* button;
-	while(button=this->findChild<QToolButton*>())
-		delete button;
-	delete this->layout();
+	QList<QToolButton*> buttons = findChildren<QToolButton*>();
+	qDeleteAll(buttons);
+	delete layout();
 //
 	FlowLayout* flMainLayout=new FlowLayout();
 	flMainLayout->setSpacing(0);
@@ -105,7 +82,7 @@ void QDriveBar::slotRefresh()
 	flMainLayout->setContentsMargins(0,0,0,0);
 	for (int i=0; i<qalDrives.count(); i++)
 	{
-		button=new QToolButton(this);
+		QToolButton* button=new QToolButton(this);
 		button->setIconSize(QSize(16,16));
 		button->setDefaultAction(qalDrives.at(i));
 		button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -161,11 +138,9 @@ void QDriveBar::slotSetDisc(const QString& path)
 void QDriveBar::timerEvent(QTimerEvent *event)
 {
 	Q_UNUSED(event);
-	int count = QFileOperationsThread::getDrivesList().count();
+	int count = QFileOperationsThread::volumes().count();
 	if (lastDrivesCount != count) {
 		slotRefresh();
 		lastDrivesCount = count;
 	}
 }
-//
-
