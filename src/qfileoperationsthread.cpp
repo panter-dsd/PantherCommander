@@ -196,88 +196,59 @@ bool QFileOperationsThread::copyFileTime(const QString& qsSourceFileName,const Q
 {
 	if(!isLocalFileSystem(qsDestFileName))
 		return true;
+
 	const QString qsSource = QDir::toNativeSeparators(qsSourceFileName);
 	const QString qsDest = QDir::toNativeSeparators(qsDestFileName);
+
+	bool ret = true;
 #ifdef Q_WS_WIN
 	FILETIME time;
 	FILETIME time1;
 	FILETIME time2;
 	HANDLE firstFileHandle = INVALID_HANDLE_VALUE;
 	HANDLE secondFileHandle = INVALID_HANDLE_VALUE;
-	QT_WA({
-		firstFileHandle = CreateFileW((TCHAR*)qsSource.utf16(),
-							0,
-							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
-							0,
-							OPEN_EXISTING,
-							0,
-							0);
-	} , {
-		firstFileHandle = CreateFileA(qsSource.toLocal8Bit(),
-							0,
-							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
-							0,
-							OPEN_EXISTING,
-							0,
-							0);
-	});
+
+	firstFileHandle = CreateFile((wchar_t*)qsSource.utf16(),
+									0,
+									FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
+									0, OPEN_EXISTING, 0, 0);
 	if (firstFileHandle == INVALID_HANDLE_VALUE)
 		return false;
 
-	QT_WA({
-		secondFileHandle = CreateFileW((TCHAR*)qsDest.utf16(),
-							GENERIC_WRITE,
-							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
-							0,
-							OPEN_EXISTING,
-							0,
-							0);
-	} , {
-		secondFileHandle = CreateFileA(qsDest.toLocal8Bit(),
-							GENERIC_WRITE,
-							FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
-							0,
-							OPEN_EXISTING,
-							0,
-							0);
-	});
-	if (secondFileHandle == INVALID_HANDLE_VALUE)
-	{
+	secondFileHandle = CreateFile((wchar_t*)qsSource.utf16(),
+									GENERIC_WRITE,
+									FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE,
+									0, OPEN_EXISTING, 0, 0);
+	if (secondFileHandle == INVALID_HANDLE_VALUE) {
 		CloseHandle(firstFileHandle);
 		return false;
 	}
 
-	if (!(GetFileTime(firstFileHandle,&time,&time1,&time2) && SetFileTime(secondFileHandle,&time,&time1,&time2)))
-	{
-		CloseHandle(firstFileHandle);
-		CloseHandle(secondFileHandle);
-		return false;
-	};
+	ret = GetFileTime(firstFileHandle, &time, &time1, &time2)
+			&& SetFileTime(secondFileHandle, &time, &time1, &time2);
 	CloseHandle(firstFileHandle);
 	CloseHandle(secondFileHandle);
 #else
 	struct stat st;
 	if (stat(QFile::encodeName(qsSource).data(), &st) != 0)
 		return false;
+
 	struct utimbuf time;
 	time.actime = st.st_atime;
 	time.modtime = st.st_mtime;
 	if (utime(QFile::encodeName(qsDest).data(), &time) != 0)
 		return false;
 #endif // Q_WS_WIN
-	return true;
+	return ret;
 }
 
-bool QFileOperationsThread::copyPermisions(const QString& qsSourceFileName,const QString& qsDestFileName)
+bool QFileOperationsThread::copyPermisions(const QString& qsSourceFileName, const QString& qsDestFileName)
 {
 	if(!isLocalFileSystem(qsDestFileName))
 		return true;
 
 #ifdef Q_WS_WIN
-	bool rez;
-	QT_WA({rez=SetFileAttributesW((TCHAR*)qsDestFileName.utf16(),GetFileAttributesW((TCHAR*)qsSourceFileName.utf16()));},
-		{rez=SetFileAttributesA(qsDestFileName.toLocal8Bit(),GetFileAttributesA(qsSourceFileName.toLocal8Bit()));})
-	return rez;
+	return SetFileAttributes((wchar_t*)qsDestFileName.utf16(), GetFileAttributes((wchar_t*)qsSourceFileName.utf16()));
 #else
 	QFile file(qsDestFileName);
 	bool ret = file.setPermissions(QFile(qsSourceFileName).permissions());
@@ -316,11 +287,7 @@ bool QFileOperationsThread::removeFile(const QString& qsFileName)
 	if(file.fileEngine()->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag)
 	{
 		// Set null attributes
-		QT_WA({
-			SetFileAttributesW((TCHAR*)qsFileName.utf16(),0);
-		}, {
-			SetFileAttributesA(qsFileName.toLocal8Bit(),0);
-		});
+		SetFileAttributes((wchar_t*)qsFileName.utf16(), 0);
 	}
 #endif
 
@@ -450,11 +417,7 @@ bool QFileOperationsThread::copyDir(const QString& qsDirName, const QString& qsD
 	copyDirTime(sourceDir.absolutePath(), destDir.absolutePath());
 
 	// Change dir attributes
-	QT_WA({
-		SetFileAttributesW((TCHAR*)destDir.absolutePath().utf16(), GetFileAttributesW((TCHAR*)sourceDir.absolutePath().utf16()));
-	} , {
-		SetFileAttributesA(destDir.absolutePath().toLocal8Bit(), GetFileAttributesA(sourceDir.absolutePath().toLocal8Bit()));
-	});
+	SetFileAttributes((wchar_t*)destDir.absolutePath().utf16(), GetFileAttributes((wchar_t*)sourceDir.absolutePath().utf16()));
 #endif
 	return true;
 }
@@ -501,12 +464,8 @@ bool QFileOperationsThread::removeDir(const QString& qsDirName)
 		}
 	}
 #ifdef Q_WS_WIN
-//Set null attributes
-	QT_WA({
-		SetFileAttributesW((TCHAR*)qsDirName.utf16(), 0);
-	} , {
-		SetFileAttributesA(qsDirName.toLocal8Bit(), 0);
-	});
+	//Set null attributes
+	SetFileAttributes((wchar_t*)qsDirName.utf16(), 0);
 #endif
 //
 	while (!dir.rmdir(qsDirName))
@@ -520,27 +479,17 @@ bool QFileOperationsThread::removeDir(const QString& qsDirName)
 }
 
 #ifdef Q_WS_WIN
-void copyDirTime(const QString& sourceDir,const QString& destDir)
+void copyDirTime(const QString& sourceDir, const QString& destDir)
 {
 	FILETIME dtCreation;
 	FILETIME dtLastAccessTime;
 	FILETIME dtLastWriteTime;
-	HANDLE hDir = INVALID_HANDLE_VALUE;
-	QT_WA({
-		hDir = CreateFileW((TCHAR*)sourceDir.utf16(),
-							GENERIC_READ|GENERIC_WRITE,
-							0, 0,
-							OPEN_EXISTING,
-							FILE_FLAG_BACKUP_SEMANTICS,
-							0);
-	} , {
-		hDir = CreateFileA(sourceDir.toLocal8Bit(),
-							GENERIC_READ|GENERIC_WRITE,
-							0, 0,
-							OPEN_EXISTING,
-							FILE_FLAG_BACKUP_SEMANTICS,
-							0);
-	});
+	HANDLE hDir = CreateFile((wchar_t*)sourceDir.utf16(),
+								GENERIC_READ | GENERIC_WRITE,
+								0, 0,
+								OPEN_EXISTING,
+								FILE_FLAG_BACKUP_SEMANTICS,
+								0);
 	if (hDir != INVALID_HANDLE_VALUE)
 	{
 		if (GetFileTime(hDir, &dtCreation, &dtLastAccessTime, &dtLastWriteTime))
@@ -552,22 +501,12 @@ void copyDirTime(const QString& sourceDir,const QString& destDir)
 bool SetDirTime(QString fileName, FILETIME* dtCreation, FILETIME* dtLastAccessTime, FILETIME* dtLastWriteTime)
 {
 	bool res = false;
-	HANDLE hDir = INVALID_HANDLE_VALUE;
-	QT_WA({
-		hDir = CreateFileW((TCHAR*)fileName.utf16(),
-							GENERIC_READ|GENERIC_WRITE,
-							0, 0,
-							OPEN_EXISTING,
-							FILE_FLAG_BACKUP_SEMANTICS,
-							0);
-	} , {
-		hDir = CreateFileA(fileName.toLocal8Bit(),
-							GENERIC_READ|GENERIC_WRITE,
-							0, 0,
-							OPEN_EXISTING,
-							FILE_FLAG_BACKUP_SEMANTICS,
-							0);
-	});
+	HANDLE hDir = CreateFile((wchar_t*)fileName.utf16(),
+								GENERIC_READ | GENERIC_WRITE,
+								0, 0,
+								OPEN_EXISTING,
+								FILE_FLAG_BACKUP_SEMANTICS,
+								0);
 	if (hDir!=INVALID_HANDLE_VALUE)
 	{
 		res = SetFileTime(hDir, dtCreation, dtLastAccessTime, dtLastWriteTime);
@@ -640,19 +579,11 @@ bool QFileOperationsThread::moveDir(const QString& qsSourceDir, const QString& q
 
 #ifdef Q_WS_WIN
 	// Change dir attributes
-	QT_WA({
-		SetFileAttributesW((TCHAR*)destDir.absolutePath().utf16(), GetFileAttributesW((TCHAR*)sourceDir.absolutePath().utf16()));
-	} , {
-		SetFileAttributesA(destDir.absolutePath().toLocal8Bit(), GetFileAttributesA(sourceDir.absolutePath().toLocal8Bit()));
-	});
+	SetFileAttributes((wchar_t*)destDir.absolutePath().utf16(), GetFileAttributes((wchar_t*)sourceDir.absolutePath().utf16()));
 
 	// Remove dir
 	// Remove readOnly AND system
-	QT_WA({
-		SetFileAttributesW((TCHAR*)sourceDir.absolutePath().utf16(), 0);
-	}, {
-		SetFileAttributesA(sourceDir.absolutePath().toLocal8Bit(), 0);
-	});
+	SetFileAttributes((wchar_t*)sourceDir.absolutePath().utf16(), 0);
 #endif
 //
 	sourceDir.rmdir(sourceDir.absolutePath());
@@ -753,8 +684,6 @@ bool QFileOperationsThread::isSameDisc(const QString& sourcePath, const QString&
 	if(!dest.endsWith(QLatin1Char('\\')))
 		dest.append(QLatin1Char('\\'));
 
-	// ANSI win functions support will be dropped soon. so fuck them.
-	QT_WA({;} , {return false;});
 #ifndef Q_CC_MSVC
 	#warning "init only once + add postroutine for uninit"
 #endif
@@ -766,18 +695,14 @@ bool QFileOperationsThread::isSameDisc(const QString& sourcePath, const QString&
 	if(!ptrGetVolumeNameForVolumeMountPointW)
 		return false;
 
-	QT_WA({
-		TCHAR sourceVolume[51];
-		TCHAR destVolume[51];
-		DWORD bufferSize = 50;
-		if(ptrGetVolumeNameForVolumeMountPointW((TCHAR*)source.utf16(), sourceVolume, bufferSize) &&
-			ptrGetVolumeNameForVolumeMountPointW((TCHAR*)dest.utf16(), destVolume, bufferSize))
-		{
-			res = (QString::fromUtf16((ushort*)sourceVolume) == QString::fromUtf16((ushort*)destVolume));
-		}
-	} , {
-		//res = false;
-	});
+	wchar_t sourceVolume[51];
+	wchar_t destVolume[51];
+	DWORD bufferSize = 50;
+	if(ptrGetVolumeNameForVolumeMountPointW((wchar_t*)source.utf16(), sourceVolume, bufferSize) &&
+		ptrGetVolumeNameForVolumeMountPointW((wchar_t*)dest.utf16(), destVolume, bufferSize))
+	{
+		res = (QString::fromWCharArray(sourceVolume) == QString::fromWCharArray(destVolume));
+	}
 
 	FreeLibrary(kernelHnd);
 #else
@@ -796,17 +721,10 @@ bool QFileOperationsThread::getDiskSpace(const QString& dirPath, qint64* total, 
 	bool res = false;
 #ifdef Q_WS_WIN
 	qint64 bytesUserFree, bytesTotalSize, bytesTotalFree;
-	QT_WA({
-		res = GetDiskFreeSpaceExW((TCHAR*)dirPath.utf16(),
-									(PULARGE_INTEGER)&bytesUserFree,
-									(PULARGE_INTEGER)&bytesTotalSize,
-									(PULARGE_INTEGER)&bytesTotalFree);
-	}, {
-		res = GetDiskFreeSpaceExA(dirPath.toLocal8Bit(),
-									(PULARGE_INTEGER)&bytesUserFree,
-									(PULARGE_INTEGER)&bytesTotalSize,
-									(PULARGE_INTEGER)&bytesTotalFree);
-	});
+	res = GetDiskFreeSpaceEx((wchar_t*)dirPath.utf16(),
+								(PULARGE_INTEGER)&bytesUserFree,
+								(PULARGE_INTEGER)&bytesTotalSize,
+								(PULARGE_INTEGER)&bytesTotalFree);
 	if(res)
 	{
 		if(total)
@@ -836,23 +754,15 @@ bool QFileOperationsThread::getDiskSpace(const QString& dirPath, qint64* total, 
 QString QFileOperationsThread::diskLabel(const QString& fileName)
 {
 	QString label;
-#ifdef Q_WS_WIN
+#ifndef Q_WS_WIN
 	QString path = QDir::toNativeSeparators(rootPath(fileName));
-	QT_WA({
-		TCHAR volumeLabel[101];
-		DWORD bufferSize = 100;
-		if (GetVolumeInformationW((TCHAR*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
-			label = QString::fromUtf16((ushort*)volumeLabel);
-		else
-			label = tr("_ERROR_GETTING_LABEL_");
-	} , {
-		char volumeLabel[101];
-		DWORD bufferSize = 100;
-		if (GetVolumeInformationA(path.toLocal8Bit(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
-			label = QString::fromLocal8Bit(volumeLabel);
-		else
-			label = tr("_ERROR_GETTING_LABEL_");
-	});
+
+	wchar_t volumeLabel[101];
+	DWORD bufferSize = 100;
+	if (GetVolumeInformation((wchar_t*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
+		label = QString::fromWCharArray(volumeLabel);
+	else
+		label = tr("_ERROR_GETTING_LABEL_");
 #endif
 	return label;
 }
@@ -945,41 +855,23 @@ bool QFileOperationsThread::execute(const QString& filePath, const QStringList& 
 	else
 	{
 		HINSTANCE__* instance;
-		QT_WA({
-			instance = ShellExecute(0,
-									(TCHAR*)QString("Open").utf16(),
-									(TCHAR*)fpath.utf16(),
-									0,
-									(TCHAR*)wpath.utf16(),
-									SW_NORMAL);
-		} , {
-			instance = ShellExecuteA(0,
-									"Open",
-									fpath.toLocal8Bit(),
-									0,
-									wpath.toLocal8Bit(),
-									SW_NORMAL);
-		});
+		instance = ShellExecute(0,
+								(wchar_t*)QString("Open").utf16(),
+								(wchar_t*)fpath.utf16(),
+								0,
+								(wchar_t*)wpath.utf16(),
+								SW_NORMAL);
 		if((int)instance > 32)
 			return true;
 
 		if((int)instance == SE_ERR_NOASSOC)
 		{
-			QT_WA({
-				instance = ShellExecute(0,
-										(TCHAR*)QString("open").utf16(),
-										(TCHAR*)QString("rundll32.exe").utf16(),
-										(TCHAR*)QString("shell32.dll,OpenAs_RunDLL "+fpath).utf16(),
-										0,
-										SW_SHOWNORMAL);
-			} , {
-				instance = ShellExecuteA(0,
-										"open",
-										"rundll32.exe",
-										QString("shell32.dll,OpenAs_RunDLL "+fpath).toLocal8Bit(),
-										0,
-										SW_SHOWNORMAL);
-			});
+			instance = ShellExecute(0,
+									(wchar_t*)QString("open").utf16(),
+									(wchar_t*)QString("rundll32.exe").utf16(),
+									(wchar_t*)QString("shell32.dll,OpenAs_RunDLL "+fpath).utf16(),
+									0,
+									SW_SHOWNORMAL);
 			if((int)instance > 32)
 				return true;
 		}
@@ -1004,12 +896,7 @@ qint64 QFileOperationsThread::winFileAttributes(const QString& filePath)
 		if(path.length() == 2 && path.at(1) == QLatin1Char(':'))
 			path += QLatin1Char('\\');
 
-		QT_WA({
-			fileAttrib = ::GetFileAttributesW((TCHAR*)path.utf16());
-		} , {
-			QString fpath = QFileInfo(path).absoluteFilePath();
-			fileAttrib = ::GetFileAttributesA(fpath.toLocal8Bit());
-		});
+		fileAttrib = ::GetFileAttributes((wchar_t*)path.utf16());
 		if (fileAttrib == INVALID_FILE_ATTRIBUTES)
 		{
 			// path for FindFirstFile should not be end in a trailing slash or slosh
@@ -1018,15 +905,7 @@ qint64 QFileOperationsThread::winFileAttributes(const QString& filePath)
 
 			HANDLE findFileHandle = INVALID_HANDLE_VALUE;
 			WIN32_FIND_DATA findData;
-			QT_WA({
-				findFileHandle = ::FindFirstFileW((TCHAR*)path.utf16(),
-													&findData);
-			} , {
-				// Cast is safe, since char is at end of WIN32_FIND_DATA
-				QString fpath = QFileInfo(path).absoluteFilePath();
-				findFileHandle = ::FindFirstFileA(fpath.toLocal8Bit(),
-													(WIN32_FIND_DATAA*)&findData);
-			});
+			findFileHandle = ::FindFirstFile((wchar_t*)path.utf16(), &findData);
 			if (findFileHandle != INVALID_HANDLE_VALUE)
 			{
 				::FindClose(findFileHandle);
