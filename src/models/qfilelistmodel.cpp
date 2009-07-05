@@ -425,23 +425,6 @@ QString QFileListModelPrivate::size(qint64 bytes)
 	return QFileListModel::tr("%1 bytes").arg(QLocale().toString(bytes));
 }
 
-QString QFileListModelPrivate::permissions(QFile::Permissions perms)
-{
-	QString ret;
-	ret.append((perms & QFile::ReadUser) ? "r" : "-");
-	ret.append((perms & QFile::WriteUser) ? "w" : "-");
-	ret.append((perms & QFile::ExeUser) ? "x" : "-");
-
-	ret.append((perms & QFile::ReadGroup) ? "r" : "-");
-	ret.append((perms & QFile::WriteGroup) ? "w" : "-");
-	ret.append((perms & QFile::ExeGroup) ? "x" : "-");
-
-	ret.append((perms & QFile::ReadOther) ? "r" : "-");
-	ret.append((perms & QFile::WriteOther) ? "w" : "-");
-	ret.append((perms & QFile::ExeOther) ? "x" : "-");
-	return ret;
-}
-
 QVariant QFileListModel::data(const QModelIndex& index, int role) const
 {
 	Q_D(const QFileListModel);
@@ -463,11 +446,31 @@ QVariant QFileListModel::data(const QModelIndex& index, int role) const
 			{
 				case NameColumn: return node->name();
 				case TypeColumn: return node->ext();
-				case SizeColumn: return (!node->isDir()) ? d->size(node->size()) : tr("<folder>");
+				case SizeColumn: return !node->isDir() ? d->size(node->size()) : tr("<folder>");
 				case ModifiedTimeColumn: return node->lastModified().toString("dd.MM.yy hh:mm:ss");
 				case OwnerColumn: return node->fileInfo().owner();
 				case GroupColumn: return node->fileInfo().group();
-				case PermissionsColumn: return d->permissions(node->permissions());
+				case PermissionsColumn:
+				{
+					QFile::Permissions perms = node->permissions();
+
+					QString ret;
+					ret.append(node->isDir() ? "d" : node->isSymLink() ? "l" : "-");
+
+					ret.append((perms & QFile::ReadUser) ? "r" : "-");
+					ret.append((perms & QFile::WriteUser) ? "w" : "-");
+					ret.append((perms & QFile::ExeUser) ? "x" : "-");
+
+					ret.append((perms & QFile::ReadGroup) ? "r" : "-");
+					ret.append((perms & QFile::WriteGroup) ? "w" : "-");
+					ret.append((perms & QFile::ExeGroup) ? "x" : "-");
+
+					ret.append((perms & QFile::ReadOther) ? "r" : "-");
+					ret.append((perms & QFile::WriteOther) ? "w" : "-");
+					ret.append((perms & QFile::ExeOther) ? "x" : "-");
+					return ret;
+				}
+					break;
 				case AttributesColumn:
 #ifdef Q_WS_WIN
 				{
