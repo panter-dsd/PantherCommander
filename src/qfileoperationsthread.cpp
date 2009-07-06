@@ -756,31 +756,31 @@ bool QFileOperationsThread::getDiskSpace(const QString& dirPath, qint64* total, 
 #ifdef Q_WS_WIN
 static QString _rootPath(const QString& fileName)
 {
-	wchar_t volume[256];
-	DWORD bufferSize = 255;
-	if(GetVolumePathName((wchar_t*)fileName.utf16(), volume, bufferSize))
-		return QString::fromWCharArray(volume);
+	wchar_t buf[256];
+	DWORD bufSize = 255;
+	if(GetVolumePathName((wchar_t*)fileName.utf16(), buf, bufSize))
+		return QString::fromWCharArray(buf);
 	return QString();
 }
 #endif // Q_WS_WIN
 
 QString QFileOperationsThread::diskLabel(const QString& fileName)
 {
-	QString label;
 #ifdef Q_WS_WIN
 	if(isLocalFileSystem(fileName))
 	{
 		QString path = _rootPath(fileName);
-
-		wchar_t volumeLabel[101];
-		DWORD bufferSize = 100;
-		if (GetVolumeInformation((wchar_t*)path.utf16(), volumeLabel, bufferSize, 0, 0, 0, 0, 0))
-			label = QString::fromWCharArray(volumeLabel);
-		else
-			label = tr("_ERROR_GETTING_LABEL_");
+		if(!path.isEmpty())
+		{
+			wchar_t buf[101];
+			DWORD bufSize = 100;
+			if(GetVolumeInformation((wchar_t*)path.utf16(), buf, bufSize, 0, 0, 0, 0, 0))
+				return QString::fromWCharArray(buf);
+		}
+		return tr("_ERROR_GETTING_LABEL_");
 	}
 #endif
-	return label;
+	return QString();
 }
 
 QString QFileOperationsThread::rootPath(const QString& filePath)
