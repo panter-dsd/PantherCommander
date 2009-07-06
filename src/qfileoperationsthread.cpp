@@ -785,6 +785,7 @@ QString QFileOperationsThread::diskLabel(const QString& fileName)
 
 QString QFileOperationsThread::rootPath(const QString& filePath)
 {
+#if 0
 	QString rootPath;
 #ifdef Q_WS_WIN
 	if(isLocalFileSystem(filePath))
@@ -825,6 +826,16 @@ QString QFileOperationsThread::rootPath(const QString& filePath)
 	rootPath = QDir::rootPath();
 #endif // Q_WS_WIN
 	return rootPath;
+#endif // 0
+#if QT_VERSION < 0x040600
+	QDir dir(filePath);
+	dir.cdUp();
+	while(!dir.isRoot())
+		dir.cdUp();
+	return dir.absolutePath();
+#else
+	return QDir::rootPath(filePath);
+#endif
 }
 
 bool QFileOperationsThread::isRoot(const QString &path)
