@@ -254,7 +254,7 @@ bool QFileOperationsThread::copyPermisions(const QString& qsSourceFileName, cons
 #else
 	QFile file(qsDestFileName);
 	bool ret = file.setPermissions(QFile(qsSourceFileName).permissions());
-#if QT_VERSION < 0x040600
+#if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 	// workaround for issue with QFSFileEngine::setPermissions() retval
 	if(!ret && file.errorString().isEmpty())
 		ret = true;
@@ -658,7 +658,7 @@ bool QFileOperationsThread::error(const QStringList& params)
 
 bool QFileOperationsThread::isLocalFileSystem(const QString& filePath)
 {
-#if QT_VERSION < 0x040600
+#if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 	bool isLocalDisk = false;
 	QAbstractFileEngine* engine = QAbstractFileEngine::create(filePath);
 	isLocalDisk = (engine->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
@@ -827,7 +827,7 @@ QString QFileOperationsThread::rootPath(const QString& filePath)
 #endif // Q_WS_WIN
 	return rootPath;
 #endif // 0
-#if QT_VERSION < 0x040600
+#if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 	QDir dir(filePath);
 	dir.cdUp();
 	while(!dir.isRoot())

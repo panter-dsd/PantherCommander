@@ -59,7 +59,7 @@ public:
 
 	bool isCaseSensitive() const
 	{
-#if QT_VERSION < 0x040600
+#if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 		QAbstractFileEngine* fe = QAbstractFileEngine::create(m_fileInfo.absoluteFilePath());
 		bool cs = fe->caseSensitive();
 		delete fe;
@@ -77,7 +77,7 @@ public:
 	}
 	bool isLocalFile() const
 	{
-#if QT_VERSION < 0x040600
+#if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 		QAbstractFileEngine* fe = QAbstractFileEngine::create(m_fileInfo.absoluteFilePath());
 		bool localDisc = (fe->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
 		delete fe;

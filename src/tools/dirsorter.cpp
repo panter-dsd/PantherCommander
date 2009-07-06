@@ -1,4 +1,4 @@
-#if QT_VERSION < 0x040600
+#if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 /****************************************************************************
 **
 ** Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -72,7 +72,7 @@
 
 #include <qalgorithms.h>
 
-#if QT_VERSION < 0x040600
+#if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 struct DirSortItem
 {
 	mutable QString filename_cache;
