@@ -364,7 +364,7 @@ void FileWidgetPrivate::setRootIndex(const QModelIndex& sourceIndex) const
 {
 	Q_ASSERT(sourceIndex.isValid() ? sourceIndex.model() == model : true);
 
-	QModelIndex index = mapFromSource(sourceIndex);
+	const QModelIndex index = mapFromSource(sourceIndex);
 	treeView->setRootIndex(index);
 }
 
@@ -446,12 +446,15 @@ void FileWidgetPrivate::_q_rowsInserted(const QModelIndex& parent, int start, in
 	for(int row = start; row <= end; ++row)
 	{
 		const QModelIndex index = model->index(row, 0, parent);
-
 		if(model->isDir(index))
+		{
 			++dirInfo.dirsCount;
+		}
 		else
+		{
 			++dirInfo.filesCount;
-		dirInfo.filesSize += model->size(index);
+			dirInfo.filesSize += model->size(index);
+		}
 	}
 	updateDirInfo();
 }
@@ -461,44 +464,61 @@ void FileWidgetPrivate::_q_rowsAboutToBeRemoved(const QModelIndex& parent, int s
 	for(int row = start; row <= end; ++row)
 	{
 		const QModelIndex index = model->index(row, 0, parent);
-
 		if(model->isDir(index))
+		{
 			--dirInfo.dirsCount;
+		}
 		else
+		{
 			--dirInfo.filesCount;
-		dirInfo.filesSize -= model->size(index);
+			dirInfo.filesSize -= model->size(index);
+		}
 	}
 	updateDirInfo();
 }
 
 void FileWidgetPrivate::_q_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
+	QList<int> rows;
+
 	foreach(const QModelIndex& index, selected.indexes())
 	{
-		const QModelIndex sourceIndex = mapToSource(index);
-//
-if(sourceIndex.column() != 0)
-	continue;
-//
-		if(model->isDir(sourceIndex))
-			++dirInfo.dirsSelectedCount;
+		if(!rows.contains(index.row()))
+			rows.append(index.row());
 		else
+			continue;
+
+		const QModelIndex sourceIndex = mapToSource(index);
+		if(model->isDir(sourceIndex))
+		{
+			++dirInfo.dirsSelectedCount;
+		}
+		else
+		{
 			++dirInfo.filesSelectedCount;
-		dirInfo.filesSelectedSize += model->size(sourceIndex);
+			dirInfo.filesSelectedSize += model->size(sourceIndex);
+		}
 	}
+
+	rows.clear();
 
 	foreach(const QModelIndex& index, deselected.indexes())
 	{
-		const QModelIndex sourceIndex = mapToSource(index);
-//
-if(sourceIndex.column() != 0)
-	continue;
-//
-		if(model->isDir(sourceIndex))
-			--dirInfo.dirsSelectedCount;
+		if(!rows.contains(index.row()))
+			rows.append(index.row());
 		else
+			continue;
+
+		const QModelIndex sourceIndex = mapToSource(index);
+		if(model->isDir(sourceIndex))
+		{
+			--dirInfo.dirsSelectedCount;
+		}
+		else
+		{
 			--dirInfo.filesSelectedCount;
-		dirInfo.filesSelectedSize -= model->size(sourceIndex);
+			dirInfo.filesSelectedSize -= model->size(sourceIndex);
+		}
 	}
 
 	updateDirInfo();
@@ -525,8 +545,7 @@ void FileWidgetPrivate::_q_showContextMenu(const QPoint& position)
 #else
 	QAbstractItemView* view = 0;
 	view = treeView;
-	QModelIndex index = view->indexAt(position);
-	index = mapToSource(index);
+	const QModelIndex index = mapToSource(view->indexAt(position));
 
 	QMenu menu(view);
 	if(index.isValid())
@@ -678,7 +697,7 @@ void FileWidgetPrivate::_q_navigateToParent()
 	if(newDirectory.isEmpty())
 		newDirectory = model->myComputer().toString();
 
-	const QModelIndex idx = rootIndex();
+	const QPersistentModelIndex idx = rootIndex();
 	q->setDirectory(newDirectory);
 	(void)setCurrentIndex(idx);
 }
@@ -1151,9 +1170,7 @@ void FileWidget::setCurrentFile(const QString& fileName)
 			setDirectory(filePath);
 	}
 
-	const QModelIndex index = d->model->index(fileName);
-	if(index.isValid())
-		d->setCurrentIndex(index);
+	d->setCurrentIndex(d->model->index(fileName));
 }
 
 /*!
