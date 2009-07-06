@@ -937,8 +937,32 @@ QFileInfoList QFileOperationsThread::volumes()
 {
 	QFileInfoList ret;
 #ifdef Q_WS_WIN
-	foreach(const QFileInfo& fi, QDir::drives())
-		ret.append(fi);
+	ret.append(QDir::drives());
+
+	// add volume mount points (aka `mounted dirs')
+#ifndef Q_CC_MSVC
+	#warning "TODO: implement mount/unmount feature (with dialog)"
+#endif
+	wchar_t volumeMountPoint[MAX_PATH];
+	for(int i = 0, n = ret.size(); i < n; ++i)
+	{
+		QString path = ret.at(i).filePath();
+		HANDLE handle = FindFirstVolumeMountPoint((wchar_t*)QDir::toNativeSeparators(path).utf16(),
+													volumeMountPoint, MAX_PATH);
+		while(handle != INVALID_HANDLE_VALUE)
+		{
+			path.append(QString::fromWCharArray(volumeMountPoint));
+			path.chop(1);
+			QFileInfo fi(path);
+			ret.append(fi);
+
+			if(!FindNextVolumeMountPoint(handle, volumeMountPoint, MAX_PATH))
+			{
+				FindVolumeMountPointClose(handle);
+				handle = INVALID_HANDLE_VALUE;
+			}
+		}
+	}
 #else
 	QFile file("/etc/mtab");
 	if(file.open(QIODevice::ReadOnly | QIODevice::Text))
