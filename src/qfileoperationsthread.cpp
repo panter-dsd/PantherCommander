@@ -827,15 +827,11 @@ QString QFileOperationsThread::rootPath(const QString& filePath)
 #endif // Q_WS_WIN
 	return rootPath;
 #endif // 0
-#if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 	QDir dir(filePath);
 	dir.cdUp();
 	while(!dir.isRoot())
 		dir.cdUp();
 	return dir.absolutePath();
-#else
-	return QDir::rootPath(filePath);
-#endif
 }
 
 bool QFileOperationsThread::isRoot(const QString &path)
