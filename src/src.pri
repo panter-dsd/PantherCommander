@@ -30,3 +30,5 @@ include( $$PWD/PantherViewer/pantherviewer.pri )
 include( $$PWD/Preferences/preferences.pri )
 include( $$PWD/tools/tools.pri )
 include( $$PWD/widgets/widgets.pri )
+
+LIBS *= $$QMAKE_LIBS_CORE
