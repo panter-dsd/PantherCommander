@@ -8,19 +8,19 @@ class AppSettings : public QSettings
 	Q_OBJECT
 
 public:
-	static AppSettings *instance();
+	static AppSettings* instance();
 	virtual ~AppSettings();
 
 	void settingsChange();
 
 protected:
-	AppSettings();
+	explicit AppSettings(QObject* parent = 0);
 
 signals:
 	void settingsChanged();
 
 private:
-	static AppSettings *pInstance;
+	static AppSettings* pInstance;
 };
 
 #endif // APPSETTINGS_H
