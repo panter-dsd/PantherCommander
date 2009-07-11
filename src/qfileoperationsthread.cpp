@@ -37,10 +37,6 @@
 #include <QtGui/QDesktopServices>
 
 #ifdef Q_WS_WIN
-#define stat64 _stati64
-bool SetDirTime(QString fileName, FILETIME* dtCreation, FILETIME* dtLastAccessTime, FILETIME* dtLastWriteTime);
-void copyDirTime(const QString& sourceDir,const QString& destDir);
-
 #ifndef INVALID_FILE_ATTRIBUTES
 #  define INVALID_FILE_ATTRIBUTES (DWORD (-1))
 #endif
@@ -368,6 +364,44 @@ void QFileOperationsThread::setJob(FileOperation job, const QStringList& params)
 	qslParametres = params;
 }
 
+#ifdef Q_WS_WIN
+bool SetDirTime(QString fileName, FILETIME* dtCreation, FILETIME* dtLastAccessTime, FILETIME* dtLastWriteTime)
+{
+	bool res = false;
+	HANDLE hDir = CreateFile((wchar_t*)fileName.utf16(),
+								GENERIC_READ | GENERIC_WRITE,
+								0, 0,
+								OPEN_EXISTING,
+								FILE_FLAG_BACKUP_SEMANTICS,
+								0);
+	if (hDir!=INVALID_HANDLE_VALUE)
+	{
+		res = SetFileTime(hDir, dtCreation, dtLastAccessTime, dtLastWriteTime);
+		CloseHandle(hDir);
+	}
+	return res;
+}
+
+void copyDirTime(const QString& sourceDir, const QString& destDir)
+{
+	FILETIME dtCreation;
+	FILETIME dtLastAccessTime;
+	FILETIME dtLastWriteTime;
+	HANDLE hDir = CreateFile((wchar_t*)sourceDir.utf16(),
+								GENERIC_READ | GENERIC_WRITE,
+								0, 0,
+								OPEN_EXISTING,
+								FILE_FLAG_BACKUP_SEMANTICS,
+								0);
+	if (hDir != INVALID_HANDLE_VALUE)
+	{
+		if (GetFileTime(hDir, &dtCreation, &dtLastAccessTime, &dtLastWriteTime))
+			SetDirTime(destDir, &dtCreation, &dtLastAccessTime, &dtLastWriteTime);
+		CloseHandle(hDir);
+	}
+}
+#endif // Q_WS_WIN
+
 bool QFileOperationsThread::copyDir(const QString& qsDirName, const QString& qsDestDir)
 {
 	QDir sourceDir(qsDirName);
@@ -479,44 +513,6 @@ bool QFileOperationsThread::removeDir(const QString& qsDirName)
 	emit changedValue(1);
 	return true;
 }
-
-#ifdef Q_WS_WIN
-void copyDirTime(const QString& sourceDir, const QString& destDir)
-{
-	FILETIME dtCreation;
-	FILETIME dtLastAccessTime;
-	FILETIME dtLastWriteTime;
-	HANDLE hDir = CreateFile((wchar_t*)sourceDir.utf16(),
-								GENERIC_READ | GENERIC_WRITE,
-								0, 0,
-								OPEN_EXISTING,
-								FILE_FLAG_BACKUP_SEMANTICS,
-								0);
-	if (hDir != INVALID_HANDLE_VALUE)
-	{
-		if (GetFileTime(hDir, &dtCreation, &dtLastAccessTime, &dtLastWriteTime))
-			SetDirTime(destDir, &dtCreation, &dtLastAccessTime, &dtLastWriteTime);
-		CloseHandle(hDir);
-	}
-}
-
-bool SetDirTime(QString fileName, FILETIME* dtCreation, FILETIME* dtLastAccessTime, FILETIME* dtLastWriteTime)
-{
-	bool res = false;
-	HANDLE hDir = CreateFile((wchar_t*)fileName.utf16(),
-								GENERIC_READ | GENERIC_WRITE,
-								0, 0,
-								OPEN_EXISTING,
-								FILE_FLAG_BACKUP_SEMANTICS,
-								0);
-	if (hDir!=INVALID_HANDLE_VALUE)
-	{
-		res = SetFileTime(hDir, dtCreation, dtLastAccessTime, dtLastWriteTime);
-		CloseHandle(hDir);
-	}
-	return res;
-}
-#endif // Q_WS_WIN
 
 bool QFileOperationsThread::moveFile(const QString& qsSourceFileName,const QString& qsDestFileName)
 {

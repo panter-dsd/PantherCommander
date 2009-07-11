@@ -25,11 +25,11 @@
 #ifndef QFILEOPERATIONSTHREAD_H
 #define QFILEOPERATIONSTHREAD_H
 
-#include <QFileInfo>
-#include <QList>
-#include <QMutex>
-#include <QStringList>
-#include <QThread>
+#include <QtCore/QFileInfo>
+#include <QtCore/QList>
+#include <QtCore/QMutex>
+#include <QtCore/QStringList>
+#include <QtCore/QThread>
 
 class QFileOperationsThread : public QThread
 {
