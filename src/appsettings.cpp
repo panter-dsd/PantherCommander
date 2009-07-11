@@ -1,11 +1,13 @@
 #include "appsettings.h"
 
+#include <QtCore/QCoreApplication>
+
 AppSettings *AppSettings::pInstance = 0;
 
 AppSettings *AppSettings::instance()
 {
-	if (!pInstance)
-		pInstance = new AppSettings();
+	if(!pInstance)
+		pInstance = new AppSettings(qApp);
 	return pInstance;
 }
 
@@ -15,7 +17,7 @@ AppSettings::AppSettings()
 
 AppSettings::~AppSettings()
 {
-	if (this == pInstance)
+	if(pInstance == this)
 		pInstance = 0;
 }
 
