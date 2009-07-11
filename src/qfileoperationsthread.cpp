@@ -775,6 +775,7 @@ QString QFileOperationsThread::diskLabel(const QString& fileName)
 		}
 		return tr("_ERROR_GETTING_LABEL_");
 	}
+	return tr("_NO_LABEL_");
 #endif
 	return QString();
 }

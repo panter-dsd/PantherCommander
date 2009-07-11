@@ -440,9 +440,8 @@ void QFilePanel::updateDiscInformation()
 	QString text;
 
 	QString label = QFileOperationsThread::diskLabel(path());
-	if(label.isEmpty())
-		label = QLatin1String("_NO_LABEL_");
-	text.append(QString("[<i>%1</i>]").arg(label));
+	if(!label.isEmpty())
+		text.append(QString("[<i>%1</i>]").arg(label));
 
 	qint64 totalBytes, freeBytes, availableBytes;
 	if(QFileOperationsThread::getDiskSpace(path(), &totalBytes, &freeBytes, &availableBytes))
