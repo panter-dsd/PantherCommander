@@ -1,7 +1,8 @@
 INCLUDEPATH	+= $$PWD
 DEPENDPATH	+= $$PWD
 
-HEADERS	+= $$PWD/mainwindowimpl.h \
+HEADERS	+= $$PWD/appsettings.h \
+	$$PWD/mainwindowimpl.h \
 	$$PWD/qfilelistsortfilterproxymodel.h \
 	$$PWD/qfilepanel.h \
 	$$PWD/qfileoperationsdialog.h \
@@ -13,6 +14,7 @@ HEADERS	+= $$PWD/mainwindowimpl.h \
 	$$PWD/qselectdiscdialog.h
 
 SOURCES	+= $$PWD/main.cpp \
+	$$PWD/appsettings.cpp \
 	$$PWD/mainwindowimpl.cpp \
 	$$PWD/qfilelistsortfilterproxymodel.cpp \
 	$$PWD/qfilepanel.cpp \
