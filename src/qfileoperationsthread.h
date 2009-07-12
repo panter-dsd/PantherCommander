@@ -105,8 +105,6 @@ public:
 	void skipFile() {isSkipFile=true;}
 	static bool isLocalFileSystem(const QString& filePath);
 	static bool isSameDisc(const QString& source, const QString& dest);
-	static bool getDiskSpace(const QString& dirPath, qint64* total, qint64* free, qint64* available);
-	static QString diskLabel(const QString& fileName);
 	static QString rootPath(const QString& filePath);
 	static bool isRoot(const QString &path);
 
@@ -116,7 +114,7 @@ public:
 #ifdef Q_WS_WIN
 	static qint64 winFileAttributes(const QString& filePath);
 #endif
-	static QFileInfoList volumes();
+
 private:
 	bool copyFile(const QString& qsSourceFileName,const QString& qsDestFileName);
 	bool removeFile(const QString& qsFileName);

@@ -41,7 +41,6 @@
 #  define INVALID_FILE_ATTRIBUTES (DWORD (-1))
 #endif
 #else
-#include <sys/statvfs.h>
 #include <utime.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -714,72 +713,6 @@ bool QFileOperationsThread::isSameDisc(const QString& sourcePath, const QString&
 	return res;
 }
 
-bool QFileOperationsThread::getDiskSpace(const QString& dirPath, qint64* total, qint64* free, qint64* available)
-{
-	bool res = false;
-#ifdef Q_WS_WIN
-	qint64 bytesUserFree, bytesTotalSize, bytesTotalFree;
-	res = GetDiskFreeSpaceEx((wchar_t*)dirPath.utf16(),
-								(PULARGE_INTEGER)&bytesUserFree,
-								(PULARGE_INTEGER)&bytesTotalSize,
-								(PULARGE_INTEGER)&bytesTotalFree);
-	if(res)
-	{
-		if(total)
-			*total = bytesTotalSize;
-		if(free)
-			*free = bytesTotalFree;
-		if(available)
-			*available = bytesUserFree;
-	}
-#else
-	struct statvfs fs;
-	res = (statvfs(QFile::encodeName(dirPath).data(), &fs) == 0);
-	if(res)
-	{
-		if(total)
-			*total = fs.f_frsize * fs.f_blocks;
-		if(free)
-			*free = fs.f_frsize * fs.f_bfree;
-		if(available)
-			*available = fs.f_frsize * fs.f_bavail;
-	}
-#endif // Q_WS_WIN
-
-	return res;
-}
-
-#ifdef Q_WS_WIN
-static QString _rootPath(const QString& fileName)
-{
-	wchar_t buf[256];
-	DWORD bufSize = 255;
-	if(GetVolumePathName((wchar_t*)fileName.utf16(), buf, bufSize))
-		return QString::fromWCharArray(buf);
-	return QString();
-}
-#endif // Q_WS_WIN
-
-QString QFileOperationsThread::diskLabel(const QString& fileName)
-{
-#ifdef Q_WS_WIN
-	if(isLocalFileSystem(fileName))
-	{
-		QString path = _rootPath(fileName);
-		if(!path.isEmpty())
-		{
-			wchar_t buf[101];
-			DWORD bufSize = 100;
-			if(GetVolumeInformation((wchar_t*)path.utf16(), buf, bufSize, 0, 0, 0, 0, 0))
-				return QString::fromWCharArray(buf);
-		}
-		return tr("_ERROR_GETTING_LABEL_");
-	}
-	return tr("_NO_LABEL_");
-#endif
-	return QString();
-}
-
 QString QFileOperationsThread::rootPath(const QString& filePath)
 {
 #if 0
@@ -936,53 +869,3 @@ qint64 QFileOperationsThread::winFileAttributes(const QString& filePath)
 	return qint64(fileAttrib);
 }
 #endif // Q_WS_WIN
-
-QFileInfoList QFileOperationsThread::volumes()
-{
-	QFileInfoList ret;
-#ifdef Q_WS_WIN
-	ret.append(QDir::drives());
-
-	// add volume mount points (aka `mounted dirs')
-#ifndef Q_CC_MSVC
-	#warning "TODO: implement mount/unmount feature (with dialog)"
-#endif
-	wchar_t volumeMountPoint[MAX_PATH];
-	for(int i = 0, n = ret.size(); i < n; ++i)
-	{
-		QString path = ret.at(i).filePath();
-		HANDLE handle = FindFirstVolumeMountPoint((wchar_t*)QDir::toNativeSeparators(path).utf16(),
-													volumeMountPoint, MAX_PATH);
-		while(handle != INVALID_HANDLE_VALUE)
-		{
-			path.append(QString::fromWCharArray(volumeMountPoint));
-			path.chop(1);
-			QFileInfo fi(path);
-			ret.append(fi);
-
-			if(!FindNextVolumeMountPoint(handle, volumeMountPoint, MAX_PATH))
-			{
-				FindVolumeMountPointClose(handle);
-				handle = INVALID_HANDLE_VALUE;
-			}
-		}
-	}
-#else
-	QFile file("/etc/mtab");
-	if(file.open(QIODevice::ReadOnly | QIODevice::Text))
-	{
-		QTextStream stream(&file);
-		while(!stream.atEnd())
-		{
-			QStringList params = stream.readLine().split(QLatin1Char(' '));
-			if(params.size() > 1)
-			{
-				QFileInfo fi(params.at(1));
-				ret.append(fi);
-			}
-		}
-		file.close();
-	}
-#endif // Q_WS_WIN
-	return ret;
-}
