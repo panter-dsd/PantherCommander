@@ -2,10 +2,8 @@ INCLUDEPATH	+= $$PWD
 DEPENDPATH	+= $$PWD
 
 HEADERS	+= $$PWD/filewidget.h \
-		$$PWD/filewidget_p.h
+		$$PWD/filewidget_p.h \
+		$$PWD/flowlayout.h
 
-SOURCES	+= $$PWD/filewidget.cpp
-
-#HEADERS	+= $$PWD/tabbar.h
-
-#SOURCES	+= $$PWD/tabbar.cpp
+SOURCES	+= $$PWD/filewidget.cpp \
+		$$PWD/flowlayout.cpp
