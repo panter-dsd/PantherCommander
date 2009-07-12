@@ -29,13 +29,13 @@
 #include <QtGui/QLayout>
 #include <QtGui/QListWidget>
 
-#include "qfileoperationsthread.h"
+#include "volumeinfoprovider.h"
 
 QSelectDiscDialog::QSelectDiscDialog(QWidget* parent) : QDialog(parent)
 {
-	//this->resize(this->width(),200);
+	//resize(width(), 200);
 	qlwDiscList=new QListWidget(this);
-	foreach(const QFileInfo& fi, QFileOperationsThread::volumes())
+	foreach(const QFileInfo& fi, VolumeInfoProvider().volumes())
 	{
 		QString path = fi.absoluteFilePath();
 		qlwDiscList->addItem(QDir::toNativeSeparators(path));

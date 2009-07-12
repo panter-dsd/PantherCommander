@@ -29,15 +29,12 @@
 #include <QIcon>
 #include <QFileIconProvider>
 
-#include "filewidget.h"
-#include "qfileoperationsthread.h"
-#include "qselectdiscdialog.h"
 #include "appsettings.h"
+#include "filewidget.h"
+#include "qselectdiscdialog.h"
+#include "volumeinfoprovider.h"
 
-#ifdef Q_WS_WIN
-	#include <windows.h>
-#endif
-#define TIMER_INTERVAL 2500
+#define TIMER_INTERVAL 5000
 
 QFilePanel::QFilePanel(QWidget* parent) : QWidget(parent),
 	m_currentIndex(-1)
@@ -79,7 +76,8 @@ void QFilePanel::createWidgets()
 
 	qcbDriveComboBox = new QComboBox(this);
 	qcbDriveComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
-	foreach(const QFileInfo& fi, QFileOperationsThread::volumes())
+	qcbDriveComboBox->setFocusPolicy(Qt::NoFocus);
+	foreach(const QFileInfo& fi, VolumeInfoProvider().volumes())
 	{
 		QString path = fi.absoluteFilePath();
 		qcbDriveComboBox->addItem(QString("[-%1-]").arg(isDrive(path) ? path.left(1) : fi.fileName()));
@@ -439,12 +437,14 @@ void QFilePanel::updateDiscInformation()
 {
 	QString text;
 
-	QString label = QFileOperationsThread::diskLabel(path());
+	VolumeInfoProvider provider;
+
+	QString label = provider.volumeLabel(path());
 	if(!label.isEmpty())
 		text.append(QString("[<i>%1</i>]").arg(label));
 
 	qint64 totalBytes, freeBytes, availableBytes;
-	if(QFileOperationsThread::getDiskSpace(path(), &totalBytes, &freeBytes, &availableBytes))
+	if(provider.getDiskFreeSpace(path(), &totalBytes, &freeBytes, &availableBytes))
 	{
 		if(!text.isEmpty())
 			text.append(QLatin1Char(' '));
