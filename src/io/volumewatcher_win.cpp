@@ -22,8 +22,10 @@
 * Contact:		ritt.ks@gmail.com
 *******************************************************************/
 
+#define WINVER 0x0500
 #define _WIN32_WINNT 0x0501
 #include <qplatformdefs.h>
+#include <dbt.h>
 
 #include "volumewatcher_win_p.h"
 
@@ -84,16 +86,87 @@ WindowsVolumeWatcherEngine::~WindowsVolumeWatcherEngine()
 		}
 	}
 }
+#if 0
+static QStringList drivesFromMask(quint32 driveBits)
+{
+	QStringList ret;
 
+	char driveName[] = "A:/";
+	driveBits = (driveBits & 0x3ffffff);
+	while(driveBits)
+	{
+		if(driveBits & 0x1)
+			ret.append(QString::fromLatin1(driveName));
+		++driveName[0];
+		driveBits = driveBits >> 1;
+	}
+
+	return ret;
+}
+#endif
 bool WindowsVolumeWatcherEngine::nativeEventFilter(void* message)
 {
-	MSG* msg = reinterpret_cast<MSG*>(message);
-	if(msg && msg->message == WM_DEVICECHANGE)
+	if(engine)
 	{
-		//###TODO: implement accuracy removables detection
-		if(engine)
+		MSG* msg = reinterpret_cast<MSG*>(message);
+		if(msg->message == WM_DEVICECHANGE)
+		{
 			QMetaObject::invokeMethod(engine, "volumesChanged", Qt::QueuedConnection);
+#if 0
+			//###TODO: implement accuracy removables detection
+			PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)msg->lParam;
+			switch(msg->wParam)
+			{
+				case DBT_DEVICEARRIVAL:
+					if(lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME)
+					{
+						PDEV_BROADCAST_VOLUME dbv = (PDEV_BROADCAST_VOLUME)lpdb;
+						const QStringList& drives = drivesFromMask(dbv->dbcv_unitmask);
+						foreach(const QString& drive, drives)
+						{
+							if(dbv->dbcv_flags & DBTF_MEDIA)
+								qWarning("Drive %c: Media has arrived.", drive.at(0).toAscii());
+							else if(dbv->dbcv_flags & DBTF_NET)
+								qWarning("Drive %c: Network share was mounted.", drive.at(0).toAscii());
+							else
+								qWarning("Drive %c: Device was added.", drive.at(0).toAscii());
+						}
+					}
+					else if(lpdb->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+					{
+						PDEV_BROADCAST_DEVICEINTERFACE dbi = (PDEV_BROADCAST_DEVICEINTERFACE)lpdb;
+					}
+					break;
+				case DBT_DEVICEREMOVECOMPLETE:
+					if(lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME)
+					{
+						PDEV_BROADCAST_VOLUME dbv = (PDEV_BROADCAST_VOLUME)lpdb;
+						const QStringList& drives = drivesFromMask(dbv->dbcv_unitmask);
+						foreach(const QString& drive, drives)
+						{
+							if(dbv->dbcv_flags & DBTF_MEDIA)
+								qWarning("Drive %c: Media was removed.", drive.at(0).toAscii());
+							else if(dbv->dbcv_flags & DBTF_NET)
+								qWarning("Drive %c: Network share was unmounted.", drive.at(0).toAscii());
+							else
+								qWarning("Drive %c: Device was removed.", drive.at(0).toAscii());
+						}
+					}
+					else if(lpdb->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+					{
+						PDEV_BROADCAST_DEVICEINTERFACE dbi = (PDEV_BROADCAST_DEVICEINTERFACE)lpdb;
+					}
+					break;
+				case DBT_DEVNODES_CHANGED:
+					break;
+				default:
+					qWarning("WM_DEVICECHANGE message received, unhandled value %d.", msg->wParam);
+					break;
+			}
+#endif
+		}
 	}
+
 	return (defaultEventFilter ? defaultEventFilter(message) : false);
 }
 
@@ -139,7 +212,7 @@ QFileInfoList WindowsVolumeWatcher::volumes() const
 {
 	QFileInfoList ret;
 	ret.append(QDir::drives());
-
+#if 0
 	// add volume mount points (aka `mounted dirs')
 	wchar_t volumeMountPoint[MAX_PATH];
 	for(int i = 0, n = ret.size(); i < n; ++i)
@@ -162,6 +235,7 @@ QFileInfoList WindowsVolumeWatcher::volumes() const
 			}
 		}
 	}
+#endif
 	return ret;
 }
 
