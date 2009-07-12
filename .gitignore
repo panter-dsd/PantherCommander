@@ -3,6 +3,4 @@ bin*
 Makefile*
 *.pro.user
 object_script.*.*
-exp/*
-old/*
 *~
