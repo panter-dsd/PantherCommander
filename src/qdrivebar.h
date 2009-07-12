@@ -24,29 +24,27 @@
 
 #ifndef QDRIVEBAR_H
 #define QDRIVEBAR_H
-//
-#include <QFrame>
-//
+
+#include <QtGui/QFrame>
+
+class QAction;
 class QActionGroup;
-//
+
 class QDriveBar : public QFrame
 {
-Q_OBJECT
+	Q_OBJECT
+
 private:
 	QAction*					qaLastChecked;
 	QActionGroup*		qagDrives;
 	QString					qsCurrentPath;
-	int				timerID;
-	int lastDrivesCount;
 
 public:
-	QDriveBar(QWidget* parent = 0);
+	explicit QDriveBar(QWidget* parent = 0);
+	virtual ~QDriveBar();
 
 private slots:
-	void slotDiscChanged();
-
-protected:
-	void timerEvent(QTimerEvent *event);
+	void _q_actionTriggered(QAction* action);
 
 public slots:
 	void slotRefresh();
@@ -54,6 +52,9 @@ public slots:
 
 signals:
 	void discChanged(const QString& disc);
+
+private:
+	bool m_inRefresh;
 };
 
 #endif // QDRIVEBAR_H
