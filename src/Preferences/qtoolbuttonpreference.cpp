@@ -1,8 +1,8 @@
 #include <QtGui>
 #include "qtoolbuttonpreference.h"
 #ifdef Q_WS_WIN
-	#include <windows.h>
-	#include <private/qpixmapdata_p.h>
+#  include <qt_windows.h>
+#  include <private/qpixmapdata_p.h>
 #endif
 //
 QToolButtonPreference::QToolButtonPreference(QWidget* parent)

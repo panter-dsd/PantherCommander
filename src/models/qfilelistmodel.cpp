@@ -27,12 +27,13 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDirIterator>
+#include <QtCore/QList>
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
 #include <QtCore/qtconcurrentrun.h>
 
 #ifdef Q_WS_WIN
-#	include <windows.h>
+#  include <qt_windows.h>
 #endif
 
 #include "dirsorter.h"
