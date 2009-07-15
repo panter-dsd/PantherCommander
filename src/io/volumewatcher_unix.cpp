@@ -42,57 +42,73 @@ static VolumeWatcherEngine* engine = 0;
 static QMutex mutex;
 #endif
 
+class UnixVolumeWatcherEngine : public VolumeWatcherEngine
+{
+public:
+	UnixVolumeWatcherEngine();
+	virtual ~UnixVolumeWatcherEngine();
+
+	static QStringList volumes();
+
+protected:
+	void timerEvent(QTimerEvent* event);
+
+private:
+	QStringList m_drives;
+	int m_timerId;
+};
+
 UnixVolumeWatcherEngine::UnixVolumeWatcherEngine() : VolumeWatcherEngine()
 {
-	m_timerId = 0;
+	m_drives = volumes();
+	m_timerId = startTimer(2500);
 }
 
 UnixVolumeWatcherEngine::~UnixVolumeWatcherEngine()
 {
+	m_drives.clear();
 	killTimer(m_timerId);
 	m_timerId = 0;
 }
 
-void UnixVolumeWatcherEngine::connectNotify(const char* signal)
+static QStringList subtract(const QStringList& from, const QStringList& other)
 {
-	if(QLatin1String(signal) == SIGNAL(volumesChanged())
-		&& receivers(SIGNAL(volumesChanged())) == 1)
+	QStringList ret(from);
+	QStringList::const_iterator it = other.constEnd();
+	while(it != other.constBegin())
 	{
-		m_drivesCount = volumes().count();
-		m_timerId = startTimer(2500);
+		--it;
+		if(from.contains(*it))
+			ret.removeOne(*it);
 	}
-}
-
-void UnixVolumeWatcherEngine::disconnectNotify(const char* signal)
-{
-	if(QLatin1String(signal) == SIGNAL(volumesChanged())
-		&& receivers(SIGNAL(volumesChanged())) == 0/* 0! */)
-	{
-		killTimer(m_timerId);
-		m_timerId = 0;
-	}
+	return ret;
 }
 
 void UnixVolumeWatcherEngine::timerEvent(QTimerEvent* event)
 {
 	if(event->timerId() == m_timerId)
 	{
-		int drivesCount = volumes().count();
-		if(m_drivesCount != drivesCount)
-		{
-			m_drivesCount = drivesCount;
-			emit volumesChanged();
-		}
+		QStringList drives = volumes();
+
+		QStringList list;
+		list = subtract(drives, m_drives);
+		for(int i = 0; i < list.size(); ++i)
+			emit volumeAdded(list.at(i));
+		list = subtract(m_drives, drives);
+		for(int i = 0; i < list.size(); ++i)
+			emit volumeRemoved(list.at(i));
+
+		m_drives = drives;
 	}
 
 	QObject::timerEvent(event);
 }
 
 
-QFileInfoList UnixVolumeWatcherEngine::volumes()
+QStringList UnixVolumeWatcherEngine::volumes()
 {
 	//###TODO: make thread-safe
-	QFileInfoList ret;
+	QStringList ret;
 	QFile file("/etc/mtab");
 	if(file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
@@ -101,10 +117,7 @@ QFileInfoList UnixVolumeWatcherEngine::volumes()
 		{
 			QStringList params = stream.readLine().split(QLatin1Char(' '));
 			if(params.size() > 1)
-			{
-				QFileInfo fi(params.at(1));
-				ret.append(fi);
-			}
+				ret.append(params.at(1));
 		}
 		file.close();
 	}
@@ -124,6 +137,10 @@ UnixVolumeWatcher::UnixVolumeWatcher(QObject* parent) : VolumeWatcher(parent)
 			engine = new UnixVolumeWatcherEngine;
 	}
 	engine->ref.ref();
+
+	connect(engine, SIGNAL(volumeAdded(const QString&)), this, SIGNAL(volumeAdded(const QString&)));
+	connect(engine, SIGNAL(volumeChanged(const QString&)), this, SIGNAL(volumeChanged(const QString&)));
+	connect(engine, SIGNAL(volumeRemoved(const QString&)), this, SIGNAL(volumeRemoved(const QString&)));
 }
 
 UnixVolumeWatcher::~UnixVolumeWatcher()
@@ -149,7 +166,10 @@ UnixVolumeWatcher::~UnixVolumeWatcher()
 
 QFileInfoList UnixVolumeWatcher::volumes() const
 {
-	return UnixVolumeWatcherEngine::volumes();
+	QFileInfoList ret;
+	foreach(const QString& volume, UnixVolumeWatcherEngine::volumes())
+		ret.append(QFileInfo(volume));
+	return ret;
 }
 
 bool UnixVolumeWatcher::getDiskFreeSpace(const QString& volume, qint64* total, qint64* free, qint64* available) const
@@ -168,22 +188,4 @@ bool UnixVolumeWatcher::getDiskFreeSpace(const QString& volume, qint64* total, q
 	}
 
 	return false;
-}
-
-void UnixVolumeWatcher::connectNotify(const char* signal)
-{
-	if(engine && QLatin1String(signal) == SIGNAL(volumesChanged())
-		&& receivers(SIGNAL(volumesChanged())) == 1)
-	{
-		connect(engine, SIGNAL(volumesChanged()), this, SIGNAL(volumesChanged()));
-	}
-}
-
-void UnixVolumeWatcher::disconnectNotify(const char* signal)
-{
-	if(engine && QLatin1String(signal) == SIGNAL(volumesChanged())
-		&& receivers(SIGNAL(volumesChanged())) == 1/* 1; not 0! */)
-	{
-		disconnect(engine, SIGNAL(volumesChanged()), this, SIGNAL(volumesChanged()));
-	}
 }

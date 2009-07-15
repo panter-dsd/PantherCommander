@@ -105,8 +105,10 @@ LRESULT CALLBACK vw_internal_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
 								qWarning("Drive %c: Network share has been mounted.", drive.at(0).toAscii());
 							else
 								qWarning("Drive %c: Device has been added.", drive.at(0).toAscii());
+
+							QMetaObject::invokeMethod(engine, "volumeAdded", Qt::QueuedConnection,
+														Q_ARG(QString, drive));
 						}
-						QMetaObject::invokeMethod(engine, "volumesChanged", Qt::QueuedConnection);
 					}
 					else if(wParam == DBT_DEVICEQUERYREMOVE)
 					{
@@ -127,8 +129,10 @@ LRESULT CALLBACK vw_internal_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
 								qWarning("Drive %c: Network share has been unmounted.", drive.at(0).toAscii());
 							else
 								qWarning("Drive %c: Device has been removed.", drive.at(0).toAscii());
+
+							QMetaObject::invokeMethod(engine, "volumeRemoved", Qt::QueuedConnection,
+														Q_ARG(QString, drive));
 						}
-						QMetaObject::invokeMethod(engine, "volumesChanged", Qt::QueuedConnection);
 					}
 				}
 				break;
@@ -234,7 +238,9 @@ WindowsVolumeWatcher::WindowsVolumeWatcher(QObject* parent) : VolumeWatcher(pare
 	}
 	engine->ref.ref();
 
-	connect(engine, SIGNAL(volumesChanged()), this, SIGNAL(volumesChanged()));
+	connect(engine, SIGNAL(volumeAdded(const QString&)), this, SIGNAL(volumeAdded(const QString&)));
+	connect(engine, SIGNAL(volumeChanged(const QString&)), this, SIGNAL(volumeChanged(const QString&)));
+	connect(engine, SIGNAL(volumeRemoved(const QString&)), this, SIGNAL(volumeRemoved(const QString&)));
 }
 
 WindowsVolumeWatcher::~WindowsVolumeWatcher()

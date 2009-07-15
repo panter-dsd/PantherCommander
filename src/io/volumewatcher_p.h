@@ -43,7 +43,9 @@ public:
 	virtual bool getDiskFreeSpace(const QString& volume, qint64* total, qint64* free, qint64* available) const;
 
 Q_SIGNALS:
-	void volumesChanged();
+	void volumeAdded(const QString& volume);
+	void volumeChanged(const QString& volume);
+	void volumeRemoved(const QString& volume);
 };
 
 
@@ -58,7 +60,9 @@ public:
 	QAtomicInt ref;
 
 Q_SIGNALS:
-	void volumesChanged();
+	void volumeAdded(const QString& volume);
+	void volumeChanged(const QString& volume);
+	void volumeRemoved(const QString& volume);
 };
 
 #endif // VOLUMEWATCHER_P_H

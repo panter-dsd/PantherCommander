@@ -60,7 +60,9 @@ QDriveBar::QDriveBar(QWidget* parent) : QFrame(parent),
 	slotRefresh();
 
 	VolumeInfoProvider* provider = new VolumeInfoProvider(this);
-	connect(provider, SIGNAL(volumesChanged()), this, SLOT(slotRefresh()));
+	connect(provider, SIGNAL(volumeAdded(const QString&)), this, SLOT(slotRefresh()));
+	connect(provider, SIGNAL(volumeChanged(const QString&)), this, SLOT(slotRefresh()));
+	connect(provider, SIGNAL(volumeRemoved(const QString&)), this, SLOT(slotRefresh()));
 }
 
 QDriveBar::~QDriveBar()

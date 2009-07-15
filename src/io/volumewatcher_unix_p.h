@@ -27,28 +27,6 @@
 
 #include "volumewatcher_p.h"
 
-class UnixVolumeWatcherEngine : public VolumeWatcherEngine
-{
-	Q_OBJECT
-
-public:
-	UnixVolumeWatcherEngine();
-	virtual ~UnixVolumeWatcherEngine();
-
-	static QFileInfoList volumes();
-
-protected:
-	void connectNotify(const char* signal);
-	void disconnectNotify(const char* signal);
-
-	void timerEvent(QTimerEvent* event);
-
-private:
-	int m_drivesCount;
-	int m_timerId;
-};
-
-
 class UnixVolumeWatcher : public VolumeWatcher
 {
 	Q_OBJECT
@@ -59,10 +37,6 @@ public:
 
 	QFileInfoList volumes() const;
 	bool getDiskFreeSpace(const QString& volume, qint64* total, qint64* free, qint64* available) const;
-
-protected:
-	void connectNotify(const char* signal);
-	void disconnectNotify(const char* signal);
 };
 
 #endif // VOLUMEWATCHER_UNIX_P_H

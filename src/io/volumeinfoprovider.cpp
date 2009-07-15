@@ -37,7 +37,10 @@ VolumeInfoProvider::VolumeInfoProvider(QObject* parent) : QObject(parent)
 #else
 	watcher = new UnixVolumeWatcher(this);
 #endif
-	connect(watcher, SIGNAL(volumesChanged()), this, SIGNAL(volumesChanged()));
+
+	connect(watcher, SIGNAL(volumeAdded(const QString&)), this, SIGNAL(volumeAdded(const QString&)));
+	connect(watcher, SIGNAL(volumeChanged(const QString&)), this, SIGNAL(volumeChanged(const QString&)));
+	connect(watcher, SIGNAL(volumeRemoved(const QString&)), this, SIGNAL(volumeRemoved(const QString&)));
 }
 
 VolumeInfoProvider::~VolumeInfoProvider()
