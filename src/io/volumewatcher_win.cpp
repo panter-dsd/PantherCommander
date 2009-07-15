@@ -106,7 +106,9 @@ LRESULT CALLBACK vw_internal_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
 							else
 								qWarning("Drive %c: Device has been added.", drive.at(0).toAscii());
 						}
-						QMetaObject::invokeMethod(engine, "volumesChanged", Qt::QueuedConnection);
+						QMetaObject::invokeMethod(engine, "volumesChanged",
+													Qt::QueuedConnection,
+													Q_ARG(QStringList, drives));
 					}
 					else if(wParam == DBT_DEVICEQUERYREMOVE)
 					{
@@ -128,7 +130,9 @@ LRESULT CALLBACK vw_internal_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
 							else
 								qWarning("Drive %c: Device has been removed.", drive.at(0).toAscii());
 						}
-						QMetaObject::invokeMethod(engine, "volumesChanged", Qt::QueuedConnection);
+						QMetaObject::invokeMethod(engine, "volumesChanged",
+													Qt::QueuedConnection,
+													Q_ARG(QStringList, drives));
 					}
 				}
 				break;
@@ -234,7 +238,8 @@ WindowsVolumeWatcher::WindowsVolumeWatcher(QObject* parent) : VolumeWatcher(pare
 	}
 	engine->ref.ref();
 
-	connect(engine, SIGNAL(volumesChanged()), this, SIGNAL(volumesChanged()));
+	connect(engine, SIGNAL(volumesChanged(const QStringList&)),
+			this, SIGNAL(volumesChanged(const QStringList&)));
 }
 
 WindowsVolumeWatcher::~WindowsVolumeWatcher()

@@ -28,6 +28,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
 #include <QtCore/QObject>
+#include <QtCore/QStringList>
 
 class VolumeWatcher;
 
@@ -44,7 +45,7 @@ public:
 	virtual bool getDiskFreeSpace(const QString& volume, qint64* total, qint64* free, qint64* available) const;
 
 Q_SIGNALS:
-	void volumesChanged();
+	void volumesChanged(const QStringList& volumes);
 
 protected:
 	VolumeWatcher* watcher;

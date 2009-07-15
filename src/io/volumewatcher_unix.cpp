@@ -55,8 +55,8 @@ UnixVolumeWatcherEngine::~UnixVolumeWatcherEngine()
 
 void UnixVolumeWatcherEngine::connectNotify(const char* signal)
 {
-	if(QLatin1String(signal) == SIGNAL(volumesChanged())
-		&& receivers(SIGNAL(volumesChanged())) == 1)
+	if(QLatin1String(signal) == SIGNAL(volumesChanged(const QStringList&))
+		&& receivers(SIGNAL(volumesChanged(const QStringList&))) == 1)
 	{
 		m_drivesCount = volumes().count();
 		m_timerId = startTimer(2500);
@@ -65,8 +65,8 @@ void UnixVolumeWatcherEngine::connectNotify(const char* signal)
 
 void UnixVolumeWatcherEngine::disconnectNotify(const char* signal)
 {
-	if(QLatin1String(signal) == SIGNAL(volumesChanged())
-		&& receivers(SIGNAL(volumesChanged())) == 0/* 0! */)
+	if(QLatin1String(signal) == SIGNAL(volumesChanged(const QStringList&))
+		&& receivers(SIGNAL(volumesChanged(const QStringList&))) == 0/* 0! */)
 	{
 		killTimer(m_timerId);
 		m_timerId = 0;
@@ -77,11 +77,15 @@ void UnixVolumeWatcherEngine::timerEvent(QTimerEvent* event)
 {
 	if(event->timerId() == m_timerId)
 	{
-		int drivesCount = volumes().count();
-		if(m_drivesCount != drivesCount)
+		QFileInfoList drives = UnixVolumeWatcherEngine::volumes();
+		if(m_drivesCount != drives.count())
 		{
-			m_drivesCount = drivesCount;
-			emit volumesChanged();
+			m_drivesCount = drives.count();
+
+			QStringList volumes;
+			for(int i = 0; i < m_drivesCount; ++i)
+				volumes.append(drives.at(i).fileName());
+			emit volumesChanged(volumes);
 		}
 	}
 
@@ -172,18 +176,20 @@ bool UnixVolumeWatcher::getDiskFreeSpace(const QString& volume, qint64* total, q
 
 void UnixVolumeWatcher::connectNotify(const char* signal)
 {
-	if(engine && QLatin1String(signal) == SIGNAL(volumesChanged())
-		&& receivers(SIGNAL(volumesChanged())) == 1)
+	if(engine && QLatin1String(signal) == SIGNAL(volumesChanged(const QStringList&))
+		&& receivers(SIGNAL(volumesChanged(const QStringList&))) == 1)
 	{
-		connect(engine, SIGNAL(volumesChanged()), this, SIGNAL(volumesChanged()));
+		connect(engine, SIGNAL(volumesChanged(const QStringList&)),
+				this, SIGNAL(volumesChanged(const QStringList&)));
 	}
 }
 
 void UnixVolumeWatcher::disconnectNotify(const char* signal)
 {
-	if(engine && QLatin1String(signal) == SIGNAL(volumesChanged())
-		&& receivers(SIGNAL(volumesChanged())) == 1/* 1; not 0! */)
+	if(engine && QLatin1String(signal) == SIGNAL(volumesChanged(const QStringList&))
+		&& receivers(SIGNAL(volumesChanged(const QStringList&))) == 1/* 1; not 0! */)
 	{
-		disconnect(engine, SIGNAL(volumesChanged()), this, SIGNAL(volumesChanged()));
+		disconnect(engine, SIGNAL(volumesChanged(const QStringList&)),
+					this, SIGNAL(volumesChanged(const QStringList&)));
 	}
 }
