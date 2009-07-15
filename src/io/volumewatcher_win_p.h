@@ -27,18 +27,6 @@
 
 #include "volumewatcher_p.h"
 
-class WindowsVolumeWatcherEngine : public VolumeWatcherEngine
-{
-	Q_OBJECT
-
-public:
-	WindowsVolumeWatcherEngine();
-	virtual ~WindowsVolumeWatcherEngine();
-
-	static bool nativeEventFilter(void* message);
-};
-
-
 class WindowsVolumeWatcher : public VolumeWatcher
 {
 	Q_OBJECT

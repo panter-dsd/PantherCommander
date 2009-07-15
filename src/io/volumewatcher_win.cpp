@@ -22,71 +22,35 @@
 * Contact:		ritt.ks@gmail.com
 *******************************************************************/
 
-#define WINVER 0x0500
-#define _WIN32_WINNT 0x0501
+#define WINVER        0x0501
+#define _WIN32_WINNT  0x0501
+#define _WIN32_IE     0x0600
 #include <qplatformdefs.h>
-#include <dbt.h>
 
 #include "volumewatcher_win_p.h"
 
-#include <QtCore/QAbstractEventDispatcher>
 #include <QtCore/QDir>
-#include <QtCore/QEvent>
 #include <QtCore/QMetaObject>
 #ifndef QT_NO_THREAD
 #  include <QtCore/QMutex>
 #endif
+#include <QtCore/QStringList>
+
+#include <dbt.h>
 
 #include "qfileoperationsthread.h"
+
+#ifndef DBT_CUSTOMEVENT
+#  define DBT_CUSTOMEVENT 0x8006
+#endif
 
 static VolumeWatcherEngine* engine = 0;
 #ifndef QT_NO_THREAD
 static QMutex mutex;
 #endif
 
-static bool bFilterOverrided = false;
-static QAbstractEventDispatcher::EventFilter defaultEventFilter = 0;
+Q_CORE_EXPORT HINSTANCE qWinAppInst();
 
-WindowsVolumeWatcherEngine::WindowsVolumeWatcherEngine() : VolumeWatcherEngine()
-{
-	QAbstractEventDispatcher* dispatcher = QAbstractEventDispatcher::instance();
-	if(dispatcher)
-	{
-		QAbstractEventDispatcher::EventFilter filter = 0;
-		filter = dispatcher->setEventFilter(nativeEventFilter);
-		if(filter && filter != nativeEventFilter)
-		{
-			if(!bFilterOverrided)
-			{
-				bFilterOverrided = true;
-				defaultEventFilter = filter;
-			}
-			else
-			{
-				// filter was changed after it was overrided by us.
-				// assume our eventFilter still in the filter sequence
-				(void)dispatcher->setEventFilter(filter);
-			}
-		}
-	}
-}
-
-WindowsVolumeWatcherEngine::~WindowsVolumeWatcherEngine()
-{
-	QAbstractEventDispatcher* dispatcher = QAbstractEventDispatcher::instance();
-	if(dispatcher)
-	{
-		QAbstractEventDispatcher::EventFilter filter = 0;
-		filter = dispatcher->setEventFilter(defaultEventFilter);
-		if(filter != nativeEventFilter)
-		{
-			// filter was changed after it was overrided by us.
-			// assume original eventFilter still in the filter sequence
-			(void)dispatcher->setEventFilter(filter);
-		}
-	}
-}
-#if 0
 static QStringList drivesFromMask(quint32 driveBits)
 {
 	QStringList ret;
@@ -103,71 +67,160 @@ static QStringList drivesFromMask(quint32 driveBits)
 
 	return ret;
 }
-#endif
-bool WindowsVolumeWatcherEngine::nativeEventFilter(void* message)
+
+LRESULT CALLBACK vw_internal_proc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	if(engine)
+	if(message == WM_DEVICECHANGE)
 	{
-		MSG* msg = reinterpret_cast<MSG*>(message);
-		if(msg->message == WM_DEVICECHANGE)
+		PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)lParam;
+		switch(wParam)
 		{
-			QMetaObject::invokeMethod(engine, "volumesChanged", Qt::QueuedConnection);
-#if 0
-			//###TODO: implement accuracy removables detection
-			PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)msg->lParam;
-			switch(msg->wParam)
-			{
-				case DBT_DEVICEARRIVAL:
-					if(lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME)
+			case DBT_DEVNODES_CHANGED:
+				qWarning("DBT_DEVNODES_CHANGED message received, no extended info.");
+				break;
+
+			case DBT_QUERYCHANGECONFIG:
+				qWarning("DBT_QUERYCHANGECONFIG message received, no extended info.");
+				break;
+			case DBT_CONFIGCHANGED:
+				qWarning("DBT_CONFIGCHANGED message received, no extended info.");
+				break;
+			case DBT_CONFIGCHANGECANCELED:
+				qWarning("DBT_CONFIGCHANGECANCELED message received, no extended info.");
+				break;
+
+			case DBT_DEVICEARRIVAL:
+			case DBT_DEVICEQUERYREMOVE:
+			case DBT_DEVICEQUERYREMOVEFAILED:
+			case DBT_DEVICEREMOVEPENDING:
+			case DBT_DEVICEREMOVECOMPLETE:
+				if(lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME)
+				{
+					DEV_BROADCAST_VOLUME* db_volume = (DEV_BROADCAST_VOLUME*)lpdb;
+					const QStringList& drives = drivesFromMask(db_volume->dbcv_unitmask);
+					if(wParam == DBT_DEVICEARRIVAL)
 					{
-						PDEV_BROADCAST_VOLUME dbv = (PDEV_BROADCAST_VOLUME)lpdb;
-						const QStringList& drives = drivesFromMask(dbv->dbcv_unitmask);
 						foreach(const QString& drive, drives)
 						{
-							if(dbv->dbcv_flags & DBTF_MEDIA)
-								qWarning("Drive %c: Media has arrived.", drive.at(0).toAscii());
-							else if(dbv->dbcv_flags & DBTF_NET)
-								qWarning("Drive %c: Network share was mounted.", drive.at(0).toAscii());
+							if(db_volume->dbcv_flags & DBTF_MEDIA)
+								qWarning("Drive %c: Media has been arrived.", drive.at(0).toAscii());
+							else if(db_volume->dbcv_flags & DBTF_NET)
+								qWarning("Drive %c: Network share has been mounted.", drive.at(0).toAscii());
 							else
-								qWarning("Drive %c: Device was added.", drive.at(0).toAscii());
+								qWarning("Drive %c: Device has been added.", drive.at(0).toAscii());
 						}
+						QMetaObject::invokeMethod(engine, "volumesChanged", Qt::QueuedConnection);
 					}
-					else if(lpdb->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+					else if(wParam == DBT_DEVICEQUERYREMOVE)
 					{
-						PDEV_BROADCAST_DEVICEINTERFACE dbi = (PDEV_BROADCAST_DEVICEINTERFACE)lpdb;
 					}
-					break;
-				case DBT_DEVICEREMOVECOMPLETE:
-					if(lpdb->dbch_devicetype == DBT_DEVTYP_VOLUME)
+					else if(wParam == DBT_DEVICEQUERYREMOVEFAILED)
 					{
-						PDEV_BROADCAST_VOLUME dbv = (PDEV_BROADCAST_VOLUME)lpdb;
-						const QStringList& drives = drivesFromMask(dbv->dbcv_unitmask);
+					}
+					else if(wParam == DBT_DEVICEREMOVEPENDING)
+					{
+					}
+					else if(wParam == DBT_DEVICEREMOVECOMPLETE)
+					{
 						foreach(const QString& drive, drives)
 						{
-							if(dbv->dbcv_flags & DBTF_MEDIA)
-								qWarning("Drive %c: Media was removed.", drive.at(0).toAscii());
-							else if(dbv->dbcv_flags & DBTF_NET)
-								qWarning("Drive %c: Network share was unmounted.", drive.at(0).toAscii());
+							if(db_volume->dbcv_flags & DBTF_MEDIA)
+								qWarning("Drive %c: Media has been removed.", drive.at(0).toAscii());
+							else if(db_volume->dbcv_flags & DBTF_NET)
+								qWarning("Drive %c: Network share has been unmounted.", drive.at(0).toAscii());
 							else
-								qWarning("Drive %c: Device was removed.", drive.at(0).toAscii());
+								qWarning("Drive %c: Device has been removed.", drive.at(0).toAscii());
 						}
+						QMetaObject::invokeMethod(engine, "volumesChanged", Qt::QueuedConnection);
 					}
-					else if(lpdb->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
-					{
-						PDEV_BROADCAST_DEVICEINTERFACE dbi = (PDEV_BROADCAST_DEVICEINTERFACE)lpdb;
-					}
-					break;
-				case DBT_DEVNODES_CHANGED:
-					break;
-				default:
-					qWarning("WM_DEVICECHANGE message received, unhandled value %d.", msg->wParam);
-					break;
-			}
-#endif
+				}
+				break;
+			case DBT_DEVICETYPESPECIFIC:
+				qWarning("DBT_DEVICETYPESPECIFIC message received, can contain extended info.");
+				break;
+			case DBT_CUSTOMEVENT:
+				qWarning("DBT_CUSTOMEVENT message received, contains extended info.");
+				break;
+			case DBT_USERDEFINED:
+				qWarning("WM_DEVICECHANGE userdefined message received, can not handle.");
+				break;
+			default:
+				qWarning("WM_DEVICECHANGE message received, unhandled value %d.", wParam);
+				break;
 		}
 	}
 
-	return (defaultEventFilter ? defaultEventFilter(message) : false);
+	return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+static HWND vw_create_internal_window(const void* userData)
+{
+	QString className = QLatin1String("VolumeWatcher_Internal_Widget") + QString::number(quintptr(vw_internal_proc));
+
+	HINSTANCE hi = qWinAppInst();
+
+	WNDCLASS wc;
+	wc.style = 0;
+	wc.lpfnWndProc = vw_internal_proc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hi;
+	wc.hIcon = 0;
+	wc.hCursor = 0;
+	wc.hbrBackground = 0;
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = reinterpret_cast<const wchar_t*>(className.utf16());
+	RegisterClass(&wc);
+
+	HWND wnd = CreateWindow(wc.lpszClassName,	// classname
+							wc.lpszClassName,	// window name
+							0,					// style
+							0, 0, 0, 0,			// geometry
+							0,					// parent
+							0,					// menu handle
+							hi,					// application
+							0);					// windows creation data.
+	if(!wnd)
+	{
+		qWarning("WindowsVolumeWatcherEngine: Failed to create internal window: %d", (int)GetLastError());
+	}
+	else if(userData)
+	{
+#ifdef GWLP_USERDATA
+		SetWindowLongPtrA(wnd, GWLP_USERDATA, (LONG_PTR)userData);
+#else
+		SetWindowLongA(wnd, GWL_USERDATA, (LONG)userData);
+#endif
+	}
+	return wnd;
+}
+
+static void vw_destroy_internal_window(HWND wnd)
+{
+	if(wnd)
+		DestroyWindow(wnd);
+	QString className = QLatin1String("VolumeWatcher_Internal_Widget") + QString::number(quintptr(vw_internal_proc));
+	UnregisterClass((wchar_t*)className.utf16(), qWinAppInst());
+}
+
+
+class WindowsVolumeWatcherEngine : public VolumeWatcherEngine
+{
+public:
+	WindowsVolumeWatcherEngine();
+	virtual ~WindowsVolumeWatcherEngine();
+
+	HWND hwnd;
+};
+
+WindowsVolumeWatcherEngine::WindowsVolumeWatcherEngine() : VolumeWatcherEngine()
+{
+	hwnd = vw_create_internal_window(this);
+}
+
+WindowsVolumeWatcherEngine::~WindowsVolumeWatcherEngine()
+{
+	vw_destroy_internal_window(hwnd);
 }
 
 
