@@ -22,11 +22,6 @@
 * Contact:		ritt.ks@gmail.com
 *******************************************************************/
 
-#define WINVER        0x0501
-#define _WIN32_WINNT  0x0501
-#define _WIN32_IE     0x0600
-#include <qplatformdefs.h>
-
 #include "volumewatcher_win_p.h"
 
 #include <QtCore/QDir>
@@ -36,6 +31,8 @@
 #endif
 #include <QtCore/QStringList>
 
+#define _WIN32_WINNT  0x0500
+#include <qt_windows.h>
 #include <dbt.h>
 
 #include "qfileoperationsthread.h"
