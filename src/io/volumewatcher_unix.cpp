@@ -50,10 +50,8 @@ public:
 
 	static QStringList volumes();
 
-protected:
 	void timerEvent(QTimerEvent* event);
 
-private:
 	QStringList m_drives;
 	int m_timerId;
 };
@@ -167,7 +165,7 @@ UnixVolumeWatcher::~UnixVolumeWatcher()
 QFileInfoList UnixVolumeWatcher::volumes() const
 {
 	QFileInfoList ret;
-	foreach(const QString& volume, UnixVolumeWatcherEngine::volumes())
+	foreach(const QString& volume, engine->m_drives)
 		ret.append(QFileInfo(volume));
 	return ret;
 }
