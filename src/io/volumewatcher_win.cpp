@@ -312,10 +312,11 @@ QString WindowsVolumeWatcher::volumeLabel(const QString& volume) const
 			DWORD bufSize = 100;
 			if(GetVolumeInformation((wchar_t*)path.utf16(), buf, bufSize, 0, 0, 0, 0, 0))
 				return QString::fromWCharArray(buf);
+			if(GetLastError() == ERROR_NO_VOLUME_LABEL)
+				return tr("_NO_LABEL_");
 		}
-		return tr("_ERROR_GETTING_LABEL_");
 	}
-	return tr("_NO_LABEL_");
+	return tr("_ERROR_GETTING_LABEL_");
 }
 
 bool WindowsVolumeWatcher::getDiskFreeSpace(const QString& volume, qint64* total, qint64* free, qint64* available) const
