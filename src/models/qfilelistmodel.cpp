@@ -63,7 +63,12 @@ static void getIcons(QList<QPCFileInfo*>* infos, QFileIconProvider* iconProvider
 	{
 		QPCFileInfo* info = (*infos)[i];
 		if(info->icon().isNull())
-			info->setIcon(iconProvider->icon(info->fileInfo()));
+		{
+			if(info->fileName() == QLatin1String(".."))
+				info->setIcon(iconProvider->icon(QFileIconProvider::Desktop));
+			else
+				info->setIcon(iconProvider->icon(info->fileInfo()));
+		}
 	}
 }
 
