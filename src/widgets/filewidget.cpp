@@ -43,6 +43,9 @@
 #include "qfileoperationsthread.h"
 //#include "qfilelistsortfilterproxymodel.h"
 #include "qfullview.h"
+#ifdef Q_WS_WIN
+#  include "filecontextmenu.h"
+#endif
 #include <QDebug>
 #include <QtGui/QMessageBox>
 
@@ -547,6 +550,13 @@ void FileWidgetPrivate::_q_showContextMenu(const QPoint& position)
 	view = treeView;
 	const QModelIndex index = mapToSource(view->indexAt(position));
 
+	QPoint globalPos = view->viewport()->mapToGlobal(position);
+
+#ifdef Q_WS_WIN
+	FileContextMenu menu(view);
+	menu.setPaths(q_ptr->selectedFiles());
+	menu.executeNativeMenu(globalPos);
+#else
 	QMenu menu(view);
 	if(index.isValid())
 	{
@@ -567,7 +577,8 @@ void FileWidgetPrivate::_q_showContextMenu(const QPoint& position)
 	menu.addSeparator();
 	menu.addAction(refreshListAction);
 
-	menu.exec(view->viewport()->mapToGlobal(position));
+	menu.exec(globalPos);
+#endif // Q_WS_WIN
 #endif // QT_NO_MENU
 }
 
