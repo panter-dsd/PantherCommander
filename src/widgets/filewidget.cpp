@@ -554,7 +554,10 @@ void FileWidgetPrivate::_q_showContextMenu(const QPoint& position)
 
 #ifdef Q_WS_WIN
 	FileContextMenu menu(view);
-	menu.setPaths(q_ptr->selectedFiles());
+	if(!index.isValid())
+		menu.setPath(model->filePath(index));
+	else
+		menu.setPaths(q_ptr->selectedFiles());
 	menu.executeNativeMenu(globalPos);
 #else
 	QMenu menu(view);
