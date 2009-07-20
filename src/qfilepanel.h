@@ -25,30 +25,27 @@
 #ifndef QFILEPANEL_H
 #define QFILEPANEL_H
 
-#include <QWidget>
+#include <QtGui/QWidget>
 
 class QLabel;
 class QActionGroup;
-class QTabBar;
-class QAction;
 class QPushButton;
 class QToolButton;
 class QComboBox;
 
 class FileWidget;
+class TabBar;
 
 class QFilePanel : public QWidget
 {
 	Q_OBJECT
 
 private:
-	QTabBar*						qtabbTabs;
+	TabBar*							qtabbTabs;
 	FileWidget*						qflvCurrentFileList;
 	QLabel*							qlDiscInformation;
 	QToolButton*					qtbDriveButton;
 	QComboBox* qcbDriveComboBox;
-
-	QAction*						actionAddTab;
 
 	int m_currentIndex;
 	int								timerID;
@@ -69,23 +66,25 @@ public:
 
 protected:
 	void timerEvent(QTimerEvent *event);
-private:
-	void createWidgets();
-	void createActions();
-	int addTab(const QString& path, bool bSetCurrent = true);
-	void updateDirInformation();
-	void updateDiscInformation();
-	static QString size(qint64 bytes);
-private slots:
+
+Q_SIGNALS:
+	void pathChanged(const QString&);
+
+private Q_SLOTS:
 	void slotPathChanged(const QString& path);
-	void closeTab(int);
-	void slotAddTab() {addTab(""); saveSettings();}
+	void slotAddTab();
 	void slotCurrentTabChange(int);
 	void slotSetDisc();
 	void slotInformationChanged();
 	void slotSelectDisc();
-signals:
-	void pathChanged(const QString&);
+
+private:
+	void createWidgets();
+	int addTab(const QString& path, bool bSetCurrent = true);
+	void updateDirInformation();
+	void updateDiscInformation();
+
+	static QString size(qint64 bytes);
 };
 
 #endif // QFILEPANEL_H
