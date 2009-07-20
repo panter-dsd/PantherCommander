@@ -45,6 +45,7 @@ public:
 
 private slots:
 	void _q_actionTriggered(QAction* action);
+	void _q_showContextMenu(const QPoint& position);
 
 public slots:
 	void slotRefresh();
