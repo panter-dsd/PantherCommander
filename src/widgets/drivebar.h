@@ -43,16 +43,16 @@ public:
 	explicit DriveBar(QWidget* parent = 0);
 	virtual ~DriveBar();
 
-private slots:
-	void _q_actionTriggered(QAction* action);
-	void _q_showContextMenu(const QPoint& position);
-
-public slots:
+public Q_SLOTS:
 	void slotRefresh();
 	void slotSetDisc(const QString& path);
 
-signals:
+Q_SIGNALS:
 	void discChanged(const QString& disc);
+
+private Q_SLOTS:
+	void _q_actionTriggered(QAction* action);
+	void _q_showContextMenu(const QPoint& position);
 
 private:
 	bool m_inRefresh;

@@ -59,7 +59,7 @@ public:
 	void setFiles(const QString& source,const QString& dest);
 	void setText(const QString& text);
 	int getResult() {return result;}
-private slots:
+private Q_SLOTS:
 	void slotButtonClick();
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QFileOperationsConfirmationDialog::StandardButtons)

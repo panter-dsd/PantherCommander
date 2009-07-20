@@ -26,7 +26,7 @@ private:
 public:
 	QPreferencesDialog(QWidget * parent = 0, Qt::WFlags f = Qt::WindowSystemMenuHint);
 	~QPreferencesDialog();
-private slots:
+private Q_SLOTS:
 	void slotSavePreferences();
 	void slotSavePreferencesAndExit() {slotSavePreferences(); close();}
 	void slotSetApplyEnabled();

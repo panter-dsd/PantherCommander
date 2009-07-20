@@ -1,5 +1,3 @@
-#ifndef PLAINVIEW_H
-#define PLAINVIEW_H
 /********************************************************************
 * Copyright (C) PanteR
 *-------------------------------------------------------------------
@@ -24,6 +22,8 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
+#ifndef PLAINVIEW_H
+#define PLAINVIEW_H
 //
 class QFile;
 class QByteArray;
@@ -35,7 +35,8 @@ class QTextCodec;
 //
 class Frame : public QFrame
 {
-Q_OBJECT
+	Q_OBJECT
+
 public:
 	QStringList qslText;
 	QRect			qrRect;
@@ -67,7 +68,7 @@ private:
 	void createControls();
 protected:
 	bool event ( QEvent * event );
-private slots:
+private Q_SLOTS:
 	void slotReadFile();
 	void slotScroll();
 };

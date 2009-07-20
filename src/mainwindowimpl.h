@@ -116,7 +116,8 @@ protected:
 	void dragEnterEvent(QDragEnterEvent* event);
 
 	QFileOperationsDialog* addJob(QFileOperationsDialog* queue, QFileOperationsThread::FileOperation operation, const QStringList& parameters);
-private slots:
+
+private Q_SLOTS:
 	void showSplitterContextMenu(const QPoint& pos);
 	void slotResizeSplitter();
 	void slotChangedFocus();
