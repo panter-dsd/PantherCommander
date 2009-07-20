@@ -1,6 +1,6 @@
-INCLUDEPATH	+= $$PWD
-DEPENDPATH	+= $$PWD
-
-HEADERS	+= $$PWD/findfilesdialog.h
-
-SOURCES	+= $$PWD/findfilesdialog.cpp
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
+HEADERS += $$PWD/findfilesdialog.h \
+	$$PWD/pccopymovedialog.h
+SOURCES += $$PWD/findfilesdialog.cpp \
+	$$PWD/pccopymovedialog.cpp
