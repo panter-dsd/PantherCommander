@@ -41,6 +41,7 @@
 #include "qfilepanel.h"
 #include "qfileoperationsdialog.h"
 #include "qpreferencesdialog.h"
+#include "pccopymovedialog.h"
 
 MainWindowImpl::MainWindowImpl(QWidget* parent, Qt::WFlags f) : QMainWindow(parent, f)
 	, qlConsolePath(0)
@@ -616,54 +617,16 @@ void MainWindowImpl::slotCopy(const QString& destDir,const QStringList& fileList
 	sourcePath=destDir.isEmpty() ? sourcePanel->path() : "";
 	destPath=destDir.isEmpty() ? destPanel->path() : destDir;
 
-	QDialog* qdCopyMoveDialog=new QDialog(this);
-	qdCopyMoveDialog->setWindowTitle(tr("Copy"));
+	PCCopyMoveDialog *copyDialog = new PCCopyMoveDialog(this);
+	copyDialog->setSource(qslFileNames);
+	copyDialog->setDest(destPath);
+	copyDialog->setOperation(tr("Copy"));
+	copyDialog->setQueueModel(qsimQeueuModel);
 
-	QLabel* qlSources=new QLabel(qdCopyMoveDialog);
-	if (qslFileNames.count()==0)
-		qlSources->setText(tr("Copy \"%1\" to").arg(qslFileNames.at(0)));
-	else
-		qlSources->setText(tr("Copy \"%1\" file(s) to").arg(qslFileNames.count()));
-
-	QLineEdit* qleDest=new QLineEdit(qdCopyMoveDialog);
-	qleDest->setText(destPath);
-	if (qslFileNames.count()==1 && QFileInfo(sourcePath+qslFileNames.at(0)).isFile())
-	{
-		//qleDest->setText(qleDest->text()+QFileInfo(qslFileNames.at(0)).fileName());
-	}
-
-	QLabel* qlQueue=new QLabel(tr("Queue"),qdCopyMoveDialog);
-
-	QComboBox* qcbQueue=new QComboBox(qdCopyMoveDialog);
-	qcbQueue->setModel(qsimQeueuModel);
-	qcbQueue->setModelColumn(0);
-	qcbQueue->setCurrentIndex(-1);
-
-	QDialogButtonBox* qdbbButtons=new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-			Qt::Horizontal,
-			qdCopyMoveDialog);
-	connect(qdbbButtons,
-			SIGNAL(accepted()),
-			qdCopyMoveDialog,
-			SLOT(accept()));
-	connect(qdbbButtons,
-			SIGNAL(rejected()),
-			qdCopyMoveDialog,
-			SLOT(reject()));
-
-	QVBoxLayout* qvblMainLayout=new QVBoxLayout();
-	qvblMainLayout->addWidget(qlSources);
-	qvblMainLayout->addWidget(qleDest);
-	qvblMainLayout->addWidget(qlQueue);
-	qvblMainLayout->addWidget(qcbQueue);
-	qvblMainLayout->addWidget(qdbbButtons);
-
-	qdCopyMoveDialog->setLayout(qvblMainLayout);
-
-	if (qdCopyMoveDialog->exec())
+	if (copyDialog->exec())
 	{
 		QFileOperationsDialog* queue=0;
-		int queueIndex=qcbQueue->currentIndex();
+		int queueIndex = copyDialog->queueIndex();
 		if (queueIndex>=0 && qlQueueList.at(queueIndex))
 		{
 			queue=qlQueueList.at(queueIndex);
@@ -674,17 +637,17 @@ void MainWindowImpl::slotCopy(const QString& destDir,const QStringList& fileList
 				queue=addJob(queue,
 					QFileOperationsThread::CopyDirOperation,
 					QStringList() << qslFileNames.at(i)+QDir::separator()
-										<< qleDest->text()+QDir::separator());
+										<< destPath);
 			else
 				queue=addJob(queue,
 					QFileOperationsThread::CopyFileOperation,
 					QStringList() << qslFileNames.at(i)
-										<< qleDest->text()+QDir::separator()+QFileInfo(qslFileNames.at(i)).fileName());
+										<< copyDialog->dest());
 		}
 		queue->setBlocked(false);
 		sourcePanel->clearSelection();
 	}
-	delete qdCopyMoveDialog;
+	delete copyDialog;
 }
 //
 void MainWindowImpl::slotRemove(const QStringList& fileList)
@@ -701,16 +664,11 @@ void MainWindowImpl::slotRemove(const QStringList& fileList)
 
 	QLabel* qlQuestion=new QLabel(tr("Do you really want to delete this file(s)?"),qdRemoveDialog);
 
-	QLabel* qlPath=new QLabel(path,qdRemoveDialog);
-	qlPath->setWordWrap(true);
-
 	QStringListModel* qslmStrings;
-	if (fileList.isEmpty())
-		qslmStrings=new QStringListModel(sourcePanel->selectedFiles(),
-														qdRemoveDialog);
-	else
-		qslmStrings=new QStringListModel(fileList,
-														qdRemoveDialog);
+	QStringList qslFiles = fileList.isEmpty() ? sourcePanel->selectedFiles() : fileList;
+	for (int i = 0; i < qslFiles.size(); i++)
+		qslFiles[i] = QDir::toNativeSeparators(qslFiles[i]);
+	qslmStrings=new QStringListModel(qslFiles, qdRemoveDialog);
 
 	QListView* qlvStrings=new QListView(qdRemoveDialog);
 	qlvStrings->setModel(qslmStrings);
@@ -736,7 +694,6 @@ void MainWindowImpl::slotRemove(const QStringList& fileList)
 
 	QVBoxLayout* qvblMainLayout=new QVBoxLayout();
 	qvblMainLayout->addWidget(qlQuestion);
-	qvblMainLayout->addWidget(qlPath);
 	qvblMainLayout->addWidget(qlvStrings);
 	qvblMainLayout->addWidget(qlQueue);
 	qvblMainLayout->addWidget(qcbQueue);
@@ -908,6 +865,7 @@ void MainWindowImpl::loadToolBar(const QString& toolBarName)
 		button.iconNumber=settings->value("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),-1).toInt();
 		button.qsCaption=settings->value("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),"").toString();
 
+		if (!button.qsCommand.isEmpty()) {
 		action=new QAction(button.qiIcon,button.qsCaption,this);
 		button.qaAction=action;
 		connect(action,
@@ -917,6 +875,9 @@ void MainWindowImpl::loadToolBar(const QString& toolBarName)
 		action->setData(toolBarName+QString::number(i));
 		qmToolBarButtons.insert(toolBarName+QString::number(i),button);
 		qtbToolBar->addAction(action);
+		} else {
+			qtbToolBar->addSeparator();
+		}
 	}
 }
 //
@@ -978,54 +939,16 @@ void MainWindowImpl::slotMove(const QString& destDir,const QStringList& fileList
 	sourcePath=destDir.isEmpty() ? sourcePanel->path() : "";
 	destPath=destDir.isEmpty() ? destPanel->path() : destDir;
 
-	QDialog* qdCopyMoveDialog=new QDialog(this);
-	qdCopyMoveDialog->setWindowTitle(tr("Move"));
+	PCCopyMoveDialog *moveDialog = new PCCopyMoveDialog(this);
+	moveDialog->setSource(qslFileNames);
+	moveDialog->setDest(destPath);
+	moveDialog->setOperation(tr("Move"));
+	moveDialog->setQueueModel(qsimQeueuModel);
 
-	QLabel* qlSources=new QLabel(qdCopyMoveDialog);
-	if (qslFileNames.count()==0)
-		qlSources->setText(tr("Move \"%1\" to").arg(qslFileNames.at(0)));
-	else
-		qlSources->setText(tr("Move \"%1\" file(s) to").arg(qslFileNames.count()));
-
-	QLineEdit* qleDest=new QLineEdit(qdCopyMoveDialog);
-	qleDest->setText(destPath);
-	if (qslFileNames.count()==1 && QFileInfo(sourcePath+qslFileNames.at(0)).isFile())
-	{
-		//qleDest->setText(qleDest->text()+QFileInfo(qslFileNames.at(0)).fileName());
-	}
-
-	QLabel* qlQueue=new QLabel(tr("Queue"),qdCopyMoveDialog);
-
-	QComboBox* qcbQueue=new QComboBox(qdCopyMoveDialog);
-	qcbQueue->setModel(qsimQeueuModel);
-	qcbQueue->setModelColumn(0);
-	qcbQueue->setCurrentIndex(-1);
-
-	QDialogButtonBox* qdbbButtons=new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-			Qt::Horizontal,
-			qdCopyMoveDialog);
-	connect(qdbbButtons,
-			SIGNAL(accepted()),
-			qdCopyMoveDialog,
-			SLOT(accept()));
-	connect(qdbbButtons,
-			SIGNAL(rejected()),
-			qdCopyMoveDialog,
-			SLOT(reject()));
-
-	QVBoxLayout* qvblMainLayout=new QVBoxLayout();
-	qvblMainLayout->addWidget(qlSources);
-	qvblMainLayout->addWidget(qleDest);
-	qvblMainLayout->addWidget(qlQueue);
-	qvblMainLayout->addWidget(qcbQueue);
-	qvblMainLayout->addWidget(qdbbButtons);
-
-	qdCopyMoveDialog->setLayout(qvblMainLayout);
-
-	if (qdCopyMoveDialog->exec())
+	if (moveDialog->exec())
 	{
 		QFileOperationsDialog* queue=0;
-		int queueIndex=qcbQueue->currentIndex();
+		int queueIndex = moveDialog->queueIndex();
 		if (queueIndex>=0 && qlQueueList.at(queueIndex))
 		{
 			queue=qlQueueList.at(queueIndex);
@@ -1036,17 +959,17 @@ void MainWindowImpl::slotMove(const QString& destDir,const QStringList& fileList
 				queue=addJob(queue,
 					QFileOperationsThread::MoveDirOperation,
 					QStringList() << qslFileNames.at(i)+QDir::separator()
-										<< qleDest->text()+QDir::separator());
+										<< moveDialog->dest()+QDir::separator());
 			else
 				queue=addJob(queue,
 					QFileOperationsThread::MoveFileOperation,
 					QStringList() << qslFileNames.at(i)
-										<< qleDest->text()+QDir::separator()+QFileInfo(qslFileNames.at(i)).fileName());
+										<< moveDialog->dest()+QDir::separator()+QFileInfo(qslFileNames.at(i)).fileName());
 		}
 		queue->setBlocked(false);
 		sourcePanel->clearSelection();
 	}
-	delete qdCopyMoveDialog;
+	delete moveDialog;
 }
 //
 void MainWindowImpl::dropEvent(QDropEvent* event)
