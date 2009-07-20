@@ -11,4 +11,6 @@ win32 {
 	HEADERS	+= $$PWD/exp/filecontextmenu.h
 
 	SOURCES	+= $$PWD/exp/filecontextmenu.cpp
+
+	LIBS *= -lgdi32
 }
