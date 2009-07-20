@@ -38,6 +38,9 @@
 #include "appsettings.h"
 #include "flowlayout.h"
 #include "volumeinfoprovider.h"
+#ifdef Q_WS_WIN
+#  include "filecontextmenu.h"
+#endif
 
 static bool isDrive(const QString& path)
 {
@@ -129,6 +132,9 @@ void QDriveBar::slotRefresh()
 		button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 		button->setAutoRaise(true);
 		button->setFocusPolicy(Qt::NoFocus);
+		button->setContextMenuPolicy(Qt::CustomContextMenu);
+		connect (button, SIGNAL(customContextMenuRequested(QPoint)),
+				 this, SLOT(_q_showContextMenu(QPoint)));
 
 		layout->addWidget(button);
 	}
@@ -173,4 +179,24 @@ void QDriveBar::slotSetDisc(const QString& volume)
 			break;
 		}
 	}
+}
+
+void QDriveBar::_q_showContextMenu(const QPoint& position)
+{
+#ifdef QT_NO_MENU
+	Q_UNUSED(position);
+#else
+	QToolButton* button = qobject_cast<QToolButton*> (sender());
+	if (!button)
+		return;
+	QString path = button->defaultAction()->data().toString();
+
+	QPoint globalPos = button->mapToGlobal(position);
+#ifdef Q_WS_WIN
+	FileContextMenu menu(this);
+	menu.setPath(path);
+	menu.executeNativeMenu(globalPos);
+#else
+#endif // Q_WS_WIN
+#endif // QT_NO_MENU
 }
