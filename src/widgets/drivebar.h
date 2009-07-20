@@ -22,15 +22,15 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-#ifndef QDRIVEBAR_H
-#define QDRIVEBAR_H
+#ifndef DRIVEBAR_H
+#define DRIVEBAR_H
 
 #include <QtGui/QFrame>
 
 class QAction;
 class QActionGroup;
 
-class QDriveBar : public QFrame
+class DriveBar : public QFrame
 {
 	Q_OBJECT
 
@@ -40,8 +40,8 @@ private:
 	QString					qsCurrentPath;
 
 public:
-	explicit QDriveBar(QWidget* parent = 0);
-	virtual ~QDriveBar();
+	explicit DriveBar(QWidget* parent = 0);
+	virtual ~DriveBar();
 
 private slots:
 	void _q_actionTriggered(QAction* action);
@@ -58,4 +58,4 @@ private:
 	bool m_inRefresh;
 };
 
-#endif // QDRIVEBAR_H
+#endif // DRIVEBAR_H

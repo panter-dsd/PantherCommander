@@ -1,9 +1,11 @@
 INCLUDEPATH	+= $$PWD
 DEPENDPATH	+= $$PWD
 
-HEADERS	+= $$PWD/filewidget.h \
+HEADERS	+= $$PWD/drivebar.h \
+		$$PWD/filewidget.h \
 		$$PWD/filewidget_p.h \
 		$$PWD/flowlayout.h
 
-SOURCES	+= $$PWD/filewidget.cpp \
+SOURCES	+= $$PWD/drivebar.cpp \
+		$$PWD/filewidget.cpp \
 		$$PWD/flowlayout.cpp

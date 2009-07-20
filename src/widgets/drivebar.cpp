@@ -22,7 +22,7 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-#include "qdrivebar.h"
+#include "drivebar.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
@@ -50,7 +50,7 @@ static bool isDrive(const QString& path)
 }
 
 
-QDriveBar::QDriveBar(QWidget* parent) : QFrame(parent),
+DriveBar::DriveBar(QWidget* parent) : QFrame(parent),
 	m_inRefresh(false)
 {
 	setFocusPolicy(Qt::NoFocus);
@@ -68,11 +68,11 @@ QDriveBar::QDriveBar(QWidget* parent) : QFrame(parent),
 	connect(provider, SIGNAL(volumeRemoved(const QString&)), this, SLOT(slotRefresh()));
 }
 
-QDriveBar::~QDriveBar()
+DriveBar::~DriveBar()
 {
 }
 
-void QDriveBar::slotRefresh()
+void DriveBar::slotRefresh()
 {
 	if(m_inRefresh)
 		return;
@@ -145,7 +145,7 @@ void QDriveBar::slotRefresh()
 	m_inRefresh = false;
 }
 
-void QDriveBar::_q_actionTriggered(QAction* action)
+void DriveBar::_q_actionTriggered(QAction* action)
 {
 	if(!action)
 		return;
@@ -165,7 +165,7 @@ void QDriveBar::_q_actionTriggered(QAction* action)
 	}
 }
 
-void QDriveBar::slotSetDisc(const QString& volume)
+void DriveBar::slotSetDisc(const QString& volume)
 {
 	QString path = QDir::fromNativeSeparators(volume);
 	const QList<QAction*>& actionList = qagDrives->actions();
@@ -181,7 +181,7 @@ void QDriveBar::slotSetDisc(const QString& volume)
 	}
 }
 
-void QDriveBar::_q_showContextMenu(const QPoint& position)
+void DriveBar::_q_showContextMenu(const QPoint& position)
 {
 #ifdef QT_NO_MENU
 	Q_UNUSED(position);

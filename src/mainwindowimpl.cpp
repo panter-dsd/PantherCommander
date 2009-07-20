@@ -37,7 +37,7 @@
 #include "appsettings.h"
 #include "findfilesdialog.h"
 #include "pantherviewer.h"
-#include "qdrivebar.h"
+#include "drivebar.h"
 #include "qfilepanel.h"
 #include "qfileoperationsdialog.h"
 #include "qpreferencesdialog.h"
@@ -76,40 +76,28 @@ void MainWindowImpl::createWidgets()
 {
 	QWidget* widget = new QWidget(this);
 
-	qdbDriveBarLeft = new QDriveBar(this);
-	connect(qdbDriveBarLeft,
-			SIGNAL(discChanged(const QString&)),
-			this,
-			SLOT(slotSetDisc(const QString&)));
+	qdbDriveBarLeft = new DriveBar(this);
+	connect(qdbDriveBarLeft, SIGNAL(discChanged(const QString&)),
+			this, SLOT(slotSetDisc(const QString&)));
 
-	qdbDriveBarRight = new QDriveBar(this);
-	connect(qdbDriveBarRight,
-			SIGNAL(discChanged(const QString&)),
-			this,
-			SLOT(slotSetDisc(const QString&)));
+	qdbDriveBarRight = new DriveBar(this);
+	connect(qdbDriveBarRight, SIGNAL(discChanged(const QString&)),
+			this, SLOT(slotSetDisc(const QString&)));
 
 	qflvLeftPanel = new QFilePanel(this);
 	qflvLeftPanel->setObjectName("LeftPanel");
-	connect(qflvLeftPanel,
-			SIGNAL(pathChanged(const QString&)),
-			qdbDriveBarLeft,
-			SLOT(slotSetDisc(const QString&)));
-	connect(qflvLeftPanel,
-			SIGNAL(pathChanged(const QString&)),
-			this,
-			SLOT(slotPathChanged(const QString&)));
+	connect(qflvLeftPanel, SIGNAL(pathChanged(const QString&)),
+			qdbDriveBarLeft, SLOT(slotSetDisc(const QString&)));
+	connect(qflvLeftPanel, SIGNAL(pathChanged(const QString&)),
+			this, SLOT(slotPathChanged(const QString&)));
 	qdbDriveBarLeft->slotSetDisc(qflvLeftPanel->path());
 
 	qflvRightPanel = new QFilePanel(this);
 	qflvRightPanel->setObjectName("RightPanel");
-	connect(qflvRightPanel,
-			SIGNAL(pathChanged(const QString&)),
-			qdbDriveBarRight,
-			SLOT(slotSetDisc(const QString&)));
-	connect(qflvRightPanel,
-			SIGNAL(pathChanged(const QString&)),
-			this,
-			SLOT(slotPathChanged(const QString&)));
+	connect(qflvRightPanel, SIGNAL(pathChanged(const QString&)),
+			qdbDriveBarRight, SLOT(slotSetDisc(const QString&)));
+	connect(qflvRightPanel, SIGNAL(pathChanged(const QString&)),
+			this, SLOT(slotPathChanged(const QString&)));
 	qdbDriveBarRight->slotSetDisc(qflvRightPanel->path());
 
 	qsplitSplitter = new QSplitter(widget);
