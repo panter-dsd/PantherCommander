@@ -36,11 +36,11 @@
 #include <QtGui/QToolButton>
 
 #include "appsettings.h"
-#include "flowlayout.h"
-#include "volumeinfoprovider.h"
 #ifdef Q_WS_WIN
 #  include "filecontextmenu.h"
 #endif
+#include "flowlayout.h"
+#include "volumeinfoprovider.h"
 
 static bool isDrive(const QString& path)
 {
@@ -196,7 +196,6 @@ void QDriveBar::_q_showContextMenu(const QPoint& position)
 	FileContextMenu menu(this);
 	menu.setPath(path);
 	menu.executeNativeMenu(globalPos);
-#else
 #endif // Q_WS_WIN
 #endif // QT_NO_MENU
 }
