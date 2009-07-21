@@ -184,11 +184,7 @@ void DriveBar::slotSetDisc(const QString& volume)
 	}
 }
 
-<<<<<<< HEAD:src/qdrivebar.cpp
-void QDriveBar::_q_showContextMenu(const QPoint& position)
-=======
 void DriveBar::_q_showContextMenu(const QPoint& position)
->>>>>>> master:src/widgets/drivebar.cpp
 {
 #ifdef QT_NO_MENU
 	Q_UNUSED(position);
@@ -203,10 +199,6 @@ void DriveBar::_q_showContextMenu(const QPoint& position)
 	FileContextMenu menu(this);
 	menu.setPath(path);
 	menu.executeNativeMenu(globalPos);
-<<<<<<< HEAD:src/qdrivebar.cpp
-#else
-=======
->>>>>>> master:src/widgets/drivebar.cpp
 #endif // Q_WS_WIN
 #endif // QT_NO_MENU
 }

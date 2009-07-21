@@ -39,15 +39,9 @@ public:
 	bool showTabBarWhenOneTab() const;
 	void setShowTabBarWhenOneTab(bool enabled);
 
-<<<<<<< HEAD:src/qdrivebar.h
-private slots:
-	void _q_actionTriggered(QAction* action);
-	void _q_showContextMenu(const QPoint& position);
-=======
 protected:
 	void mouseDoubleClickEvent(QMouseEvent* event);
 	void mouseReleaseEvent(QMouseEvent* event);
->>>>>>> master:src/widgets/tabbar.h
 
 	QSize tabSizeHint(int index) const;
 
