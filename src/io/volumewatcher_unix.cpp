@@ -37,11 +37,6 @@
 #include <sys/statvfs.h>
 #include <sys/types.h>
 
-static UnixVolumeWatcherEngine* engine = 0;
-#ifndef QT_NO_THREAD
-static QMutex mutex;
-#endif
-
 class UnixVolumeWatcherEngine : public VolumeWatcherEngine
 {
 public:
@@ -55,6 +50,11 @@ public:
 	QStringList m_drives;
 	int m_timerId;
 };
+
+static UnixVolumeWatcherEngine* engine = 0;
+#ifndef QT_NO_THREAD
+static QMutex mutex;
+#endif
 
 UnixVolumeWatcherEngine::UnixVolumeWatcherEngine() : VolumeWatcherEngine()
 {
