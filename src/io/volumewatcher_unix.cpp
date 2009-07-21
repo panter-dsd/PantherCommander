@@ -37,7 +37,7 @@
 #include <sys/statvfs.h>
 #include <sys/types.h>
 
-static VolumeWatcherEngine* engine = 0;
+static UnixVolumeWatcherEngine* engine = 0;
 #ifndef QT_NO_THREAD
 static QMutex mutex;
 #endif
