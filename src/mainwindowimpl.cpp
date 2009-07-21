@@ -24,7 +24,10 @@
 
 #include "mainwindowimpl.h"
 
-#include <QtGui>
+#include <QtCore/QDir>
+#include <QtCore/QProcess>
+#include <QtCore/QDebug>
+#include <QtCore/QUrl>
 #include <QtGui/QAction>
 #include <QtGui/QComboBox>
 #include <QtGui/QFrame>
@@ -33,6 +36,21 @@
 #include <QtGui/QSplitter>
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QToolBar>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
+#include <QtGui/QApplication>
+#include <QtGui/QMenu>
+#include <QtGui/QMenuBar>
+#include <QtGui/QMessageBox>
+#include <QtGui/QInputDialog>
+#include <QtGui/QStringListModel>
+#include <QtGui/QListView>
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QDropEvent>
+#include <QtGui/QToolButton>
+
 
 #include "appsettings.h"
 #include "findfilesdialog.h"
