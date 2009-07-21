@@ -108,6 +108,8 @@ private:
 	void loadSettings();
 	void loadToolBar(const QString& toolBarName);
 	void saveToolBars();
+	void removeToolBarForName(const QString& toolBarName);
+	void renameToolBar(const QString& oldName, const QString& newName);
 
 protected:
 	void resizeEvent(QResizeEvent* event);
@@ -139,6 +141,9 @@ private slots:
 	void slotToolBarContextMenu(const QPoint& pos);
 	void slotToolButtonChange();
 	void slotToolButtonDelete();
+	void slotAddToolBar();
+	void slotRemoveToolBar();
+	void slotRenameToolBar();
 	void slotFindFiles();
 	void slotPreferences();
 
