@@ -91,8 +91,9 @@ private:
 
 public:
 	FileOperationConfirmations confirmation;
+
 public:
-	QFileOperationsThread(QObject* parent = 0);
+	explicit QFileOperationsThread(QObject* parent = 0);
 
 	void stop() {QMutexLocker locker(&mutex);bStopped=true;}
 	void setJob(FileOperation job,const QStringList& params);
@@ -126,15 +127,18 @@ private:
 	bool error(const QStringList& params);
 	bool copyFileTime(const QString& qsSourceFileName,const QString& qsDestFileName);
 	bool copyPermisions(const QString& qsSourceFileName,const QString& qsDestFileName);
+
 protected:
 	void run();
-signals:
+
+Q_SIGNALS:
 	void changedPercent(int percent);
 	void changedValue(qint64 value);
 	void changedDirSize(qint64 size, qint64 dirs, qint64 files);
 	void currentFileCopyChanged(const QString& sourceFile,const QString& destFile);
 	void operationError();
-public slots:
+
+public Q_SLOTS:
 	void slotPause() {QMutexLocker locker(&mutex);isPaused=true;}
 	void slotResume() {QMutexLocker locker(&mutex);isPaused=false;}
 };

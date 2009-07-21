@@ -40,7 +40,7 @@ public:
 protected:
 	explicit AppSettings(QObject* parent = 0);
 
-signals:
+Q_SIGNALS:
 	void settingsChanged();
 
 private:

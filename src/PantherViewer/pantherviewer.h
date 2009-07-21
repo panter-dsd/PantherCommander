@@ -62,7 +62,7 @@ private:
 	void loadSettings();
 	void saveSettings();
 	QStringList codecsList();
-private slots:
+private Q_SLOTS:
 	void slotSetEncoding();
 	void slotCurrentTabChanged(int index);
 	void slotCloseCurrentTab();

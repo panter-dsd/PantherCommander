@@ -80,7 +80,7 @@ private:
 	void createControls();
 	void setLayouts();
 	void setConnects();
-private slots:
+private Q_SLOTS:
 	void slotChooseCommandFile();
 	void slotChooseWorkDir();
 	void slotChooseIconFile();

@@ -1,5 +1,3 @@
-#ifndef ABSTRACTVIEW_H
-#define ABSTRACTVIEW_H
 /********************************************************************
 * Copyright (C) PanteR
 *-------------------------------------------------------------------
@@ -24,12 +22,15 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-//
+#ifndef ABSTRACTVIEW_H
+#define ABSTRACTVIEW_H
+
 #include <QWidget>
-//
+
 class AbstractView : public QWidget
 {
-Q_OBJECT
+	Q_OBJECT
+
 private:
 	QString					qsFileName;
 public:

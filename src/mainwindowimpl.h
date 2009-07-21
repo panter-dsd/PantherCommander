@@ -38,7 +38,7 @@ class QPushButton;
 class QSplitter;
 class QToolBar;
 //
-class QDriveBar;
+class DriveBar;
 class QFilePanel;
 class QFileOperationsDialog;
 class QFileOperationsDialog;
@@ -53,8 +53,8 @@ class MainWindowImpl : public QMainWindow
 	Q_PROPERTY(QStringList commandHistory READ commandHistory WRITE setCommandHistory)
 
 private:
-	QDriveBar*									qdbDriveBarLeft;
-	QDriveBar*									qdbDriveBarRight;
+	DriveBar*									qdbDriveBarLeft;
+	DriveBar*									qdbDriveBarRight;
 	QFilePanel*									qflvLeftPanel;
 	QFilePanel*									qflvRightPanel;
 	QFilePanel*									qfpFocusedFilePanel;
@@ -118,7 +118,8 @@ protected:
 	void dragEnterEvent(QDragEnterEvent* event);
 
 	QFileOperationsDialog* addJob(QFileOperationsDialog* queue, QFileOperationsThread::FileOperation operation, const QStringList& parameters);
-private slots:
+
+private Q_SLOTS:
 	void showSplitterContextMenu(const QPoint& pos);
 	void slotResizeSplitter();
 	void slotChangedFocus();

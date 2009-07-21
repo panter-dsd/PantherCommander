@@ -9,7 +9,6 @@ HEADERS	+= $$PWD/appsettings.h \
 	$$PWD/qfileoperationsthread.h \
 	$$PWD/qfullview.h \
 	$$PWD/qfileoperationsconfirmationdialog.h \
-	$$PWD/qdrivebar.h \
 	$$PWD/qselectdiscdialog.h
 
 SOURCES	+= $$PWD/main.cpp \
@@ -21,7 +20,6 @@ SOURCES	+= $$PWD/main.cpp \
 	$$PWD/qfileoperationsthread.cpp \
 	$$PWD/qfullview.cpp \
 	$$PWD/qfileoperationsconfirmationdialog.cpp \
-	$$PWD/qdrivebar.cpp \
 	$$PWD/qselectdiscdialog.cpp
 
 include( $$PWD/dialogs/dialogs.pri )

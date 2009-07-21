@@ -18,59 +18,56 @@
 * Boston, MA 02110-1301 USA
 *-------------------------------------------------------------------
 * Project:		Panther Commander
-* Author:		PanteR
-* Contact:	panter.dsd@gmail.com
+* Author:		Ritt K.
+* Contact:		ritt.ks@gmail.com
 *******************************************************************/
 
-#ifndef PLAINVIEW_H
-#define PLAINVIEW_H
-//
-class QFile;
-class QByteArray;
-class QScrollArea;
-class QTextCodec;
-//
-#include "abstractview.h"
-#include <QFrame>
-//
-class Frame : public QFrame
+#ifndef TABBAR_H
+#define TABBAR_H
+
+#include <QtGui/QTabBar>
+
+class TabBar : public QTabBar
 {
 	Q_OBJECT
+	Q_PROPERTY(bool showTabBarWhenOneTab READ showTabBarWhenOneTab WRITE setShowTabBarWhenOneTab)
 
 public:
-	QStringList qslText;
-	QRect			qrRect;
-public:
-	Frame(QWidget* parent=0);
-	virtual ~Frame() {;}
-	void setRect(const QRect& rect) {qrRect=rect;}
+	explicit TabBar(QWidget* parent = 0);
+	virtual ~TabBar();
+
+	bool showTabBarWhenOneTab() const;
+	void setShowTabBarWhenOneTab(bool enabled);
+
+<<<<<<< HEAD:src/qdrivebar.h
+private slots:
+	void _q_actionTriggered(QAction* action);
+	void _q_showContextMenu(const QPoint& position);
+=======
 protected:
-	void paintEvent(QPaintEvent * /* event */);
-};
-//
-class PlainView : public AbstractView
-{
-Q_OBJECT
-private:
-	Frame*				m_frame;
-	QScrollArea*		qsbScroll;
-	QFile*					qfFile;
-	QTextCodec*		qtcCodec;
-	int						stringCount;
-	QString				qsSplitSymbol;
-public:
-	PlainView(const QString& fileName,QWidget* parent=0);
-	~PlainView();
-	static bool isOpen(const QString& /*fileName*/) {return true;}
-	void setTextCodec(const QString& codecName);
-	QString textCodec();
-private:
-	void createControls();
-protected:
-	bool event ( QEvent * event );
+	void mouseDoubleClickEvent(QMouseEvent* event);
+	void mouseReleaseEvent(QMouseEvent* event);
+>>>>>>> master:src/widgets/tabbar.h
+
+	QSize tabSizeHint(int index) const;
+
+	void tabInserted(int position);
+	void tabRemoved(int position);
+
+Q_SIGNALS:
+	void newTab();
+	void cloneTab(int index);
+
 private Q_SLOTS:
-	void slotReadFile();
-	void slotScroll();
+	void cloneTab();
+	void closeTab(int index = -1);
+	void closeOtherTabs();
+	void contextMenuRequested(const QPoint& pos);
+
+private:
+	void updateVisibility();
+
+	bool m_showTabBarWhenOneTab;
 };
 
-#endif // PLAINVIEW_H
+#endif // TABBAR_H

@@ -31,6 +31,7 @@
 
 #include "appsettings.h"
 #include "filewidget.h"
+#include "tabbar.h"
 #include "qselectdiscdialog.h"
 #include "volumeinfoprovider.h"
 
@@ -40,7 +41,6 @@ QFilePanel::QFilePanel(QWidget* parent) : QWidget(parent),
 	m_currentIndex(-1)
 {
 	createWidgets();
-	createActions();
 
 	updateDiscInformation();
 	const QString path=qflvCurrentFileList->directory().absolutePath();
@@ -83,10 +83,9 @@ void QFilePanel::createWidgets()
 		qcbDriveComboBox->addItem(QString("[-%1-]").arg(isDrive(path) ? path.left(1) : fi.fileName()));
 	}
 
-	qlDiscInformation=new QLabel(this);
+	qlDiscInformation = new QLabel(this);
 
-	qtabbTabs = new QTabBar(this);
-	qtabbTabs->setContextMenuPolicy(Qt::ActionsContextMenu);
+	qtabbTabs = new TabBar(this);
 	qtabbTabs->setExpanding(false);
 	qtabbTabs->setFocusPolicy(Qt::NoFocus);
 #if QT_VERSION >= 0x040500
@@ -96,7 +95,8 @@ void QFilePanel::createWidgets()
 	qtabbTabs->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
 #endif
 
-	connect(qtabbTabs, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTab(int)));
+	connect(qtabbTabs, SIGNAL(newTab()), this, SLOT(slotAddTab()));
+	connect(qtabbTabs, SIGNAL(cloneTab(int)), this, SLOT(slotAddTab()));
 	connect(qtabbTabs, SIGNAL(currentChanged(int)), this, SLOT(slotCurrentTabChange(int)));
 
 	qflvCurrentFileList = new FileWidget(qtabbTabs);
@@ -120,18 +120,7 @@ void QFilePanel::createWidgets()
 
 	setFocusProxy(qflvCurrentFileList);
 }
-//
-void QFilePanel::createActions()
-{
-	actionAddTab = new QAction(this);
-	actionAddTab->setText(tr("Add copy of this tab"));
-#ifndef Q_CC_MSVC
-	#warning "TODO: this set only current path in new tab, but must set path from clicked tab"
-#endif
-	connect(actionAddTab, SIGNAL(triggered(bool)), this, SLOT(slotAddTab()));
-	qtabbTabs->addAction(actionAddTab);
-}
-//
+
 void QFilePanel::slotPathChanged(const QString& path)
 {
 	updateDiscInformation();
@@ -187,10 +176,11 @@ int QFilePanel::addTab(const QString& path, bool bSetCurrent)
 	return index;
 }
 
-void QFilePanel::closeTab(int index)
+void QFilePanel::slotAddTab()
 {
-	if(qtabbTabs->count() > 1)
-		qtabbTabs->removeTab(index);
+	addTab(QString());
+
+	saveSettings();
 }
 
 void QFilePanel::slotCurrentTabChange(int index)

@@ -46,7 +46,7 @@ public:
 	explicit FindFilesDialog(QWidget* parent = 0);
 	virtual ~FindFilesDialog();
 
-private slots:
+private Q_SLOTS:
 	void browse();
 	void find();
 	void _slot_cellActivated(int row, int column);

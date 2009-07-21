@@ -97,7 +97,7 @@ private:
 	QString getSizeStr(double size) const;
 	QStringList normalizeFileNames(const QStringList& names);
 	QString normalizeFileName(const QString& name);
-private slots:
+private Q_SLOTS:
 	void slotPauseResume();
 	void slotShowHideJobList();
 	void slotCancel();
@@ -106,7 +106,7 @@ private slots:
 	void slotCurrentFileCopyChanged(const QString& sourceFile,const QString& destFile);
 	void slotAddingJob(SJob& job);
 	void slotOperationError();
-signals:
+Q_SIGNALS:
 	void jobChanged();
 	void jobAdding(SJob& job);
 };
