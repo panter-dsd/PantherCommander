@@ -41,9 +41,6 @@
 #endif
 #include "flowlayout.h"
 #include "volumeinfoprovider.h"
-#ifdef Q_WS_WIN
-#  include "filecontextmenu.h"
-#endif
 
 static bool isDrive(const QString& path)
 {
