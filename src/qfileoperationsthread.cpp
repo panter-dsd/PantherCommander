@@ -802,7 +802,7 @@ bool QFileOperationsThread::execute(const QString& filePath, const QStringList& 
 	if (fi.suffix().toLower() == QLatin1String("bat"))
 	{
 		return QProcess::startDetached("cmd.exe",
-								QStringList() << "/C" << fpath,
+								QStringList() << "/C" << fpath << arguments,
 								workingDirectory);
 	}
 	else
@@ -811,7 +811,7 @@ bool QFileOperationsThread::execute(const QString& filePath, const QStringList& 
 		instance = ShellExecute(0,
 								(wchar_t*)QString("Open").utf16(),
 								(wchar_t*)fpath.utf16(),
-								0,
+								(wchar_t*)arguments.join(" ").utf16(),
 								(wchar_t*)wpath.utf16(),
 								SW_NORMAL);
 		if((int)instance > 32)
