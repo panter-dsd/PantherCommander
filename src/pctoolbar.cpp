@@ -45,18 +45,20 @@ PCToolBar::PCToolBar(const QString &name, QWidget *parent)
 void PCToolBar::restore()
 {
 	QSettings* settings = AppSettings::instance();
-	int buttonsCount = settings->value("ToolBar_" + qsName + "/ButtonsCount",0).toInt();
+	settings->beginGroup("ToolBar_" + qsName);
+	int buttonsCount = settings->value("ButtonsCount",0).toInt();
 	for (int i = 0; i < buttonsCount; i++) {
 		SToolBarButton button;
-		button.qsCommand = settings->value("ToolBar_" + qsName + "/Command_" + QString::number(i), "").toString();
-		button.qsParams = settings->value("ToolBar_" + qsName + "/Params_" + QString::number(i), "").toString();
-		button.qsWorkDir = settings->value("ToolBar_" + qsName + "/WorkDir_" + QString::number(i), "").toString();
-		button.qsIconFile = settings->value("ToolBar_" + qsName + "/IconFile_" + QString::number(i), "").toString();
-		button.qiIcon = settings->value("ToolBar_" + qsName + "/Icon_" + QString::number(i), "").value<QIcon>();
-		button.iconNumber = settings->value("ToolBar_" + qsName + "/IconNumber_" + QString::number(i), -1).toInt();
-		button.qsCaption = settings->value("ToolBar_" + qsName + "/Caption_" + QString::number(i), "").toString();
+		button.qsCommand = settings->value("Command_" + QString::number(i), "").toString();
+		button.qsParams = settings->value("Params_" + QString::number(i), "").toString();
+		button.qsWorkDir = settings->value("WorkDir_" + QString::number(i), "").toString();
+		button.qsIconFile = settings->value("IconFile_" + QString::number(i), "").toString();
+		button.qiIcon = settings->value("Icon_" + QString::number(i), "").value<QIcon>();
+		button.iconNumber = settings->value("IconNumber_" + QString::number(i), -1).toInt();
+		button.qsCaption = settings->value("Caption_" + QString::number(i), "").toString();
 		qlButtons << button;
 	}
+	settings->endGroup();
 	refreshActions();
 }
 
