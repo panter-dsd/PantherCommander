@@ -241,7 +241,7 @@ void PCToolBar::slotToolButtonCD()
 }
 
 void PCToolBar::dropEvent(QDropEvent* event)
-{qDebug("1");
+{
 	QAction *action = this->actionAt(event->pos());
 	if (action) {
 		SToolBarButton button = qlButtons.at(action->data().toInt());
