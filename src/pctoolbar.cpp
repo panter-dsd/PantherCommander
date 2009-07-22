@@ -21,6 +21,8 @@
 * Author:		PanteR
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
+#include <QtCore/QUrl>
+#include <QtCore/QDir>
 #include <QtGui/QAction>
 #include <QtGui/QMenu>
 #include <QtGui/QContextMenuEvent>
@@ -235,5 +237,38 @@ void PCToolBar::slotToolButtonCD()
 
 	SToolBarButton button = qlButtons.at(action->data().toInt());
 	emit cdExecuted(button.qsWorkDir);
+}
+
+void PCToolBar::dropEvent(QDropEvent* event)
+{qDebug("1");
+	QAction *action = this->actionAt(event->pos());
+	if (action) {
+		SToolBarButton button = qlButtons.at(action->data().toInt());
+		if (!button.qsCommand.isEmpty()) {
+			QStringList qslParams;
+			foreach(QUrl url, event->mimeData()->urls())
+				qslParams << QDir::toNativeSeparators(url.toLocalFile());
+			button.qsParams += qslParams.join(QLatin1String(" "));
+			emit toolBarActionExecuted(button);
+		}
+	} else {
+		foreach(QUrl url, event->mimeData()->urls()) {
+			SToolBarButton button = QToolButtonPreference::getButton(url.toLocalFile());
+			qlButtons << button;
+		}
+		refreshActions();
+	}
+}
+
+void PCToolBar::dragMoveEvent(QDragMoveEvent* event)
+{
+	event->setAccepted(true);
+	event->accept();
+}
+
+void PCToolBar::dragEnterEvent(QDragEnterEvent* event)
+{
+	if (event->mimeData()->hasFormat("text/uri-list"))
+		event->acceptProposedAction();
 }
 

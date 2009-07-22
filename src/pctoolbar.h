@@ -46,6 +46,9 @@ private:
 
 protected:
 	void contextMenuEvent(QContextMenuEvent *event);
+	void dropEvent(QDropEvent* event);
+	void dragMoveEvent(QDragMoveEvent* event);
+	void dragEnterEvent(QDragEnterEvent* event);
 
 private Q_SLOTS:
 	void slotToolButtonPress();
