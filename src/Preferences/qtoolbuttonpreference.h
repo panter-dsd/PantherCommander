@@ -42,7 +42,6 @@ struct SToolBarButton
 	int				iconNumber;
 	QIcon			qiIcon;
 	QString		qsCaption;
-	QAction*		qaAction;
 };
 class QToolButtonPreference : public QWidget
 {
