@@ -45,7 +45,8 @@ class QFileOperationsDialog;
 class PantherViewer;
 //
 #include "qfileoperationsthread.h"
-#include "Preferences/qtoolbuttonpreference.h"
+#include "qtoolbuttonpreference.h"
+#include "pctoolbar.h"
 //
 class MainWindowImpl : public QMainWindow
 {
@@ -67,6 +68,7 @@ private:
 	QList<QFileOperationsDialog*> qlQueueList;
 	QMap<QString,SToolBarButton>		qmToolBarButtons;
 	QList<QToolBar*>						qltbToolBarList;
+	QList<PCToolBar*> qlpcToolBars;
 
 	QPushButton*								qpbRunConsole;
 	QPushButton*								qpbView;
@@ -110,6 +112,7 @@ private:
 	void saveToolBars();
 	void removeToolBarForName(const QString& toolBarName);
 	void renameToolBar(const QString& oldName, const QString& newName);
+	inline void connectToolBar(PCToolBar *toolBar);
 
 protected:
 	void resizeEvent(QResizeEvent* event);
@@ -138,7 +141,6 @@ private Q_SLOTS:
 	void slotRename();
 	void slotQueueFinished();
 	void slotQueueChanged();
-	void slotToolButtonPress();
 	void slotToolBarContextMenu(const QPoint& pos);
 	void slotToolButtonChange();
 	void slotToolButtonDelete();
@@ -147,6 +149,8 @@ private Q_SLOTS:
 	void slotRenameToolBar();
 	void slotFindFiles();
 	void slotPreferences();
+	void toolBarActionExecute(const SToolBarButton& action);
+	void cdExecute(const QString& path);
 
 	/* ** TESTING PURPOSES ONLY ** */
 	void slotTestingFileDialog();

@@ -1,7 +1,6 @@
-INCLUDEPATH	+= $$PWD
-DEPENDPATH	+= $$PWD
-
-HEADERS	+= $$PWD/appsettings.h \
+INCLUDEPATH += $$PWD
+DEPENDPATH += $$PWD
+HEADERS += $$PWD/appsettings.h \
 	$$PWD/mainwindowimpl.h \
 	$$PWD/qfilelistsortfilterproxymodel.h \
 	$$PWD/qfilepanel.h \
@@ -9,9 +8,9 @@ HEADERS	+= $$PWD/appsettings.h \
 	$$PWD/qfileoperationsthread.h \
 	$$PWD/qfullview.h \
 	$$PWD/qfileoperationsconfirmationdialog.h \
-	$$PWD/qselectdiscdialog.h
-
-SOURCES	+= $$PWD/main.cpp \
+	$$PWD/qselectdiscdialog.h \
+	$$PWD/pctoolbar.h
+SOURCES += $$PWD/main.cpp \
 	$$PWD/appsettings.cpp \
 	$$PWD/mainwindowimpl.cpp \
 	$$PWD/qfilelistsortfilterproxymodel.cpp \
@@ -20,8 +19,8 @@ SOURCES	+= $$PWD/main.cpp \
 	$$PWD/qfileoperationsthread.cpp \
 	$$PWD/qfullview.cpp \
 	$$PWD/qfileoperationsconfirmationdialog.cpp \
-	$$PWD/qselectdiscdialog.cpp
-
+	$$PWD/qselectdiscdialog.cpp \
+	$$PWD/pctoolbar.cpp
 include( $$PWD/dialogs/dialogs.pri )
 include( $$PWD/io/io.pri )
 include( $$PWD/models/models.pri )
@@ -29,5 +28,4 @@ include( $$PWD/PantherViewer/pantherviewer.pri )
 include( $$PWD/Preferences/preferences.pri )
 include( $$PWD/tools/tools.pri )
 include( $$PWD/widgets/widgets.pri )
-
 LIBS *= $$QMAKE_LIBS_CORE

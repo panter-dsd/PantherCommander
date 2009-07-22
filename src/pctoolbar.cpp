@@ -1,0 +1,239 @@
+/********************************************************************
+* Copyright (C) PanteR
+*-------------------------------------------------------------------
+*
+* Panther Commander is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License as
+* published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+*
+* Panther Commander is distributed in the hope that it will be
+* useful, but WITHOUT ANY WARRANTY; without even the implied
+* warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+* See the GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with Panther Commander; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin St, Fifth Floor,
+* Boston, MA 02110-1301 USA
+*-------------------------------------------------------------------
+* Project:		Panther Commander
+* Author:		PanteR
+* Contact:	panter.dsd@gmail.com
+*******************************************************************/
+#include <QtGui/QAction>
+#include <QtGui/QMenu>
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QDialog>
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QVBoxLayout>
+
+#include "pctoolbar.h"
+#include "appsettings.h"
+
+PCToolBar::PCToolBar(const QString &name, QWidget *parent)
+		:QToolBar(name, parent)
+{
+	qsName = name;
+	this->setObjectName(qsName);
+	restore();
+}
+
+void PCToolBar::restore()
+{
+	QSettings* settings = AppSettings::instance();
+	int buttonsCount = settings->value("ToolBar_" + qsName + "/ButtonsCount",0).toInt();
+	for (int i = 0; i < buttonsCount; i++) {
+		SToolBarButton button;
+		button.qsCommand = settings->value("ToolBar_" + qsName + "/Command_" + QString::number(i), "").toString();
+		button.qsParams = settings->value("ToolBar_" + qsName + "/Params_" + QString::number(i), "").toString();
+		button.qsWorkDir = settings->value("ToolBar_" + qsName + "/WorkDir_" + QString::number(i), "").toString();
+		button.qsIconFile = settings->value("ToolBar_" + qsName + "/IconFile_" + QString::number(i), "").toString();
+		button.qiIcon = settings->value("ToolBar_" + qsName + "/Icon_" + QString::number(i), "").value<QIcon>();
+		button.iconNumber = settings->value("ToolBar_" + qsName + "/IconNumber_" + QString::number(i), -1).toInt();
+		button.qsCaption = settings->value("ToolBar_" + qsName + "/Caption_" + QString::number(i), "").toString();
+		qlButtons << button;
+	}
+	refreshActions();
+}
+
+void PCToolBar::save()
+{
+	QSettings* settings = AppSettings::instance();
+
+	settings->remove("ToolBar_" + qsName);
+	settings->beginGroup("ToolBar_" + qsName);
+	settings->setValue("ButtonsCount", qlButtons.count());
+
+	int i = 0;
+	foreach(const SToolBarButton &button, qlButtons) {
+		settings->setValue("Command_" + QString::number(i), button.qsCommand);
+		settings->setValue("Params_" + QString::number(i), button.qsParams);
+		settings->setValue("WorkDir_" + QString::number(i), button.qsWorkDir);
+		settings->setValue("IconFile_" + QString::number(i), button.qsIconFile);
+		settings->setValue("IconNumber_" + QString::number(i), button.iconNumber);
+		settings->setValue("Icon_" + QString::number(i), button.qiIcon);
+		settings->setValue("Caption_" + QString::number(i), button.qsCaption);
+		i++;
+	}
+	settings->endGroup();
+	settings->sync();
+}
+
+void PCToolBar::refreshActions()
+{
+	foreach(QAction *act, this->actions()) {
+		this->removeAction(act);
+		delete 	act;
+	}
+
+	QAction* action;
+	int i = 0;
+	foreach(SToolBarButton button, qlButtons) {
+		if (!button.qsCommand.isEmpty()) {
+			action = new QAction(button.qiIcon, button.qsCaption, this);
+			connect(action, SIGNAL(triggered()),
+					this, 	SLOT(slotToolButtonPress()));
+			action->setData(QString::number(i));
+			this->addAction(action);
+		} else {
+			action = this->addSeparator();
+			action->setData(QString::number(i));
+		}
+		i++;
+	}
+}
+
+void PCToolBar::contextMenuEvent(QContextMenuEvent *event)
+{
+	QMenu* qmToolBarMenu = new QMenu(this);
+	QAction* action = this->actionAt(event->pos());
+	QAction* menuAction;
+
+	if (action) {
+		SToolBarButton button = qlButtons.at(action->data().toInt());
+		if (!button.qsCommand.isEmpty()) {
+			menuAction = new QAction(tr("&Execute ") + button.qsCaption, qmToolBarMenu);
+			connect(menuAction, SIGNAL(triggered()),
+					action, SLOT(trigger()));
+			qmToolBarMenu->addAction(menuAction);
+			qmToolBarMenu->addSeparator();
+		}
+
+		menuAction = new QAction(tr("&Change..."), qmToolBarMenu);
+		menuAction->setData(action->data());
+		connect(menuAction, SIGNAL(triggered()),
+				this, 	SLOT(slotToolButtonChange()));
+		qmToolBarMenu->addAction(menuAction);
+
+		menuAction = new QAction(tr("&Delete"), qmToolBarMenu);
+		menuAction->setData(action->data());
+		connect(menuAction, SIGNAL(triggered()),
+				this, SLOT(slotToolButtonDelete()));
+		qmToolBarMenu->addAction(menuAction);
+
+		if (!button.qsCommand.isEmpty()) {
+			menuAction = new QAction(tr("cd ") + button.qsWorkDir, qmToolBarMenu);
+			menuAction->setData(action->data());
+			connect(menuAction, SIGNAL(triggered()),
+					this, SLOT(slotToolButtonCD()));
+			qmToolBarMenu->addAction(menuAction);
+		}
+
+		qmToolBarMenu->exec(event->globalPos());
+	} else {
+		menuAction = new QAction(tr("&Add toolbar"), qmToolBarMenu);
+		connect(menuAction, SIGNAL(triggered()),
+				this, SIGNAL(addToolBar()));
+		qmToolBarMenu->addAction(menuAction);
+
+		menuAction = new QAction(tr("&Remove \"%1\"").arg(qsName), qmToolBarMenu);
+		connect(menuAction, SIGNAL(triggered()),
+				this, SIGNAL(removeToolBar()));
+		qmToolBarMenu->addAction(menuAction);
+
+		menuAction = new QAction(tr("Re&name \"%1\"").arg(qsName), qmToolBarMenu);
+		connect(menuAction, SIGNAL(triggered()),
+				this, SIGNAL(renameToolBar()));
+		qmToolBarMenu->addAction(menuAction);
+
+		qmToolBarMenu->exec(event->globalPos());
+	}
+	delete qmToolBarMenu;
+}
+
+void PCToolBar::slotToolButtonPress()
+{
+	QAction *action = qobject_cast<QAction*> (sender());
+	if (!action)
+		return;
+
+	SToolBarButton button = qlButtons.at(action->data().toInt());
+	emit toolBarActionExecuted(button);
+}
+
+void PCToolBar::rename(const QString &name)
+{
+	qsName = name;
+	this->setObjectName(qsName);
+	save();
+}
+
+void PCToolBar::slotToolButtonChange()
+{
+	QAction *action = qobject_cast<QAction*> (sender());
+	if (!action)
+		return;
+
+	int index = action->data().toInt();
+
+	SToolBarButton button = qlButtons.at(index);
+
+	QDialog* toolButtonChangeDialog = new QDialog(this);
+
+	QToolButtonPreference* qtbpToolButtonPreference = new QToolButtonPreference(toolButtonChangeDialog);
+	qtbpToolButtonPreference->setButton(button);
+
+	QDialogButtonBox* qdbbButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+									Qt::Horizontal,
+									toolButtonChangeDialog);
+	connect(qdbbButtonBox, SIGNAL(accepted()),
+			toolButtonChangeDialog, SLOT(accept()));
+	connect(qdbbButtonBox, SIGNAL(rejected()),
+			toolButtonChangeDialog, SLOT(reject()));
+
+	QVBoxLayout* layout=new QVBoxLayout();
+	layout->addWidget(qtbpToolButtonPreference);
+	layout->addWidget(qdbbButtonBox);
+	toolButtonChangeDialog->setLayout(layout);
+
+	if (toolButtonChangeDialog->exec())
+	{
+		button = qtbpToolButtonPreference->getButton();
+		qlButtons.removeAt(index);
+		qlButtons.insert(index, button);
+		refreshActions();
+	}
+	delete toolButtonChangeDialog;
+}
+
+void PCToolBar::slotToolButtonDelete()
+{
+	QAction *action = qobject_cast<QAction*> (sender());
+	if (!action)
+		return;
+	int index = action->data().toInt();
+	qlButtons.removeAt(index);
+	refreshActions();
+}
+
+void PCToolBar::slotToolButtonCD()
+{
+	QAction *action = qobject_cast<QAction*> (sender());
+	if (!action)
+		return;
+
+	SToolBarButton button = qlButtons.at(action->data().toInt());
+	emit cdExecuted(button.qsWorkDir);
+}
+

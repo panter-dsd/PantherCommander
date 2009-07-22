@@ -407,7 +407,17 @@ void MainWindowImpl::saveSettings()
 	settings->setValue("CommandHistory", commandHistory());
 	settings->endGroup();
 
-	saveToolBars();
+	QStringList qslToolBars;
+	foreach(PCToolBar *toolBar, qlpcToolBars) {
+		qslToolBars << toolBar->name();
+		toolBar->save();
+	}
+
+	settings->beginGroup("Global");
+	settings->setValue("ToolBars", qslToolBars);
+	settings->endGroup();
+
+	settings->sync();
 }
 //
 void MainWindowImpl::loadSettings()
@@ -426,10 +436,19 @@ void MainWindowImpl::loadSettings()
 	QStringList toolBarNames = settings->value("ToolBars").toStringList();
 	settings->endGroup();
 
-	if(toolBarNames.isEmpty())
-		toolBarNames.append("MainToolbar");
-	foreach(const QString& toolBarName, toolBarNames)
-		loadToolBar(toolBarName);
+	if(toolBarNames.isEmpty()) {
+		PCToolBar *toolBar = new PCToolBar(tr("Main toolbar"), this);
+		connectToolBar(toolBar);
+		this->addToolBar(toolBar);
+		qlpcToolBars << toolBar;
+	}
+
+	foreach(const QString& toolBarName, toolBarNames) {
+		PCToolBar *toolBar = new PCToolBar(toolBarName, this);
+		connectToolBar(toolBar);
+		this->addToolBar(toolBar);
+		qlpcToolBars << toolBar;
+	}
 
 	qdbDriveBarLeft->setVisible(settings->value("Interface/ShowDriveBar", true).toBool());
 	qdbDriveBarRight->setVisible(settings->value("Interface/ShowTwoDriveBar", true).toBool()
@@ -1137,19 +1156,18 @@ void MainWindowImpl::dragEnterEvent(QDragEnterEvent* event)
 /*?*///	QMainWindow::dragEnterEvent(event);
 }
 //
-void MainWindowImpl::slotToolButtonPress()
+void MainWindowImpl::toolBarActionExecute(const SToolBarButton& action)
 {
-	QAction* action=qobject_cast<QAction*>(sender());
-	if (!action)
-		return;
-	QString key=action->data().toString();
 #ifndef Q_CC_MSVC
-	#warning "TODO: don't execute dirs"
 	#warning "TODO: parse params"
 #endif
-	QFileOperationsThread::execute(qmToolBarButtons.value(key).qsCommand,
-									qmToolBarButtons.value(key).qsParams.split(QLatin1Char(' ')),
-									qmToolBarButtons.value(key).qsWorkDir);
+	QFileInfo fi(action.qsCommand);
+	if (fi.isDir())
+		cdExecute(fi.absoluteFilePath());
+	else
+		QFileOperationsThread::execute(action.qsCommand,
+									action.qsParams.split(QLatin1Char(' ')),
+									action.qsWorkDir);
 }
 //
 void MainWindowImpl::slotToolBarContextMenu(const QPoint& pos)
@@ -1300,38 +1318,86 @@ void MainWindowImpl::slotAddToolBar()
 	QString qsToolBarName = QInputDialog::getText(this,
 												  tr("Set toolbar name"),
 												  tr("Name"));
-	if (qsToolBarName.isEmpty())
-		QMessageBox::critical(this, "", tr("Toolbar name is empty"));
-	else
-		loadToolBar(qsToolBarName);
+	if (qsToolBarName.isEmpty()) {
+		QMessageBox::critical(this, "", tr("Toolbar name is empty. Break."));
+		return;
+	}
+
+	foreach (PCToolBar *toolBar, qlpcToolBars) {
+		if (toolBar->name() == qsToolBarName) {
+			QMessageBox::critical(this, "", tr("This name is not unique."));
+			slotAddToolBar();
+			return;
+		}
+	}
+
+	PCToolBar *toolBar = new PCToolBar(qsToolBarName, this);
+	connectToolBar(toolBar);
+	this->addToolBar(toolBar);
+	qlpcToolBars << toolBar;
 }
 
 void MainWindowImpl::slotRemoveToolBar()
 {
-	QAction *action = qobject_cast<QAction*> (sender());
-	if (!action)
+	PCToolBar *toolBar = qobject_cast<PCToolBar*> (sender());
+	if (!toolBar)
 		return;
-	QString qsToolBarName = action->data().toString();
-	removeToolBarForName(qsToolBarName);
+
+	QString qsName = toolBar->name();
+	this->removeToolBar(toolBar);
+	qlpcToolBars.removeOne(toolBar);
+	toolBar->deleteLater();
+
+	QSettings* settings = AppSettings::instance();
+	settings->remove("ToolBar_" + qsName);
+	settings->sync();
 }
 
 void MainWindowImpl::slotRenameToolBar()
 {
-	QAction *action = qobject_cast<QAction*> (sender());
-	if (!action)
+	PCToolBar *toolBar = qobject_cast<PCToolBar*> (sender());
+	if (!toolBar)
 		return;
-	QString qsToolBarName = action->data().toString();
+
+	QString qsName = toolBar->name();
 	QString qsToolBarNewName = QInputDialog::getText(this,
 												  tr("Set toolbar name"),
 												  tr("Name"),
 												  QLineEdit::Normal,
-												  qsToolBarName);
-	if (qsToolBarNewName == qsToolBarName)
+												  qsName);
+
+	if (qsToolBarNewName.isEmpty()) {
+		QMessageBox::critical(this, "", tr("Toolbar name is empty. Break."));
 		return;
-	if (qsToolBarName.isEmpty())
-		QMessageBox::critical(this, "", tr("Toolbar name is empty"));
-	else
-		renameToolBar(qsToolBarName, qsToolBarNewName);
+	}
+
+	if (qsToolBarNewName == qsName)
+		return;
+
+	foreach (PCToolBar *toolBar, qlpcToolBars) {
+		if (toolBar->name() == qsToolBarNewName) {
+			QMessageBox::critical(this, "", tr("This name is not unique. Break."));
+			return;
+		}
+	}
+
+	toolBar->rename(qsToolBarNewName);
+
+	QSettings* settings = AppSettings::instance();
+	settings->remove("ToolBar_" + qsName);
+
+	QStringList qslToolBars;
+	foreach(PCToolBar *toolBar, qlpcToolBars) {
+		qslToolBars << toolBar->name();
+	}
+
+	settings->beginGroup("Global");
+	settings->setValue("ToolBars", qslToolBars);
+	settings->endGroup();
+
+	toolBar->save();
+
+	settings->sync();
 }
 
 void MainWindowImpl::removeToolBarForName(const QString& toolBarName)
@@ -1388,8 +1454,29 @@ void MainWindowImpl::renameToolBar(const QString& oldName, const QString& newNam
 	settings->sync();
 }
 
+void MainWindowImpl::connectToolBar(PCToolBar *toolBar)
+{
+	connect (toolBar, SIGNAL(addToolBar()),
+			 this, SLOT(slotAddToolBar()));
+	connect (toolBar, SIGNAL(removeToolBar()),
+			 this, SLOT(slotRemoveToolBar()));
+	connect (toolBar, SIGNAL(renameToolBar()),
+			 this, SLOT(slotRenameToolBar()));
+	connect (toolBar, SIGNAL(toolBarActionExecuted(SToolBarButton)),
+			 this, SLOT(toolBarActionExecute(SToolBarButton)));
+	connect (toolBar, SIGNAL(cdExecuted(QString)),
+			 this, SLOT(cdExecute(QString)));
+}
 
+void MainWindowImpl::cdExecute(const QString& path)
+{
+	if (!qflvRightPanel->hasFocus() && !qflvLeftPanel->hasFocus())
+		return;
+	qfpFocusedFilePanel = qflvRightPanel->hasFocus() ? qflvRightPanel : qflvLeftPanel;
 
+	QDir dir(path);
+	qfpFocusedFilePanel->setPath(dir.absolutePath());
+}
 
 /* ** TESTING PURPOSES ONLY ** */
 #include <QFileDialog>
