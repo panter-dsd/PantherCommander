@@ -243,7 +243,7 @@ void PCToolBar::slotToolButtonCD()
 void PCToolBar::dropEvent(QDropEvent* event)
 {
 	QAction *action = this->actionAt(event->pos());
-	if (action) {
+	if (action && !(event->keyboardModifiers() & Qt::ShiftModifier)) {
 		SToolBarButton button = qlButtons.at(action->data().toInt());
 		if (!button.qsCommand.isEmpty()) {
 			QStringList qslParams;
@@ -259,6 +259,13 @@ void PCToolBar::dropEvent(QDropEvent* event)
 			}
 			refreshActions();
 		}
+	} else if (action) {
+		int index = action->data().toInt();
+		foreach(QUrl url, event->mimeData()->urls()) {
+			SToolBarButton button = QToolButtonPreference::getButton(url.toLocalFile());
+			qlButtons.insert(++index, button);
+		}
+		refreshActions();
 	} else {
 		foreach(QUrl url, event->mimeData()->urls()) {
 			SToolBarButton button = QToolButtonPreference::getButton(url.toLocalFile());
@@ -266,6 +273,7 @@ void PCToolBar::dropEvent(QDropEvent* event)
 		}
 		refreshActions();
 	}
+	event->accept();
 }
 
 void PCToolBar::dragMoveEvent(QDragMoveEvent* event)
