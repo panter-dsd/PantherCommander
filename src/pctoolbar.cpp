@@ -39,6 +39,7 @@ PCToolBar::PCToolBar(const QString &name, QWidget *parent)
 	qsName = name;
 	this->setObjectName(qsName);
 	restore();
+	this->setAcceptDrops(true);
 }
 
 void PCToolBar::restore()
