@@ -865,80 +865,7 @@ void MainWindowImpl::slotMkDir()
 	}
 	delete qdMkDirDialog;
 }
-//
-void MainWindowImpl::loadToolBar(const QString& toolBarName)
-{
-	if (toolBarName.isEmpty())
-		return;
-	QToolBar* qtbToolBar=new QToolBar(toolBarName,this);
-	qtbToolBar->setObjectName(toolBarName);
-	qtbToolBar->setContextMenuPolicy(Qt::CustomContextMenu);
-	connect(qtbToolBar,
-			SIGNAL(customContextMenuRequested(QPoint)),
-			this,
-			SLOT(slotToolBarContextMenu(QPoint)));
-	this->addToolBar(qtbToolBar);
-	qltbToolBarList << qtbToolBar;
 
-	QSettings* settings = AppSettings::instance();
-	int buttonsCount=settings->value("ToolBar_"+toolBarName+"/ButtonsCount",0).toInt();
-	QAction* action;
-	for (int i=0; i<buttonsCount; i++)
-	{
-		SToolBarButton button;
-		button.qsCommand=settings->value("ToolBar_"+toolBarName+"/Command_"+QString::number(i),"").toString();
-		button.qsParams=settings->value("ToolBar_"+toolBarName+"/Params_"+QString::number(i),"").toString();
-		button.qsWorkDir=settings->value("ToolBar_"+toolBarName+"/WorkDir_"+QString::number(i),"").toString();
-		button.qsIconFile=settings->value("ToolBar_"+toolBarName+"/IconFile_"+QString::number(i),"").toString();
-		button.qiIcon=settings->value("ToolBar_"+toolBarName+"/Icon_"+QString::number(i),"").value<QIcon>();
-		button.iconNumber=settings->value("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),-1).toInt();
-		button.qsCaption=settings->value("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),"").toString();
-
-		if (!button.qsCommand.isEmpty()) {
-		action=new QAction(button.qiIcon,button.qsCaption,this);
-		button.qaAction=action;
-		connect(action,
-				SIGNAL(triggered()),
-				this,
-				SLOT(slotToolButtonPress()));
-		action->setData(toolBarName+QString::number(i));
-		qmToolBarButtons.insert(action->data().toString(), button);
-		qtbToolBar->addAction(action);
-		} else {
-			qtbToolBar->addSeparator();
-		}
-	}
-}
-//
-void MainWindowImpl::saveToolBars()
-{
-	QSettings* settings = AppSettings::instance();
-	QStringList qslToolBars;
-	for (int i=0; i<qltbToolBarList.count(); i++)
-	{
-		QString toolBarName = qltbToolBarList.at(i)->objectName();
-		qslToolBars << toolBarName;
-		int actionsCount = qltbToolBarList.at(i)->actions().count();
-		settings->remove("ToolBar_"+toolBarName);
-		settings->setValue("ToolBar_"+
-						toolBarName+
-						"/ButtonsCount",actionsCount);
-		for (int i=0; i<actionsCount; i++)
-		{
-			SToolBarButton button=qmToolBarButtons.value(toolBarName+QString::number(i));
-			settings->setValue("ToolBar_"+toolBarName+"/Command_"+QString::number(i),button.qsCommand);
-			settings->setValue("ToolBar_"+toolBarName+"/Params_"+QString::number(i),button.qsParams);
-			settings->setValue("ToolBar_"+toolBarName+"/WorkDir_"+QString::number(i),button.qsWorkDir);
-			settings->setValue("ToolBar_"+toolBarName+"/IconFile_"+QString::number(i),button.qsIconFile);
-			settings->setValue("ToolBar_"+toolBarName+"/IconNumber_"+QString::number(i),button.iconNumber);
-			settings->setValue("ToolBar_"+toolBarName+"/Icon_"+QString::number(i),button.qiIcon);
-			settings->setValue("ToolBar_"+toolBarName+"/Caption_"+QString::number(i),button.qsCaption);
-		}
-	}
-	settings->setValue("Global/ToolBars",qslToolBars);
-	settings->sync();
-}
-//
 QStringList MainWindowImpl::commandHistory() const
 {
 	QStringList history;
@@ -1034,51 +961,7 @@ void MainWindowImpl::dropEvent(QDropEvent* event)
 			list << QDir::toNativeSeparators(url.toLocalFile());
 		slotRemove(list);
 	}
-//ToolButton
-	QToolButton* button=qobject_cast<QToolButton*>(widget);
-	if (button)
-	{
-		QAction* action=button->defaultAction();
-		if (action)
-		{
-			QString key=action->data().toString();
-			QString params=qmToolBarButtons.value(key).qsParams;
-			if (!params.isEmpty())
-				params+=" ";
-			params+=QDir::toNativeSeparators(event->mimeData()->urls().at(0).toLocalFile());
-#ifndef Q_CC_MSVC
-	#warning "TODO: don't execute dirs"
-	#warning "TODO: parse params"
-#endif
-			QFileOperationsThread::execute(qmToolBarButtons.value(key).qsCommand,
-											params.split(QLatin1Char(' ')),
-											qmToolBarButtons.value(key).qsWorkDir);
-		}
-	}
-//ToolBar
-	QToolBar* toolBar=0;
-	for (int i=0; i<qltbToolBarList.count(); i++)
-	{
-		if (qltbToolBarList.at(i)==widget)
-		{
-			toolBar=qltbToolBarList.at(i);
-			break;
-		}
-	}
-	if (toolBar)
-	{
-		SToolBarButton button=QToolButtonPreference::getButton(event->mimeData()->urls().at(0).toLocalFile());
 
-		QAction* action=new QAction(button.qiIcon,button.qsCaption,this);
-		button.qaAction=action;
-		connect(action,
-				SIGNAL(triggered()),
-				this,
-				SLOT(slotToolButtonPress()));
-		action->setData(toolBar->objectName()+QString::number(toolBar->actions().count()));
-		qmToolBarButtons.insert(toolBar->objectName()+QString::number(toolBar->actions().count()),button);
-		toolBar->addAction(action);
-	}
 /*?	QTreeView* view=qobject_cast<QTreeView*>(widget->parent());
 	if (view)
 	{
@@ -1105,29 +988,21 @@ void MainWindowImpl::dropEvent(QDropEvent* event)
 		else
 			slotCopy(destPath,fileList);
 	}*/
+/*?*///	QMainWindow::dropEvent(event);
 }
 //
 void MainWindowImpl::dragMoveEvent(QDragMoveEvent* event)
 {
 	bool isAccepted = false;
 	QWidget* widget = childAt(event->pos());
-//ToolBars
-	for (int i=0; i<qltbToolBarList.count(); i++)
-	{
-		if (qltbToolBarList.at(i)==widget)
-		{
-			isAccepted=true;
+//Command Buttons
+	isAccepted = widget == qpbRunConsole || widget == qpbView || widget == qpbEdit || widget == qpbRemove;
+
+	foreach(PCToolBar *toolBar, qlpcToolBars)
+		if (toolBar == widget || toolBar == widget->parentWidget()) {
+			isAccepted = true;
 			break;
 		}
-	}
-//ToolButtons
-	QToolButton* button=qobject_cast<QToolButton*>(widget);
-	if (button)
-		isAccepted=true;
-//
-//Command Buttons
-	if(widget == qpbRunConsole || widget == qpbView || widget == qpbEdit || widget == qpbRemove)
-		isAccepted = true;
 //TreeView
 /*?	QTreeView* view=qobject_cast<QTreeView*>(widget->parent());
 	if (view)
@@ -1168,112 +1043,6 @@ void MainWindowImpl::toolBarActionExecute(const SToolBarButton& action)
 		QFileOperationsThread::execute(action.qsCommand,
 									action.qsParams.split(QLatin1Char(' ')),
 									action.qsWorkDir);
-}
-//
-void MainWindowImpl::slotToolBarContextMenu(const QPoint& pos)
-{
-	QToolBar* toolBar=qobject_cast<QToolBar*>(sender());
-	if (!toolBar)
-		return;
-
-	QMenu* qmToolBarMenu=new QMenu(toolBar);
-	QAction* action=toolBar->actionAt(pos);
-	QAction* menuAction;
-	if (action) {
-		SToolBarButton button = qmToolBarButtons.value(action->data().toString());
-		menuAction = new QAction(button.qsCaption, qmToolBarMenu);
-		connect(menuAction,
-				SIGNAL(triggered()),
-				action,
-				SLOT(trigger()));
-		qmToolBarMenu->addAction(menuAction);
-		qmToolBarMenu->addSeparator();
-
-		menuAction = new QAction(tr("Change..."), qmToolBarMenu);
-		menuAction->setData(action->data());
-		connect(menuAction,
-				SIGNAL(triggered()),
-				this,
-				SLOT(slotToolButtonChange()));
-		qmToolBarMenu->addAction(menuAction);
-
-		menuAction = new QAction(tr("Delete"), qmToolBarMenu);
-		menuAction->setData(action->data());
-		connect(menuAction,
-				SIGNAL(triggered()),
-				this,
-				SLOT(slotToolButtonDelete()));
-		connect(menuAction,
-						SIGNAL(triggered()),
-						action,
-						SLOT(deleteLater()));
-		qmToolBarMenu->addAction(menuAction);
-
-		qmToolBarMenu->exec(toolBar->mapToGlobal(pos));
-	} else {
-		menuAction = new QAction(tr("Add toolbar"), qmToolBarMenu);
-		connect(menuAction, SIGNAL(triggered()), this, SLOT(slotAddToolBar()));
-		qmToolBarMenu->addAction(menuAction);
-
-		menuAction = new QAction(tr("Remove toolbar %1").arg(toolBar->objectName()), qmToolBarMenu);
-		menuAction->setData(toolBar->objectName());
-		connect(menuAction, SIGNAL(triggered()), this, SLOT(slotRemoveToolBar()));
-		qmToolBarMenu->addAction(menuAction);
-
-		menuAction = new QAction(tr("Rename toolbar %1").arg(toolBar->objectName()), qmToolBarMenu);
-		menuAction->setData(toolBar->objectName());
-		connect(menuAction, SIGNAL(triggered()), this, SLOT(slotRenameToolBar()));
-		qmToolBarMenu->addAction(menuAction);
-
-		qmToolBarMenu->exec(toolBar->mapToGlobal(pos));
-	}
-	delete qmToolBarMenu;
-}
-//
-void MainWindowImpl::slotToolButtonChange()
-{
-	QAction* action=qobject_cast<QAction*>(sender());
-	if (!action)
-		return;
-	SToolBarButton button=qmToolBarButtons.value(action->data().toString());
-	QDialog* toolButtonChangeDialog=new QDialog(this);
-
-	QToolButtonPreference* qtbpToolButtonPreference=new QToolButtonPreference(toolButtonChangeDialog);
-	qtbpToolButtonPreference->setButton(button);
-
-	QDialogButtonBox* qdbbButtonBox=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel,
-									Qt::Horizontal,
-									toolButtonChangeDialog);
-	connect(qdbbButtonBox,
-			SIGNAL(accepted()),
-			toolButtonChangeDialog,
-			SLOT(accept()));
-	connect(qdbbButtonBox,
-			SIGNAL(rejected()),
-			toolButtonChangeDialog,
-			SLOT(reject()));
-
-	QVBoxLayout* layout=new QVBoxLayout();
-	layout->addWidget(qtbpToolButtonPreference);
-	layout->addWidget(qdbbButtonBox);
-	toolButtonChangeDialog->setLayout(layout);
-
-	if (toolButtonChangeDialog->exec())
-	{
-		button=qtbpToolButtonPreference->getButton();
-		qmToolBarButtons.remove(action->data().toString());
-		qmToolBarButtons.insert(action->data().toString(),button);
-		button.qaAction->setText(button.qsCaption);
-		button.qaAction->setIcon(button.qiIcon);
-	}
-	delete toolButtonChangeDialog;
-}
-//
-void MainWindowImpl::slotToolButtonDelete()
-{
-	QAction* action=qobject_cast<QAction*>(sender());
-	if (action)
-		qmToolBarButtons.remove(action->data().toString());
 }
 
 void MainWindowImpl::slotFindFiles()
@@ -1397,60 +1166,6 @@ void MainWindowImpl::slotRenameToolBar()
 
 	toolBar->save();
 
-	settings->sync();
-}
-
-void MainWindowImpl::removeToolBarForName(const QString& toolBarName)
-{
-	QToolBar *toolBar;
-	for (int i = 0; i < qltbToolBarList.count(); i++) {
-		if (qltbToolBarList.at(i)->objectName() == toolBarName) {
-			toolBar = qltbToolBarList.at(i);
-			break;
-		}
-	}
-
-	if (!toolBar)
-		return;
-	foreach (QAction *action, toolBar->actions()) {
-		qmToolBarButtons.remove(action->data().toString());
-		delete action;
-	}
-
-	QSettings* settings = AppSettings::instance();
-	settings->remove("ToolBar_" + toolBar->objectName());
-
-	this->removeToolBar(toolBar);
-	qltbToolBarList.removeOne(toolBar);
-	toolBar->deleteLater();
-	settings->sync();
-}
-
-void MainWindowImpl::renameToolBar(const QString& oldName, const QString& newName)
-{
-	QToolBar *toolBar;
-	for (int i = 0; i < qltbToolBarList.count(); i++) {
-		if (qltbToolBarList.at(i)->objectName() == oldName) {
-			toolBar = qltbToolBarList[i];
-			break;
-		}
-	}
-
-	if (!toolBar)
-		return;
-
-	int i = 0;
-	foreach (QAction *action, toolBar->actions()) {
-		SToolBarButton button = qmToolBarButtons.value(action->data().toString());
-		qmToolBarButtons.remove(action->data().toString());
-		action->setData(newName + QString::number(i));
-		qmToolBarButtons.insert(action->data().toString(), button);
-		i++;
-	}
-	toolBar->setObjectName(newName);
-
-	QSettings* settings = AppSettings::instance();
-	settings->remove("ToolBar_" + oldName);
 	settings->sync();
 }
 

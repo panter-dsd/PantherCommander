@@ -45,7 +45,6 @@ class QFileOperationsDialog;
 class PantherViewer;
 //
 #include "qfileoperationsthread.h"
-#include "qtoolbuttonpreference.h"
 #include "pctoolbar.h"
 //
 class MainWindowImpl : public QMainWindow
@@ -66,8 +65,6 @@ private:
 	QPointer<PantherViewer>			pvViewer;
 	QStandardItemModel*				qsimQeueuModel;
 	QList<QFileOperationsDialog*> qlQueueList;
-	QMap<QString,SToolBarButton>		qmToolBarButtons;
-	QList<QToolBar*>						qltbToolBarList;
 	QList<PCToolBar*> qlpcToolBars;
 
 	QPushButton*								qpbRunConsole;
@@ -108,10 +105,6 @@ private:
 	void createCommandButtons();
 	void saveSettings();
 	void loadSettings();
-	void loadToolBar(const QString& toolBarName);
-	void saveToolBars();
-	void removeToolBarForName(const QString& toolBarName);
-	void renameToolBar(const QString& oldName, const QString& newName);
 	inline void connectToolBar(PCToolBar *toolBar);
 
 protected:
@@ -141,9 +134,6 @@ private Q_SLOTS:
 	void slotRename();
 	void slotQueueFinished();
 	void slotQueueChanged();
-	void slotToolBarContextMenu(const QPoint& pos);
-	void slotToolButtonChange();
-	void slotToolButtonDelete();
 	void slotAddToolBar();
 	void slotRemoveToolBar();
 	void slotRenameToolBar();
