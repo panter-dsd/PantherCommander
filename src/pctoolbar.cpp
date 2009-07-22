@@ -251,6 +251,13 @@ void PCToolBar::dropEvent(QDropEvent* event)
 				qslParams << QDir::toNativeSeparators(url.toLocalFile());
 			button.qsParams += qslParams.join(QLatin1String(" "));
 			emit toolBarActionExecuted(button);
+		} else {//If separator then insert
+			int index = action->data().toInt() + 1;
+			foreach(QUrl url, event->mimeData()->urls()) {
+				SToolBarButton button = QToolButtonPreference::getButton(url.toLocalFile());
+				qlButtons.insert(index++, button);
+			}
+			refreshActions();
 		}
 	} else {
 		foreach(QUrl url, event->mimeData()->urls()) {
