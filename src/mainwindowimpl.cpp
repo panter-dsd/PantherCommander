@@ -60,6 +60,7 @@
 #include "qfileoperationsdialog.h"
 #include "qpreferencesdialog.h"
 #include "pccopymovedialog.h"
+#include "pctoolbar.h"
 
 MainWindowImpl::MainWindowImpl(QWidget* parent, Qt::WFlags f) : QMainWindow(parent, f)
 	, qlConsolePath(0)

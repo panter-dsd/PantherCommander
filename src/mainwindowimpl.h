@@ -43,10 +43,10 @@ class QFilePanel;
 class QFileOperationsDialog;
 class QFileOperationsDialog;
 class PantherViewer;
-//
+class PCToolBar;
+
 #include "qfileoperationsthread.h"
-#include "pctoolbar.h"
-//
+
 class MainWindowImpl : public QMainWindow
 {
 	Q_OBJECT
