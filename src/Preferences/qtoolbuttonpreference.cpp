@@ -1,4 +1,16 @@
-#include <QtGui>
+#include <QtCore/QDir>
+#include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
+#include <QtGui/QListWidget>
+#include <QtGui/QToolButton>
+#include <QtGui/QAction>
+#include <QtGui/QGridLayout>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QFileDialog>
+#include <QtGui/QPixmap>
+#include <QtGui/QFileIconProvider>
+#include <QtGui/QBitmap>
+
 #include "qtoolbuttonpreference.h"
 #ifdef Q_WS_WIN
 #  include <qt_windows.h>
