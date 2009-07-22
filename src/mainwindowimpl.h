@@ -28,7 +28,7 @@
 #include <QMainWindow>
 #include <QMap>
 #include <QPointer>
-//
+
 class QLabel;
 class QComboBox;
 class QAction;
@@ -37,13 +37,14 @@ class QStandardItemModel;
 class QPushButton;
 class QSplitter;
 class QToolBar;
-//
+
 class DriveBar;
 class QFilePanel;
 class QFileOperationsDialog;
 class QFileOperationsDialog;
 class PantherViewer;
 class PCToolBar;
+class SToolBarButton;
 
 #include "qfileoperationsthread.h"
 
