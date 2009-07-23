@@ -44,6 +44,7 @@
 #include <QtGui/QTableWidget>
 
 #include "dirsorter.h"
+#include "appsettings.h"
 
 //TODO: implement in-text binary search algorithm
 //TODO: support regexp patterns in file mask and search text
@@ -196,7 +197,13 @@ FindFilesDialog::~FindFilesDialog()
 
 void FindFilesDialog::browse()
 {
-	QString directory = QFileDialog::getExistingDirectory(this, tr("Find Files"), QDir::currentPath());
+	QFileDialog::Options options;
+	if (!AppSettings::instance()->useNativeDialogs())
+		options = QFileDialog::DontUseNativeDialog;
+	QString directory = QFileDialog::getExistingDirectory(this,
+														  tr("Find Files"),
+														  QDir::currentPath(),
+														  options);
 	if(!directory.isEmpty())
 	{
 		if(directoryComboBox->findText(directory) == -1)

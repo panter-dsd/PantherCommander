@@ -42,6 +42,8 @@ void QInterfacePreference::saveSettings()
 	settings->setValue("Interface/FlatDriveBar", qchbFlatDriveBar->isChecked());
 	settings->setValue("Interface/FlatDriveButtons", qchbFlatDriveButtons->isChecked());
 	settings->setValue("Interface/FlatFunctionButtons", qchbFlatFunctionButtons->isChecked());
+
+	settings->sync();
 }
 //
 void QInterfacePreference::loadSettings()

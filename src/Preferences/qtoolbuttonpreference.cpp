@@ -12,6 +12,7 @@
 #include <QtGui/QBitmap>
 
 #include "qtoolbuttonpreference.h"
+#include "appsettings.h"
 #ifdef Q_WS_WIN
 #  include <qt_windows.h>
 #  include <private/qpixmapdata_p.h>
@@ -107,9 +108,15 @@ void QToolButtonPreference::setConnects()
 void QToolButtonPreference::slotChooseCommandFile()
 {
 	QString command;
+	QFileDialog::Options options;
+	if (!AppSettings::instance()->useNativeDialogs())
+		options = QFileDialog::DontUseNativeDialog;
 	command = QFileDialog::getOpenFileName(this,
 										tr("Choose command file"),
-										QDir(qleCommand->text()).absolutePath());
+										QDir(qleCommand->text()).absolutePath(),
+										QString(),
+										0,
+										options);
 	if (!command.isEmpty()) {
 		qleCommand->setText(QDir::toNativeSeparators(command));
 		qleWorkDir->setText(QDir::toNativeSeparators(QFileInfo(command).absolutePath()));
@@ -121,9 +128,13 @@ void QToolButtonPreference::slotChooseCommandFile()
 void QToolButtonPreference::slotChooseWorkDir()
 {
 	QString dir;
+	QFileDialog::Options options;
+	if (!AppSettings::instance()->useNativeDialogs())
+		options = QFileDialog::DontUseNativeDialog;
 	dir = QFileDialog::getExistingDirectory(this,
 										tr("Choose work dir"),
-										QDir(qleWorkDir->text()).absolutePath());
+										QDir(qleWorkDir->text()).absolutePath(),
+										options);
 	if (!dir.isEmpty())
 		qleWorkDir->setText(QDir::toNativeSeparators(dir));
 }
@@ -132,9 +143,15 @@ void QToolButtonPreference::slotChooseIconFile()
 {
 	QString iconFileName;
 	QStringList qslFilter;
+	QFileDialog::Options options;
+	if (!AppSettings::instance()->useNativeDialogs())
+		options = QFileDialog::DontUseNativeDialog;
 	iconFileName = QFileDialog::getOpenFileName(this,
 										tr("Choose command file"),
-										QDir(qleIconFile->text()).absolutePath());
+										QDir(qleIconFile->text()).absolutePath(),
+										QString(),
+										0,
+										options);
 	if (!iconFileName.isEmpty())
 		qleIconFile->setText(QDir::toNativeSeparators(iconFileName));
 }

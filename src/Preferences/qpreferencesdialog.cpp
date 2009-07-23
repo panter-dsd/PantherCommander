@@ -32,7 +32,10 @@ void QPreferencesDialog::createControls()
 
 	QScrollArea *area;
 	qswPreferencesWidgets=new QStackedWidget();
-	qswPreferencesWidgets->addWidget(new QPreferenceGlobal(qswPreferencesWidgets));
+	area=new QScrollArea(this);
+	area->setWidgetResizable(true);
+	area->setWidget(new QPreferenceGlobal(qswPreferencesWidgets));
+	qswPreferencesWidgets->addWidget(area);
 	area=new QScrollArea(this);
 	area->setWidgetResizable(true);
 	area->setWidget(new QInterfacePreference(qswPreferencesWidgets));

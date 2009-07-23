@@ -10,7 +10,8 @@ class QCheckBox;
 class QPreferenceGlobal : public QAbstractPreferencesPage
 {
 	Q_OBJECT
-
+private:
+	QCheckBox *qchbUseNativeDialogs;
 public:
 	QPreferenceGlobal(QWidget* parent = 0);
 	~QPreferenceGlobal();

@@ -48,3 +48,8 @@ AppSettings::~AppSettings()
 void AppSettings::settingsChange()
 {
 }
+
+bool AppSettings::useNativeDialogs()
+{
+	return value("Global/UseNativeDialogs", true).toBool();
+}

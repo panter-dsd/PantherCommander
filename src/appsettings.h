@@ -37,6 +37,8 @@ public:
 
 	void settingsChange();
 
+	bool useNativeDialogs();
+
 protected:
 	explicit AppSettings(QObject* parent = 0);
 
