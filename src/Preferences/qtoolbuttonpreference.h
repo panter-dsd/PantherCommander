@@ -51,6 +51,7 @@ class QToolButtonPreference : public QWidget
 private:
 	QLabel *qlCommand;
 	QLineEdit *qleCommand;
+	QToolButton *qtbPCCommand;
 	QToolButton *qtbCommand;
 
 	QLabel *qlParams;
@@ -85,6 +86,7 @@ private:
 
 private Q_SLOTS:
 	void slotChooseCommandFile();
+	void slotChoosePCCommand();
 	void slotChooseWorkDir();
 	void slotChooseIconFile();
 	void slotGetIconList(const QString& iconFileName);

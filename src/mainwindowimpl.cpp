@@ -61,6 +61,7 @@
 #include "qpreferencesdialog.h"
 #include "pccopymovedialog.h"
 #include "pctoolbar.h"
+#include "pccommands.h"
 
 MainWindowImpl::MainWindowImpl(QWidget* parent, Qt::WFlags f) : QMainWindow(parent, f)
 	, qlConsolePath(0)
@@ -167,105 +168,132 @@ void MainWindowImpl::createWidgets()
 void MainWindowImpl::createActions()
 {
 	actionCpCurFileName2Cmd = new QAction(this);
+	actionCpCurFileName2Cmd->setObjectName("actionCpCurFileName2Cmd");
 	actionCpCurFileName2Cmd->setText(tr("Copy current file name to command string"));
 	actionCpCurFileName2Cmd->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Return));
 	connect(actionCpCurFileName2Cmd, SIGNAL(triggered(bool)),
 			this, SLOT(slotCpCurFileName2Cmd()));
 	addAction(actionCpCurFileName2Cmd);
+	PCCommands::instance()->addAction(tr("Command line"), actionCpCurFileName2Cmd);
 
 	actionCpCurFileNameWhithPath2Cmd = new QAction(this);
+	actionCpCurFileNameWhithPath2Cmd->setObjectName("actionCpCurFileNameWhithPath2Cmd");
 	actionCpCurFileNameWhithPath2Cmd->setText(tr("Copy current file name whith path to command string"));
 	actionCpCurFileNameWhithPath2Cmd->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Return));
 	connect(actionCpCurFileNameWhithPath2Cmd, SIGNAL(triggered(bool)),
 			this, SLOT(slotCpCurFileNameWhithPath2Cmd()));
 	addAction(actionCpCurFileNameWhithPath2Cmd);
+	PCCommands::instance()->addAction(tr("Command line"), actionCpCurFileNameWhithPath2Cmd);
 
 	actionClearCmd = new QAction(this);
+	actionClearCmd->setObjectName("actionClearCmd");
 	actionClearCmd->setText(tr("Clear command string"));
 	actionClearCmd->setShortcut(QKeySequence(Qt::Key_Escape));
 	connect(actionClearCmd, SIGNAL(triggered(bool)),
 			qcbConsoleCommand->lineEdit(), SLOT(clear()));
 	addAction(actionClearCmd);
+	PCCommands::instance()->addAction(tr("Command line"), actionClearCmd);
 
 
 	actionRunConsole = new QAction(this);
+	actionRunConsole->setObjectName("actionRunConsole");
 	actionRunConsole->setText(tr("Run console"));
 	actionRunConsole->setShortcut(QKeySequence(Qt::Key_F2));
 	connect(actionRunConsole, SIGNAL(triggered(bool)),
 			this, SLOT(slotRunConsole()));
 	addAction(actionRunConsole);
+	PCCommands::instance()->addAction(tr("Misk"), actionRunConsole);
 
 	actionView = new QAction(this);
+	actionView->setObjectName("actionView");
 	actionView->setText(tr("View"));
 	actionView->setShortcut(QKeySequence(Qt::Key_F3));
 	connect(actionView, SIGNAL(triggered(bool)),
 			this, SLOT(slotView()));
 	addAction(actionView);
+	PCCommands::instance()->addAction(tr("File operation"), actionView);
 
 	actionEdit = new QAction(this);
+	actionEdit->setObjectName("actionEdit");
 	actionEdit->setText(tr("Edit"));
 	actionEdit->setShortcut(QKeySequence(Qt::Key_F4));
 //	connect(actionEdit, SIGNAL(triggered(bool)),
 //			this, SLOT(slotView()));
 	addAction(actionEdit);
+	PCCommands::instance()->addAction(tr("File operation"), actionEdit);
 
 	actionCopy = new QAction(this);
+	actionCopy->setObjectName("actionCopy");
 	actionCopy->setText(tr("Copy"));
 	actionCopy->setShortcut(QKeySequence(Qt::Key_F5));
 	connect(actionCopy, SIGNAL(triggered(bool)),
 			this, SLOT(slotCopy()));
 	addAction(actionCopy);
+	PCCommands::instance()->addAction(tr("File operation"), actionCopy);
 
 	actionMove = new QAction(this);
+	actionMove->setObjectName("actionMove");
 	actionMove->setText(tr("Move"));
 	actionMove->setShortcut(QKeySequence(Qt::Key_F6));
 	connect(actionMove, SIGNAL(triggered(bool)),
 			this, SLOT(slotMove()));
 	addAction(actionMove);
+	PCCommands::instance()->addAction(tr("File operation"), actionMove);
 
 	actionRename = new QAction(this);
+	actionRename->setObjectName("actionRename");
 	actionRename->setText(tr("Rename"));
 	actionRename->setShortcut(QKeySequence(Qt::SHIFT + Qt::Key_F6));
 	connect(actionRename, SIGNAL(triggered(bool)),
 			this, SLOT(slotRename()));
 	addAction(actionRename);
+	PCCommands::instance()->addAction(tr("File operation"), actionRename);
 
 	actionMkDir = new QAction(this);
+	actionMkDir->setObjectName("actionMkDir");
 	actionMkDir->setText(tr("Create Dir"));
 	actionMkDir->setShortcut(QKeySequence(Qt::Key_F7));
 	connect(actionMkDir, SIGNAL(triggered(bool)),
 			this, SLOT(slotMkDir()));
 	addAction(actionMkDir);
+	PCCommands::instance()->addAction(tr("File operation"), actionMkDir);
 
 	actionRemove = new QAction(this);
+	actionRemove->setObjectName("actionRemove");
 	actionRemove->setText(tr("Remove"));
 	actionRemove->setShortcut(QKeySequence(Qt::Key_F8));
 	connect(actionRemove, SIGNAL(triggered(bool)),
 			this, SLOT(slotRemove()));
 	addAction(actionRemove);
+	PCCommands::instance()->addAction(tr("File operation"), actionRemove);
 
 	actionExit = new QAction(this);
+	actionExit->setObjectName("actionExit");
 	actionExit->setText(tr("Exit"));
 	actionExit->setShortcut(QKeySequence(Qt::ALT + Qt::Key_X));
 	connect(actionExit, SIGNAL(triggered(bool)),
 			qApp, SLOT(quit()));
 	addAction(actionExit);
+	PCCommands::instance()->addAction(tr("Window"), actionExit);
 
 
 	actionFindFiles = new QAction(this);
+	actionFindFiles->setObjectName("actionFindFiles");
 	actionFindFiles->setText(tr("Find Files"));
 //	actionFindFiles->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
 	connect(actionFindFiles, SIGNAL(triggered(bool)),
 			this, SLOT(slotFindFiles()));
 	addAction(actionFindFiles);
-
+	PCCommands::instance()->addAction(tr("Tools"), actionFindFiles);
 
 	actionPreferences = new QAction(this);
+	actionPreferences->setObjectName("actionPreferences");
 	actionPreferences->setText(tr("Preferences"));
 //	actionPreferences->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_O));
 	connect(actionPreferences, SIGNAL(triggered(bool)),
 			this, SLOT(slotPreferences()));
 	addAction(actionPreferences);
+	PCCommands::instance()->addAction(tr("Preferences"), actionFindFiles);
 }
 //
 void MainWindowImpl::createMenus()
@@ -1032,18 +1060,23 @@ void MainWindowImpl::dragEnterEvent(QDragEnterEvent* event)
 /*?*///	QMainWindow::dragEnterEvent(event);
 }
 //
-void MainWindowImpl::toolBarActionExecute(const SToolBarButton& action)
+void MainWindowImpl::toolBarActionExecute(const SToolBarButton& actionButton)
 {
 #ifndef Q_CC_MSVC
 	#warning "TODO: parse params"
 #endif
-	QFileInfo fi(action.qsCommand);
+	QFileInfo fi(actionButton.qsCommand);
+	if (!fi.exists()) {
+		QAction *action = PCCommands::instance()->action(actionButton.qsCommand);
+		if (action)
+			action->trigger();
+	}
 	if (fi.isDir())
 		cdExecute(fi.absoluteFilePath());
 	else
-		QFileOperationsThread::execute(action.qsCommand,
-									action.qsParams.split(QLatin1Char(' ')),
-									action.qsWorkDir);
+		QFileOperationsThread::execute(actionButton.qsCommand,
+									actionButton.qsParams.split(QLatin1Char(' ')),
+									actionButton.qsWorkDir);
 }
 
 void MainWindowImpl::slotFindFiles()

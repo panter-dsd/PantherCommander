@@ -141,7 +141,7 @@ private Q_SLOTS:
 	void slotRenameToolBar();
 	void slotFindFiles();
 	void slotPreferences();
-	void toolBarActionExecute(const SToolBarButton& action);
+	void toolBarActionExecute(const SToolBarButton& actionButton);
 	void cdExecute(const QString& path);
 	void slotToolBarContextMenu(const QPoint& pos);
 

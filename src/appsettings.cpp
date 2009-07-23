@@ -30,7 +30,7 @@ AppSettings* AppSettings::pInstance = 0;
 
 AppSettings* AppSettings::instance()
 {
-	if(!pInstance)
+	if(!AppSettings::pInstance)
 		pInstance = new AppSettings(qApp);
 	return pInstance;
 }

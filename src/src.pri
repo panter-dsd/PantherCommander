@@ -10,7 +10,8 @@ HEADERS	+= $$PWD/appsettings.h \
 		$$PWD/qfullview.h \
 		$$PWD/qfileoperationsconfirmationdialog.h \
 		$$PWD/qselectdiscdialog.h \
-		$$PWD/pctoolbar.h
+		$$PWD/pctoolbar.h \
+		$$PWD/pccommands.h
 
 SOURCES	+= $$PWD/main.cpp \
 		$$PWD/appsettings.cpp \
@@ -22,7 +23,8 @@ SOURCES	+= $$PWD/main.cpp \
 		$$PWD/qfullview.cpp \
 		$$PWD/qfileoperationsconfirmationdialog.cpp \
 		$$PWD/qselectdiscdialog.cpp \
-		$$PWD/pctoolbar.cpp
+		$$PWD/pctoolbar.cpp \
+		$$PWD/pccommands.cpp
 
 include( $$PWD/dialogs/dialogs.pri )
 include( $$PWD/io/io.pri )

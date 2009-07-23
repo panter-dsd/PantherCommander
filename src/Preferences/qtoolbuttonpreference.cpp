@@ -13,6 +13,7 @@
 
 #include "qtoolbuttonpreference.h"
 #include "appsettings.h"
+#include "pccommandsdialog.h"
 #ifdef Q_WS_WIN
 #  include <qt_windows.h>
 #  include <private/qpixmapdata_p.h>
@@ -30,6 +31,9 @@ void QToolButtonPreference::createControls()
 {
 	qlCommand = new QLabel(tr("Command"), this);
 	qleCommand = new QLineEdit(this);
+	qtbPCCommand = new QToolButton(this);
+	qtbPCCommand->setText(QLatin1String("..."));
+	qtbPCCommand->setToolButtonStyle(Qt::ToolButtonTextOnly);
 	qtbCommand = new QToolButton(this);
 	qtbCommand->setText(QLatin1String(">>"));
 	qtbCommand->setToolButtonStyle(Qt::ToolButtonTextOnly);
@@ -67,6 +71,7 @@ void QToolButtonPreference::setLayouts()
 
 	QHBoxLayout* qhblCommandLayout = new QHBoxLayout();
 	qhblCommandLayout->addWidget(qleCommand);
+	qhblCommandLayout->addWidget(qtbPCCommand);
 	qhblCommandLayout->addWidget(qtbCommand);
 
 	QHBoxLayout* qhblWorkDirLayout = new QHBoxLayout();
@@ -95,6 +100,8 @@ void QToolButtonPreference::setLayouts()
 
 void QToolButtonPreference::setConnects()
 {
+	connect(qtbPCCommand, SIGNAL(clicked()),
+			this, SLOT(slotChoosePCCommand()));
 	connect(qtbCommand, SIGNAL(clicked()),
 			this, SLOT(slotChooseCommandFile()));
 	connect(qtbWorkDir, SIGNAL(clicked()),
@@ -123,6 +130,14 @@ void QToolButtonPreference::slotChooseCommandFile()
 		qleIconFile->setText(QDir::toNativeSeparators(command));
 		qleCaption->setText(QFileInfo(command).baseName());
 	}
+}
+
+void QToolButtonPreference::slotChoosePCCommand()
+{
+	PCCommandsDialog *dialog = new PCCommandsDialog(this);
+	if (dialog->exec())
+		qleCommand->setText(dialog->getCurrentActionName());
+	delete dialog;
 }
 
 void QToolButtonPreference::slotChooseWorkDir()
