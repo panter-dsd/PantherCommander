@@ -1124,6 +1124,14 @@ void MainWindowImpl::slotRemoveToolBar()
 	QSettings* settings = AppSettings::instance();
 	settings->remove("ToolBar_" + qsName);
 	settings->sync();
+
+	if (qlpcToolBars.count() == 0) {
+		PCToolBar *toolBar = new PCToolBar(tr("Main toolbar"), this);
+		toolBar->hide();
+		connectToolBar(toolBar);
+		this->addToolBar(toolBar);
+		qlpcToolBars << toolBar;
+	}
 }
 
 void MainWindowImpl::slotRenameToolBar()
