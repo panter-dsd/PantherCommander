@@ -202,7 +202,7 @@ void MainWindowImpl::createActions()
 	connect(actionRunConsole, SIGNAL(triggered(bool)),
 			this, SLOT(slotRunConsole()));
 	addAction(actionRunConsole);
-	PCCommands::instance()->addAction(tr("Misk"), actionRunConsole);
+	PCCommands::instance()->addAction(tr("Misc"), actionRunConsole);
 
 	actionView = new QAction(this);
 	actionView->setObjectName("actionView");
@@ -211,7 +211,7 @@ void MainWindowImpl::createActions()
 	connect(actionView, SIGNAL(triggered(bool)),
 			this, SLOT(slotView()));
 	addAction(actionView);
-	PCCommands::instance()->addAction(tr("File operation"), actionView);
+	PCCommands::instance()->addAction(tr("File operations"), actionView);
 
 	actionEdit = new QAction(this);
 	actionEdit->setObjectName("actionEdit");
@@ -220,7 +220,7 @@ void MainWindowImpl::createActions()
 //	connect(actionEdit, SIGNAL(triggered(bool)),
 //			this, SLOT(slotView()));
 	addAction(actionEdit);
-	PCCommands::instance()->addAction(tr("File operation"), actionEdit);
+	PCCommands::instance()->addAction(tr("File operations"), actionEdit);
 
 	actionCopy = new QAction(this);
 	actionCopy->setObjectName("actionCopy");
@@ -229,7 +229,7 @@ void MainWindowImpl::createActions()
 	connect(actionCopy, SIGNAL(triggered(bool)),
 			this, SLOT(slotCopy()));
 	addAction(actionCopy);
-	PCCommands::instance()->addAction(tr("File operation"), actionCopy);
+	PCCommands::instance()->addAction(tr("File operations"), actionCopy);
 
 	actionMove = new QAction(this);
 	actionMove->setObjectName("actionMove");
@@ -238,7 +238,7 @@ void MainWindowImpl::createActions()
 	connect(actionMove, SIGNAL(triggered(bool)),
 			this, SLOT(slotMove()));
 	addAction(actionMove);
-	PCCommands::instance()->addAction(tr("File operation"), actionMove);
+	PCCommands::instance()->addAction(tr("File operations"), actionMove);
 
 	actionRename = new QAction(this);
 	actionRename->setObjectName("actionRename");
@@ -247,7 +247,7 @@ void MainWindowImpl::createActions()
 	connect(actionRename, SIGNAL(triggered(bool)),
 			this, SLOT(slotRename()));
 	addAction(actionRename);
-	PCCommands::instance()->addAction(tr("File operation"), actionRename);
+	PCCommands::instance()->addAction(tr("File operations"), actionRename);
 
 	actionMkDir = new QAction(this);
 	actionMkDir->setObjectName("actionMkDir");
@@ -256,7 +256,7 @@ void MainWindowImpl::createActions()
 	connect(actionMkDir, SIGNAL(triggered(bool)),
 			this, SLOT(slotMkDir()));
 	addAction(actionMkDir);
-	PCCommands::instance()->addAction(tr("File operation"), actionMkDir);
+	PCCommands::instance()->addAction(tr("File operations"), actionMkDir);
 
 	actionRemove = new QAction(this);
 	actionRemove->setObjectName("actionRemove");
@@ -265,7 +265,7 @@ void MainWindowImpl::createActions()
 	connect(actionRemove, SIGNAL(triggered(bool)),
 			this, SLOT(slotRemove()));
 	addAction(actionRemove);
-	PCCommands::instance()->addAction(tr("File operation"), actionRemove);
+	PCCommands::instance()->addAction(tr("File operations"), actionRemove);
 
 	actionExit = new QAction(this);
 	actionExit->setObjectName("actionExit");

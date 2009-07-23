@@ -1,5 +1,3 @@
-#ifndef QFILEOPERATIONSCONFIRMATIONDIALOG_H
-#define QFILEOPERATIONSCONFIRMATIONDIALOG_H
 /********************************************************************
 * Copyright (C) PanteR
 *-------------------------------------------------------------------
@@ -24,6 +22,8 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
+#ifndef QFILEOPERATIONSCONFIRMATIONDIALOG_H
+#define QFILEOPERATIONSCONFIRMATIONDIALOG_H
 //
 class QVBoxLayout;
 //
