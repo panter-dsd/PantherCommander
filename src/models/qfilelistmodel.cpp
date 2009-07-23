@@ -452,7 +452,7 @@ QVariant QFileListModel::data(const QModelIndex& index, int role) const
 			{
 				case NameColumn: return node->name();
 				case TypeColumn: return node->ext();
-				case SizeColumn: return !node->isDir() ? d->size(node->size()) : tr("<folder>");
+				case SizeColumn: return !node->isDir() || node->isSymLink() ? d->size(node->size()) : tr("<folder>");
 				case ModifiedTimeColumn: return node->lastModified().toString("dd.MM.yy hh:mm:ss");
 				case OwnerColumn: return node->fileInfo().owner();
 				case GroupColumn: return node->fileInfo().group();

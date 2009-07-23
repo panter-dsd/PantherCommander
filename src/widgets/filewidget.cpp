@@ -892,6 +892,7 @@ void FileWidget::setDirectory(const QString& directory)
 #ifndef Q_CC_MSVC
 	#warning "TODO: must be configurable (message, beep, or something else)"
 #endif
+		QApplication::beep();
 #ifndef QT_NO_MESSAGEBOX
 		QMessageBox::critical(this, "", tr("You have no enought privilegies"));
 #endif
