@@ -1109,7 +1109,10 @@ void MainWindowImpl::slotAddToolBar()
 
 void MainWindowImpl::slotRemoveToolBar()
 {
-	PCToolBar *toolBar = qobject_cast<PCToolBar*> (sender());
+	QAction *action = qobject_cast<QAction*> (sender());
+	if (!action)
+		return;
+	PCToolBar *toolBar = qlpcToolBars.at(action->data().toInt());
 	if (!toolBar)
 		return;
 
@@ -1125,7 +1128,10 @@ void MainWindowImpl::slotRemoveToolBar()
 
 void MainWindowImpl::slotRenameToolBar()
 {
-	PCToolBar *toolBar = qobject_cast<PCToolBar*> (sender());
+	QAction *action = qobject_cast<QAction*> (sender());
+	if (!action)
+		return;
+	PCToolBar *toolBar = qlpcToolBars.at(action->data().toInt());
 	if (!toolBar)
 		return;
 
@@ -1172,16 +1178,12 @@ void MainWindowImpl::slotRenameToolBar()
 
 void MainWindowImpl::connectToolBar(PCToolBar *toolBar)
 {
-	connect (toolBar, SIGNAL(addToolBar()),
-			 this, SLOT(slotAddToolBar()));
-	connect (toolBar, SIGNAL(removeToolBar()),
-			 this, SLOT(slotRemoveToolBar()));
-	connect (toolBar, SIGNAL(renameToolBar()),
-			 this, SLOT(slotRenameToolBar()));
 	connect (toolBar, SIGNAL(toolBarActionExecuted(SToolBarButton)),
 			 this, SLOT(toolBarActionExecute(SToolBarButton)));
 	connect (toolBar, SIGNAL(cdExecuted(QString)),
 			 this, SLOT(cdExecute(QString)));
+	connect (toolBar, SIGNAL(toolbarContextMenu(QPoint)),
+			 this, SLOT(slotToolBarContextMenu(QPoint)));
 }
 
 void MainWindowImpl::cdExecute(const QString& path)
@@ -1192,6 +1194,79 @@ void MainWindowImpl::cdExecute(const QString& path)
 
 	QDir dir(path);
 	qfpFocusedFilePanel->setPath(dir.absolutePath());
+}
+
+QMenu* MainWindowImpl::createToolBarsMenu(PCToolBar *currentToolBar)
+{
+	QMenu *qmToolBarMenu = new QMenu(tr("Toolbars"), this);
+	QAction *menuAction;
+
+	menuAction = new QAction(tr("&Add toolbar"), qmToolBarMenu);
+	connect(menuAction, SIGNAL(triggered()),
+			this, SLOT(slotAddToolBar()));
+	qmToolBarMenu->addAction(menuAction);
+
+	if (qlpcToolBars.count() <= 0)
+		return qmToolBarMenu;
+
+	QMenu *removeMenu = new QMenu(tr("&Remove toolbar"), this);
+	int i = 0;
+	foreach(PCToolBar *toolBar, qlpcToolBars) {
+		menuAction = new QAction(toolBar->name(), removeMenu);
+		menuAction->setData(i++);
+		connect(menuAction, SIGNAL(triggered()),
+				this, SLOT(slotRemoveToolBar()));
+		removeMenu->addAction(menuAction);
+		if (toolBar == currentToolBar)
+			removeMenu->setDefaultAction(menuAction);
+	}
+	qmToolBarMenu->addMenu(removeMenu);
+
+	QMenu *renameMenu = new QMenu(tr("Re&name toolbar"), this);
+	i = 0;
+	foreach(PCToolBar *toolBar, qlpcToolBars) {
+		menuAction = new QAction(toolBar->name(), renameMenu);
+		menuAction->setData(i++);
+		connect(menuAction, SIGNAL(triggered()),
+				this, SLOT(slotRenameToolBar()));
+		renameMenu->addAction(menuAction);
+		if (toolBar == currentToolBar)
+			renameMenu->setDefaultAction(menuAction);
+	}
+	qmToolBarMenu->addMenu(renameMenu);
+
+	QMenu *showHideMenu = new QMenu(tr("&Show/Hide toolbar"), this);
+	foreach(PCToolBar *toolBar, qlpcToolBars) {
+		menuAction = new QAction(toolBar->name(), showHideMenu);
+		menuAction->setCheckable(true);
+		menuAction->setChecked(toolBar->isVisible());
+		connect(menuAction, SIGNAL(triggered(bool)),
+				toolBar, SLOT(setShown(bool)));
+		showHideMenu->addAction(menuAction);
+		if (toolBar == currentToolBar)
+			showHideMenu->setDefaultAction(menuAction);
+	}
+	qmToolBarMenu->addMenu(showHideMenu);
+
+	if (currentToolBar) {
+		qmToolBarMenu->addSeparator();
+
+		menuAction = new QAction(tr("A&dd separator"), qmToolBarMenu);
+		connect(menuAction, SIGNAL(triggered()),
+				currentToolBar, SLOT(slotAddSeparator()));
+		qmToolBarMenu->addAction(menuAction);
+	}
+
+	return qmToolBarMenu;
+}
+
+void MainWindowImpl::slotToolBarContextMenu(const QPoint& pos)
+{
+	PCToolBar *pcToolBar = qobject_cast<PCToolBar*> (sender());
+	if (!pcToolBar)
+		return;
+
+	createToolBarsMenu(pcToolBar)->exec(pos);
 }
 
 /* ** TESTING PURPOSES ONLY ** */

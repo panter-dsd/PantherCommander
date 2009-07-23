@@ -107,6 +107,7 @@ private:
 	void saveSettings();
 	void loadSettings();
 	inline void connectToolBar(PCToolBar *toolBar);
+	QMenu* createToolBarsMenu(PCToolBar *currentToolBar);
 
 protected:
 	void resizeEvent(QResizeEvent* event);
@@ -142,6 +143,7 @@ private Q_SLOTS:
 	void slotPreferences();
 	void toolBarActionExecute(const SToolBarButton& action);
 	void cdExecute(const QString& path);
+	void slotToolBarContextMenu(const QPoint& pos);
 
 	/* ** TESTING PURPOSES ONLY ** */
 	void slotTestingFileDialog();

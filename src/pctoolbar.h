@@ -56,12 +56,13 @@ private Q_SLOTS:
 	void slotToolButtonDelete();
 	void slotToolButtonCD();
 
+public Q_SLOTS:
+	void slotAddSeparator();
+
 Q_SIGNALS:
-	void addToolBar();
-	void removeToolBar();
-	void renameToolBar();
 	void toolBarActionExecuted(const SToolBarButton& action);
 	void cdExecuted(const QString& path);
+	void toolbarContextMenu(const QPoint& pos);
 };
 
 #endif // PCTOOLBAR_H

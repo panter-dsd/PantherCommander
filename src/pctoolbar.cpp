@@ -147,22 +147,7 @@ void PCToolBar::contextMenuEvent(QContextMenuEvent *event)
 
 		qmToolBarMenu->exec(event->globalPos());
 	} else {
-		menuAction = new QAction(tr("&Add toolbar"), qmToolBarMenu);
-		connect(menuAction, SIGNAL(triggered()),
-				this, SIGNAL(addToolBar()));
-		qmToolBarMenu->addAction(menuAction);
-
-		menuAction = new QAction(tr("&Remove \"%1\"").arg(qsName), qmToolBarMenu);
-		connect(menuAction, SIGNAL(triggered()),
-				this, SIGNAL(removeToolBar()));
-		qmToolBarMenu->addAction(menuAction);
-
-		menuAction = new QAction(tr("Re&name \"%1\"").arg(qsName), qmToolBarMenu);
-		connect(menuAction, SIGNAL(triggered()),
-				this, SIGNAL(renameToolBar()));
-		qmToolBarMenu->addAction(menuAction);
-
-		qmToolBarMenu->exec(event->globalPos());
+		emit toolbarContextMenu(event->globalPos());
 	}
 	delete qmToolBarMenu;
 }
@@ -290,3 +275,8 @@ void PCToolBar::dragEnterEvent(QDragEnterEvent* event)
 		event->acceptProposedAction();
 }
 
+void PCToolBar::slotAddSeparator()
+{
+	qlButtons << SToolBarButton();
+	refreshActions();
+}
