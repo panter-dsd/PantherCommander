@@ -155,7 +155,14 @@ public:
 	{ return m_fileInfo.lastRead(); }
 
 	qint64 size() const
-	{ return m_fileInfo.isDir() && !m_fileInfo.isSymLink() ? 0 : m_fileInfo.size(); }
+	{
+		Type t = type();
+		if(t == File)
+			return m_fileInfo.size();
+		if(t == Dir)
+			return 0;
+		return -1;
+	}
 
 	inline QFile::Permissions permissions() const
 	{ return m_permissions ? m_permissions : m_fileInfo.permissions(); }

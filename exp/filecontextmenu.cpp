@@ -12,11 +12,7 @@
 #include <QtCore/QPointer>
 #include <QtCore/QVarLengthArray>
 
-#include <QtGui/QLabel>
-#include <QtGui/QPaintEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleOption>
+#include <QtGui/QMoveEvent>
 
 #include <qdebug.h>
 
@@ -42,156 +38,9 @@ typedef struct _CMInvokeCommandInfoEx {
 	POINT ptInvoke;
 } CMINVOKECOMMANDINFOEX, *LPCMINVOKECOMMANDINFOEX;
 #endif
-#ifndef ODS_NOACCEL
-#  define ODS_NOACCEL 0x0100
-#endif
-#ifndef ODS_NOFOCUSRECT
-#  define ODS_NOFOCUSRECT 0x0200
-#endif
 
 #define MIN_ID 1
 #define MAX_ID 10000
-#include <QCoreApplication>
-static LRESULT CALLBACK HookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-MSG msg;
-msg.hwnd = hWnd;
-msg.message = message;
-msg.wParam = wParam;
-msg.lParam = lParam;
-if(message != WM_ENTERIDLE && message != WM_PAINT && message != WM_MOUSEMOVE)
-	qWarning() << msg;
-
-	switch(message)
-	{
-		case WM_MENUCHAR:
-		{
-			// only supported by IContextMenu3
-			IContextMenu2* pContextMenu2 = (LPCONTEXTMENU2)GetProp(hWnd, TEXT("ContextMenu"));
-			IContextMenu3* pContextMenu3 = 0;
-			if(pContextMenu2->QueryInterface(IID_IContextMenu3, (void**)&pContextMenu3) == NOERROR)
-			{
-				LRESULT lResult = 0;
-				pContextMenu3->HandleMenuMsg2(message, wParam, lParam, &lResult);
-				return lResult;
-			}
-		}
-			break;
-
-		case WM_DRAWITEM:
-		case WM_MEASUREITEM:
-			if(wParam)
-			{
-				// if wParam != 0 then the message is not menu-related
-				break;
-			}
-			else if(message == WM_MEASUREITEM)
-			{
-		MEASUREITEMSTRUCT* mi = (MEASUREITEMSTRUCT*)lParam;
-qWarning() << "MEASUREITEMSTRUCT:"
-		<< "CtlType:" << mi->CtlType
-		<< "CtlID:" << mi->CtlID
-		<< "itemID:" << mi->itemID
-		<< "itemWidth:" << mi->itemWidth
-		<< "itemHeight:" << mi->itemHeight
-		<< "itemData:" << mi->itemData;
-			}
-			else if(message == WM_DRAWITEM)
-			{
-		DRAWITEMSTRUCT* di = (DRAWITEMSTRUCT*)lParam;
-//di->hwndItem = 0;
-//di->hDC = GetDC(0);
-//di->itemID = 108;
-//di->itemData = 3;
-		QRect r(QPoint(di->rcItem.left, di->rcItem.top), QPoint(di->rcItem.right, di->rcItem.bottom));
-qWarning() << "DRAWITEMSTRUCT:"
-		<< "CtlType:" << di->CtlType
-		<< "CtlID:" << di->CtlID
-		<< "itemID:" << di->itemID
-		<< "itemAction:" << di->itemAction
-		<< "itemState:" << di->itemState
-		<< "hwndItem:" << di->hwndItem
-		<< "hDC:" << di->hDC
-		<< "rcItem:" << r
-		<< "itemData:" << di->itemData;
-			}
-
-		case WM_INITMENUPOPUP:
-		{
-			IContextMenu2* pContextMenu2 = (LPCONTEXTMENU2)GetProp(hWnd, TEXT("ContextMenu"));
-			IContextMenu3* pContextMenu3 = 0;
-			if(pContextMenu2->QueryInterface(IID_IContextMenu3, (void**)&pContextMenu3) == NOERROR)
-				pContextMenu3->HandleMenuMsg(message, wParam, lParam);
-			else
-				pContextMenu2->HandleMenuMsg(message, wParam, lParam);
-
-			if(message == WM_MEASUREITEM)
-			{
-		MEASUREITEMSTRUCT* mi = (MEASUREITEMSTRUCT*)lParam;
-qWarning() << "MEASUREITEMSTRUCT:"
-		<< "CtlType:" << mi->CtlType
-		<< "CtlID:" << mi->CtlID
-		<< "itemID:" << mi->itemID
-		<< "itemWidth:" << mi->itemWidth
-		<< "itemHeight:" << mi->itemHeight
-		<< "itemData:" << mi->itemData;
-			}
-			else if(message == WM_DRAWITEM)
-			{
-		DRAWITEMSTRUCT* di = (DRAWITEMSTRUCT*)lParam;
-		QRect r(QPoint(di->rcItem.left, di->rcItem.top), QPoint(di->rcItem.right, di->rcItem.bottom));
-qWarning() << "DRAWITEMSTRUCT:"
-		<< "CtlType:" << di->CtlType
-		<< "CtlID:" << di->CtlID
-		<< "itemID:" << di->itemID
-		<< "itemAction:" << di->itemAction
-		<< "itemState:" << di->itemState
-		<< "hwndItem:" << di->hwndItem
-		<< "hDC:" << di->hDC
-		<< "rcItem:" << r
-		<< "itemData:" << di->itemData;
-			}
-
-			return (message == WM_INITMENUPOPUP ? 0 : TRUE); // inform caller that we handled WM_INITPOPUPMENU by ourself
-		}
-			break;
-
-		default:
-			break;
-	}
-
-	// call original WndProc of window to prevent undefined bevhaviour of window
-	return ::CallWindowProc((WNDPROC)GetProp(hWnd, TEXT("OldWndProc")), hWnd, message, wParam, lParam);
-}
-
-
-class FileContextMenuActionPrivate
-{
-public:
-	FileContextMenuActionPrivate() :
-		menu(0), itemData(0), itemUserData(0), ownerDraw(0)
-	{}
-	~FileContextMenuActionPrivate()
-	{}
-
-	HMENU menu;
-	int itemData;
-	qint64 itemUserData;
-	bool ownerDraw;
-	QPixmap pixmap;
-};
-
-
-FileContextMenuAction::FileContextMenuAction(QObject* parent) : QWidgetAction(parent),
-	d(new FileContextMenuActionPrivate)
-{
-}
-
-FileContextMenuAction::~FileContextMenuAction()
-{
-	delete d;
-}
-
 
 class FileContextMenuPrivate
 {
@@ -199,14 +48,9 @@ public:
 	FileContextMenuPrivate();
 	~FileContextMenuPrivate();
 
-	bool paintNativeMenuItem(EvilWidget* w);
+	void parseNativeMenuItem(HMENU menu, int index, FileContextMenuAction* action);
 	void parseNativeMenu(HMENU menu, QMenu* qmenu);
 
-	void registerHook(HWND hWnd);
-	void unregisterHook(HWND hWnd);
-
-	void _q_aboutToShow();
-	void _q_aboutToHide();
 	void _q_nativeActionTriggered();
 
 	FileContextMenu* q;
@@ -218,6 +62,8 @@ public:
 	QPoint pos;
 
 	IShellFolder* psfFolder;
+
+	static LRESULT CALLBACK HookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 };
 
 FileContextMenuPrivate::FileContextMenuPrivate() : q(0),
@@ -237,53 +83,14 @@ FileContextMenuPrivate::~FileContextMenuPrivate()
 	psfFolder = 0;
 }
 
-void FileContextMenuPrivate::registerHook(HWND hWnd)
-{
-	// subclass window to handle messages
-	// if context menu version 2 or 3
-	IContextMenu2* tmpContextMenu2 = 0;
-	if(pContextMenu->QueryInterface(IID_IContextMenu3, (void**)&tmpContextMenu2) == NOERROR)
-	{
-		if(SetProp(hWnd, TEXT("ContextMenu"), pContextMenu))
-		{
-			WNDPROC oldWndProc = (WNDPROC)SetWindowLongA(hWnd, GWL_WNDPROC, (LONG)HookWndProc);
-			//WNDPROC oldWndProc = (WNDPROC)GetWindowLongA(hWnd, GWL_WNDPROC);
-			SetProp(hWnd, TEXT("OldWndProc"), (void*)oldWndProc);
-		}
-	}
-}
-
-void FileContextMenuPrivate::unregisterHook(HWND hWnd)
-{
-	// unsubclass
-	WNDPROC oldWndProc = (WNDPROC)GetProp(hWnd, TEXT("OldWndProc"));
-	if(oldWndProc)
-	{
-		SetWindowLongA(hWnd, GWL_WNDPROC, (LONG)oldWndProc);
-		RemoveProp(hWnd, TEXT("ContextMenu"));
-	}
-}
-
-void FileContextMenuPrivate::_q_aboutToShow()
-{
-	registerHook(hWnd);
-}
-
-void FileContextMenuPrivate::_q_aboutToHide()
-{
-	unregisterHook(hWnd);
-}
-
 void FileContextMenuPrivate::_q_nativeActionTriggered()
 {
 	FileContextMenuAction* action = qobject_cast<FileContextMenuAction*>(q->sender());
 	if(action && pContextMenu)
 	{
-		int idCommand = action->d->itemData;
+		int idCommand = action->itemData;
 		if(idCommand >= MIN_ID && idCommand <= MAX_ID)
 		{
-qWarning() << "InvokeCommand" << idCommand;
-
 			CMINVOKECOMMANDINFOEX command = { 0 };
 			command.cbSize = sizeof(CMINVOKECOMMANDINFOEX);
 			command.hwnd = hWnd;
@@ -311,9 +118,6 @@ FileContextMenu::FileContextMenu(QWidget* parent) : QMenu(parent),
 	// force native window creation
 	if(!d->hWnd)
 		d->hWnd = winId();
-
-	//connect(this, SIGNAL(aboutToShow()), this, SLOT(_q_aboutToShow()));
-	//connect(this, SIGNAL(aboutToHide()), this, SLOT(_q_aboutToHide()));
 }
 
 FileContextMenu::FileContextMenu(const QString& title, QWidget* parent) : QMenu(title, parent),
@@ -331,181 +135,56 @@ FileContextMenu::~FileContextMenu()
 	delete d;
 }
 
-
-EvilWidget::EvilWidget(QWidget* parent) : QWidget(parent),
-	qmenu(0), action(0), drawn(0)
+LRESULT CALLBACK FileContextMenuPrivate::HookWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	// force native window creation
-	winId();
-	setAttribute(Qt::WA_NoSystemBackground);
+	switch(message)
+	{
+		case WM_MENUCHAR:
+		{
+			// only supported by IContextMenu3
+			IContextMenu2* pContextMenu2 = (LPCONTEXTMENU2)GetProp(hWnd, TEXT("ContextMenu"));
+			IContextMenu3* pContextMenu3 = 0;
+			if(pContextMenu2->QueryInterface(IID_IContextMenu3, (void**)&pContextMenu3) == NOERROR)
+			{
+				LRESULT lResult = 0;
+				pContextMenu3->HandleMenuMsg2(message, wParam, lParam, &lResult);
+				return lResult;
+			}
+		}
+			break;
+
+		case WM_DRAWITEM:
+		case WM_MEASUREITEM:
+			if(wParam)
+			{
+				// if wParam != 0 then the message is not menu-related
+				break;
+			}
+
+		case WM_INITMENUPOPUP:
+		{
+			IContextMenu2* pContextMenu2 = (LPCONTEXTMENU2)GetProp(hWnd, TEXT("ContextMenu"));
+			IContextMenu3* pContextMenu3 = 0;
+			if(pContextMenu2->QueryInterface(IID_IContextMenu3, (void**)&pContextMenu3) == NOERROR)
+				pContextMenu3->HandleMenuMsg(message, wParam, lParam);
+			else
+				pContextMenu2->HandleMenuMsg(message, wParam, lParam);
+			return (message == WM_INITMENUPOPUP ? 0 : TRUE); // inform caller that we handled WM_INITPOPUPMENU by ourself
+		}
+			break;
+
+		default:
+			break;
+	}
+
+	return ::CallWindowProc((WNDPROC)GetProp(hWnd, TEXT("OldWndProc")), hWnd, message, wParam, lParam);
 }
 
-void EvilWidget::paintEvent(QPaintEvent* event)
+void FileContextMenuPrivate::parseNativeMenuItem(HMENU menu, int index, FileContextMenuAction* action)
 {
-	if(!drawn)
-	{
-		//drawn = true;
-		qWarning() << "EvilWidget::paintEvent" << this;
-		qmenu->d->paintNativeMenuItem(this);
-	}
+	QMenu* qmenu = qobject_cast<QMenu*>(action->parentWidget());
+	Q_ASSERT(qmenu);
 
-	/*QPainter p(this);
-	p.save();
-	p.setOpacity(0.0);
-	//p.drawPixmap(0, 0, action->pixmap);
-	p.fillRect(rect(), Qt::white);
-	p.restore();*/
-	//hide();
-}
-
-bool FileContextMenuPrivate::paintNativeMenuItem(EvilWidget* w)
-{
-	FileContextMenuAction* action = w->action;
-
-	if(!action || !action->d->ownerDraw)// || !action->pixmap.isNull())
-		return false;
-
-	HMENU menu = action->d->menu;
-	FileContextMenu* qmenu = w->qmenu;
-
-	HWND hWnd = w->winId();
-	QRect r = w->rect();//.adjusted(1, 1, -1, -1);
-
-	qmenu->d->registerHook(hWnd);
-
-	//HookWndProc(hWnd, WM_INITMENU, (WPARAM)menu, 0);
-
-	//HookWndProc(hWnd, WM_INITMENUPOPUP, (WPARAM)menu, 0);
-
-
-	/*RECT rcClient;
-	GetClientRect(hWnd, &rcClient);
-	qWarning() << rcClient.left << rcClient.top << rcClient.right << rcClient.bottom;*/
-
-//	r = QRect(0, 0, mi.itemWidth, mi.itemHeight);
-//r.setWidth(r.width() * 3);
-//r.setWidth(q->width());
-
-	/*RECT itemRect;
-	bool ok = GetMenuItemRect(hWnd, menu, index, &itemRect);
-	if(ok)
-	{
-		r = QRect(QPoint(itemRect.left, itemRect.top), QPoint(itemRect.right, itemRect.bottom));
-		r.translate(itemRect.left, itemRect.top);
-	}
-qWarning() << ok << r;
-r = QRect(0, 0, 300, 50);
-
-	widget->setFixedSize(r.size());*/
-
-
-		/*MEASUREITEMSTRUCT mi = { 0 };
-
-		mi.CtlType = ODT_MENU;
-		mi.CtlID = 0; // not used for menus
-		mi.itemID = action->d->itemData;
-		mi.itemWidth = r.width();
-		mi.itemHeight = r.height();
-		mi.itemData = action->d->itemUserData;
-
-		HookWndProc(hWnd, WM_MEASUREITEM, 0, (LPARAM)&mi);*/
-
-
-	HDC hdc = GetDC(hWnd);
-
-	// Create a compatible DC which is used in a BitBlt from the window DC
-	//HDC hMemDC = CreateCompatibleDC(hdc);
-
-	// Create a compatible bitmap from the Window DC
-	//HBITMAP hBitmap = CreateCompatibleBitmap(hdc, r.width(), r.height());
-
-	/*void* lpBits;
-	// Create the DIB section with an alpha channel
-	BITMAPV5HEADER bh5 = { 0 };
-	bh5.bV5Size = sizeof(BITMAPV5HEADER);
-
-	bh5.bV5Width = r.width();
-	bh5.bV5Height = r.height();
-	bh5.bV5Planes = 1;
-	bh5.bV5BitCount = 32;
-	bh5.bV5Compression = BI_BITFIELDS;
-	// The following mask specification specifies a supported 32 BPP
-	// alpha format for Windows XP
-	bh5.bV5RedMask = 0x00FF0000;
-	bh5.bV5GreenMask = 0x0000FF00;
-	bh5.bV5BlueMask = 0x000000FF;
-	bh5.bV5AlphaMask = 0xFF000000;
-
-	HBITMAP hBitmap = CreateDIBSection(hdc, (BITMAPINFO*)&bh5, DIB_RGB_COLORS,
-										(void**)&lpBits, 0, (DWORD)0);*/
-/*	if(!hBitmap)
-	{
-		//widget->deleteLater();
-		qWarning() << "!!! CreateCompatibleBitmap has failed";
-		return false;
-	}
-	else*/
-	{
-		//HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hBitmap);
-
-
-		DRAWITEMSTRUCT di = { 0 };
-
-		di.CtlType = ODT_MENU;
-		di.CtlID = 0; // not used for menus
-		di.itemID = action->d->itemData;
-		di.itemAction = ODA_DRAWENTIRE;
-		di.itemState = ODS_NOACCEL | ODS_NOFOCUSRECT;
-		di.hwndItem = (HWND)menu;
-		di.hDC = hdc;
-		di.rcItem.left = r.left();
-		di.rcItem.top = r.top();
-		di.rcItem.right = r.right();
-		di.rcItem.bottom = r.bottom();
-		di.itemData = action->d->itemUserData;
-
-		HookWndProc(hWnd, WM_DRAWITEM, 0, (LPARAM)&di);
-
-
-		//if(!BitBlt(hMemDC, 0, 0, r.width(), r.height(), hdc, r.x(), r.y(), SRCCOPY))
-		//	qWarning() << "!!! BitBlt has failed";
-
-		//SelectObject(hMemDC, hOldBitmap);
-
-		//action->d->pixmap = QPixmap::fromWinHBITMAP(hBitmap, QPixmap::Alpha);
-//action->setIcon(QIcon(action->d->pixmap));
-		/*QLabel* label = new QLabel(q);
-		label->setPixmap(action->d->pixmap);
-		label->setFixedSize(action->d->pixmap.size());
-		action->setDefaultWidget(label);*/
-//action->d->pixmap.save(QString("E:/opt/PantherCommander/1/img%1.png").arg(action->d->itemData));
-
-		//DeleteObject(hBitmap);
-	}
-
-	//DeleteDC(hMemDC);
-	ReleaseDC(hWnd, hdc);
-
-
-	//HookWndProc(hWnd, WM_UNINITMENUPOPUP, (WPARAM)menu, 0);
-
-	qmenu->d->unregisterHook(hWnd);
-
-	return true;
-}
-
-void FileContextMenuPrivate::parseNativeMenu(HMENU menu, QMenu* qmenu)
-{
-	HookWndProc(hWnd, WM_INITMENUPOPUP, (WPARAM)menu, 0);
-
-	int itemCount = GetMenuItemCount(menu);
-	for(int index = 0; index < itemCount; ++index)
-	{
-		FileContextMenuAction* action = new FileContextMenuAction(qmenu);
-		action->d->menu = menu;
-
-
-{
 	QVarLengthArray<wchar_t, 64> buf(63);
 
 	MENUITEMINFO info = { 0 };
@@ -529,9 +208,6 @@ void FileContextMenuPrivate::parseNativeMenu(HMENU menu, QMenu* qmenu)
 			if(!info.hbmpChecked)
 			{
 				// ### TODO
-				//QActionGroup* ag = new QActionGroup(qmenu);
-				//ag->setExclusive(true);
-				//action->setActionGroup(ag);
 			}
 		}
 	}
@@ -548,12 +224,12 @@ void FileContextMenuPrivate::parseNativeMenu(HMENU menu, QMenu* qmenu)
 
 	if(info.fMask & MIIM_ID)
 	{
-		action->d->itemData = info.wID;
+		action->itemData = info.wID;
 	}
 
 	if(info.fMask & MIIM_DATA)
 	{
-		action->d->itemUserData = info.dwItemData;
+		action->itemUserData = info.dwItemData;
 	}
 
 	if(info.fMask & MIIM_CHECKMARKS)
@@ -584,65 +260,15 @@ void FileContextMenuPrivate::parseNativeMenu(HMENU menu, QMenu* qmenu)
 
 	if(info.fType == MFT_BITMAP)
 	{
-		if(info.hbmpItem == HBMMENU_CALLBACK)
+		if(info.hbmpItem && info.hbmpItem != HBMMENU_CALLBACK)
 		{
-			info.fType = MFT_OWNERDRAW;
+			QIcon icon(QPixmap::fromWinHBITMAP(info.hbmpItem, QPixmap::Alpha));
+			action->setIcon(icon);
 		}
-		else if(info.hbmpItem)
-		{
-			action->d->pixmap = QPixmap::fromWinHBITMAP(info.hbmpItem, QPixmap::Alpha);
-//action->setIcon(QIcon(action->pixmap));
-			QLabel* label = new QLabel(qmenu);
-			label->setPixmap(action->d->pixmap);
-			label->setFixedSize(action->d->pixmap.size());
-			action->setDefaultWidget(label);
-		}
-	}
-
-qWarning() << "\n     "
-		<< "info.fMask:" << info.fMask
-		<< "info.fType:" << info.fType
-		<< "info.fState:" << info.fState
-		<< "info.hbmpChecked:" << info.hbmpChecked
-		<< "info.hbmpUnchecked:" << info.hbmpUnchecked
-		<< "info.wID:" << info.wID
-		<< "info.dwItemData:" << info.dwItemData
-		<< "info.dwTypeData:" << info.dwTypeData
-		<< "info.cch:" << info.cch
-		<< "info.hbmpItem:" << info.hbmpItem
-		<< "\n"
-		<< QString::fromWCharArray(buf.data(), info.cch);
-
-	if(info.fType == MFT_OWNERDRAW)
-	{
-		action->d->ownerDraw = true;
-
-		QRect r(0, 0, 0, 16);
-
-
-		MEASUREITEMSTRUCT mi = { 0 };
-
-		mi.CtlType = ODT_MENU;
-		mi.CtlID = 0; // not used for menus
-		mi.itemID = action->d->itemData;
-		mi.itemWidth = r.width();
-		mi.itemHeight = r.height();
-		mi.itemData = action->d->itemUserData;
-
-		HookWndProc(hWnd, WM_MEASUREITEM, 0, (LPARAM)&mi);
-
-		r = QRect(0, 0, mi.itemWidth, mi.itemHeight);
-
-		EvilWidget* widget = new EvilWidget();
-		widget->qmenu = q;
-		widget->action = action;
-		widget->setMinimumSize(r.size());
-		widget->resize(r.size());
-		action->setDefaultWidget(widget);
 	}
 
 	int cch = info.cch + 1;
-	if(cch > 1 && ((info.dwTypeData && info.dwTypeData != buf.data()) || cch >= buf.size()))
+	if((info.dwTypeData && info.dwTypeData != buf.data()) || cch >= buf.size())
 	{
 		if(cch >= buf.size())
 			buf.resize(cch);
@@ -653,42 +279,38 @@ qWarning() << "\n     "
 
 		if(!GetMenuItemInfo(menu, index, true, &info))
 			qWarning() << "!!!!!!!";
-
-qWarning() << "***"
-		<< "info.fMask:" << info.fMask
-		<< "info.fType:" << info.fType
-		<< "info.fState:" << info.fState
-		<< "info.hbmpChecked:" << info.hbmpChecked
-		<< "info.hbmpUnchecked:" << info.hbmpUnchecked
-		<< "info.wID:" << info.wID
-		<< "info.dwItemData:" << info.dwItemData
-		<< "info.dwTypeData:" << info.dwTypeData
-		<< "info.cch:" << info.cch
-		<< "info.hbmpItem:" << info.hbmpItem
-		<< "\n"
-		<< QString::fromWCharArray(buf.data(), info.cch);
 	}
 
 	if(info.fType == MIIM_STRING || info.dwTypeData == buf.data())
 		action->setText(QString::fromWCharArray(buf.data(), info.cch));
 }
 
-
-		qmenu->addAction(action);
+void FileContextMenuPrivate::parseNativeMenu(HMENU menu, QMenu* qmenu)
+{
+	int itemCount = GetMenuItemCount(menu);
+	for(int i = 0; i < itemCount; ++i)
+	{
+		FileContextMenuAction* action = new FileContextMenuAction(qmenu);
 		q->connect(action, SIGNAL(triggered(bool)), q, SLOT(_q_nativeActionTriggered()));
+		qmenu->addAction(action);
 
-		//pContextMenu->GetCommandString(UINT_PTR(0), GCS_VERBW, 0, buf.data(), buf.size());
-		//pContextMenu->GetCommandString(UINT_PTR(0), GCS_HELPTEXTW, 0, buf.data(), buf.size());
+		parseNativeMenuItem(menu, i, action);
 	}
-
-	HookWndProc(hWnd, WM_UNINITMENUPOPUP, (WPARAM)menu, 0);
 }
 
 QAction* FileContextMenu::executeNativeMenu(const QPoint& pos)
 {
 	QAction* ret = 0;
 
-	d->registerHook(d->hWnd);
+	// subclass window to handle messages
+	WNDPROC OldWndProc = 0;
+	// only subclass if its version 2 or 3
+	IContextMenu2* tmpContextMenu2 = 0;
+	if(d->pContextMenu->QueryInterface(IID_IContextMenu3, (void**)&tmpContextMenu2) == NOERROR)
+	{
+		if(SetProp(d->hWnd, TEXT("ContextMenu"), d->pContextMenu))
+			OldWndProc = (WNDPROC)SetWindowLongA(d->hWnd, GWL_WNDPROC, (LONG)FileContextMenuPrivate::HookWndProc);
+	}
 
 	QPointer<QObject> guard = this;
 	int idCommand = TrackPopupMenuEx(d->menu, TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD,
@@ -696,14 +318,19 @@ QAction* FileContextMenu::executeNativeMenu(const QPoint& pos)
 	if(guard.isNull())
 		return 0;
 
-	d->unregisterHook(d->hWnd);
+	// unsubclass
+	if(OldWndProc)
+	{
+		SetWindowLongA(d->hWnd, GWL_WNDPROC, (LONG)OldWndProc);
+		RemoveProp(d->hWnd, TEXT("ContextMenu"));
+	}
 
 	if(idCommand >= MIN_ID && idCommand <= MAX_ID)
 	{
 		foreach(QAction* act, actions())
 		{
 			FileContextMenuAction* action = qobject_cast<FileContextMenuAction*>(act);
-			if(action && action->d->itemData == idCommand)
+			if(action && action->itemData == idCommand)
 			{
 				act->trigger();
 				ret = act;
@@ -721,52 +348,12 @@ void FileContextMenu::moveEvent(QMoveEvent* event)
 	QMenu::moveEvent(event);
 }
 
-void FileContextMenu::paintEvent(QPaintEvent* event)
-{
-/*	bool changed = false;
-	QList<QAction*> actionList = actions();
-	for(int i = 0; i < actionList.size(); ++i)
-	{
-		FileContextMenuAction* action = qobject_cast<FileContextMenuAction*>(actionList.at(i));
-		changed |= d->paintNativeMenuItem(d->menu, i, action);
-	}
-	if(changed)
-		return;
-*/
-
-	QMenu::paintEvent(event);
-
-
-	QPainter p(this);
-
-	//draw the items that need updating..
-	const QList<QAction*>& actionList = actions();
-	for(int i = 0; i < actionList.size(); ++i)
-	{
-		QAction* act = actionList.at(i);
-		QRect adjustedActionRect = actionGeometry(act);
-		FileContextMenuAction* action = qobject_cast<FileContextMenuAction*>(act);
-		if(event->rect().intersects(adjustedActionRect) && action)
-		{
-			//set the clip region to be extra safe (and adjust for the scrollers)
-			QRegion adjustedActionReg(adjustedActionRect);
-			p.setClipRegion(adjustedActionReg);
-
-			QStyleOptionMenuItem opt;
-			initStyleOption(&opt, action);
-			opt.rect = adjustedActionRect;
-			//style()->drawControl(QStyle::CE_MenuItem, &opt, &p, this);
-			//p.drawPixmap(adjustedActionRect.topLeft(), action->pixmap);
-		}
-	}
-}
-
 void FileContextMenu::setPath(const QString& path)
 {
 	setPaths(QStringList(path));
 }
 
-static UINT GetPIDLSize(LPCITEMIDLIST pidl)
+static UINT GetPIDLSize (LPCITEMIDLIST pidl)
 {
 	if (!pidl) 
 		return 0;
@@ -780,7 +367,7 @@ static UINT GetPIDLSize(LPCITEMIDLIST pidl)
 	return nSize;
 }
 
-static LPITEMIDLIST CopyPIDL(LPCITEMIDLIST pidl)
+static LPITEMIDLIST CopyPIDL (LPCITEMIDLIST pidl)
 {
 	int cb = GetPIDLSize(pidl); // Calculate size of list.
 
@@ -851,14 +438,7 @@ qWarning() << paths << pidl;
 
 	d->pContextMenu->QueryContextMenu(d->menu, 0, MIN_ID, MAX_ID, CMF_NORMAL | CMF_EXPLORE | CMF_CANRENAME);
 
-	QPixmap pixmap(style()->standardPixmap(QStyle::SP_ComputerIcon, 0, this));
-	HBITMAP hBitmap = pixmap.toWinHBITMAP(QPixmap::Alpha);
-	AppendMenu(d->menu, MF_BITMAP, size, (LPCTSTR)hBitmap);
-
-	d->registerHook(d->hWnd);
-	HookWndProc(d->hWnd, WM_INITMENU, (WPARAM)d->menu, 0);
 	d->parseNativeMenu(d->menu, this);
-	d->unregisterHook(d->hWnd);
 }
 
 #include "moc_filecontextmenu.cpp"

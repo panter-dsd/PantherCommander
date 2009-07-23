@@ -3,10 +3,8 @@
 
 #include <QtCore/QStringList>
 
+#include <QtGui/QAction>
 #include <QtGui/QMenu>
-#include <QtGui/QPixmap>
-#include <QtGui/QWidget>
-#include <QtGui/QWidgetAction>
 
 class FileContextMenuPrivate;
 class FileContextMenu : public QMenu
@@ -25,52 +23,25 @@ public:
 
 protected:
 	void moveEvent(QMoveEvent* event);
-	void paintEvent(QPaintEvent* event);
 
 private:
 	friend class FileContextMenuPrivate;
 	FileContextMenuPrivate* const d;
-	Q_PRIVATE_SLOT(d, void _q_aboutToShow())
-	Q_PRIVATE_SLOT(d, void _q_aboutToHide())
 	Q_PRIVATE_SLOT(d, void _q_nativeActionTriggered())
-
-	friend class EvilWidget;
 };
 
 
-class FileContextMenuActionPrivate;
-class FileContextMenuAction : public QWidgetAction
+class FileContextMenuAction : public QAction
 {
 	Q_OBJECT
 
 public:
-	explicit FileContextMenuAction(QObject* parent = 0);
-	virtual ~FileContextMenuAction();
+	explicit FileContextMenuAction(QObject* parent = 0) : QAction(parent),
+		itemData(0), itemUserData(0)
+	{}
 
-private:
-	FileContextMenuActionPrivate* const d;
-
-	friend class FileContextMenu;
-	friend class FileContextMenuPrivate;
-};
-
-
-class EvilWidget : public QWidget
-{
-	Q_OBJECT
-
-public:
-	explicit EvilWidget(QWidget* parent = 0);
-
-protected:
-	void paintEvent(QPaintEvent* event);
-
-private:
-	friend class FileContextMenuPrivate;
-
-	FileContextMenu* qmenu;
-	FileContextMenuAction* action;
-	bool drawn;
+	int itemData;
+	qint64 itemUserData;
 };
 
 #endif // FILECONTEXTEMNU_H

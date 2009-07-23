@@ -558,12 +558,7 @@ void FileWidgetPrivate::_q_showContextMenu(const QPoint& position)
 		menu.setPath(model->filePath(index));
 	else
 		menu.setPaths(q_ptr->selectedFiles());
-	static bool odd = false;
-	odd = !odd;
-	if(odd)
-		menu.exec(globalPos);
-	else
-		menu.executeNativeMenu(globalPos);
+	menu.executeNativeMenu(globalPos);
 #else
 	QMenu menu(view);
 	if(index.isValid())
@@ -897,7 +892,6 @@ void FileWidget::setDirectory(const QString& directory)
 #ifndef Q_CC_MSVC
 	#warning "TODO: must be configurable (message, beep, or something else)"
 #endif
-		QApplication::beep();
 #ifndef QT_NO_MESSAGEBOX
 		QMessageBox::critical(this, "", tr("You have no enought privilegies"));
 #endif
