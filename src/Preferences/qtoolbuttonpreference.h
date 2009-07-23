@@ -1,5 +1,3 @@
-#ifndef QTOOLBUTTONPREFERENCE_H
-#define QTOOLBUTTONPREFERENCE_H
 /********************************************************************
 * Copyright (C) PanteR
 *-------------------------------------------------------------------
@@ -23,16 +21,19 @@
 * Author:		PanteR
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
-//
+
+#ifndef QTOOLBUTTONPREFERENCE_H
+#define QTOOLBUTTONPREFERENCE_H
+
 class QLabel;
 class QLineEdit;
 class QListWidget;
 class QToolButton;
 class QAction;
-//
+
 #include <QtGui/QWidget>
 #include <QtGui/QIcon>
-//
+
 struct SToolBarButton
 {
 	QString qsCommand;
@@ -43,6 +44,7 @@ struct SToolBarButton
 	QIcon qiIcon;
 	QString qsCaption;
 };
+
 class QToolButtonPreference : public QWidget
 {
 	Q_OBJECT

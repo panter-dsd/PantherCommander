@@ -17,7 +17,7 @@
 #  include <qt_windows.h>
 #  include <private/qpixmapdata_p.h>
 #endif
-//
+
 QToolButtonPreference::QToolButtonPreference(QWidget* parent)
 		:QWidget(parent)
 {
@@ -25,7 +25,7 @@ QToolButtonPreference::QToolButtonPreference(QWidget* parent)
 	setLayouts();
 	setConnects();
 }
-//
+
 void QToolButtonPreference::createControls()
 {
 	qlCommand = new QLabel(tr("Command"), this);
@@ -60,7 +60,7 @@ void QToolButtonPreference::createControls()
 	qlCaption = new QLabel(tr("Caption"), this);
 	qleCaption = new QLineEdit(this);
 }
-//
+
 void QToolButtonPreference::setLayouts()
 {
 	QGridLayout* qglMainLayout = new QGridLayout();
@@ -92,7 +92,7 @@ void QToolButtonPreference::setLayouts()
 
 	this->setLayout(qglMainLayout);
 }
-//
+
 void QToolButtonPreference::setConnects()
 {
 	connect(qtbCommand, SIGNAL(clicked()),
@@ -104,7 +104,7 @@ void QToolButtonPreference::setConnects()
 	connect(qleIconFile, SIGNAL(textChanged(QString)),
 			this, SLOT(slotGetIconList(QString)));
 }
-//
+
 void QToolButtonPreference::slotChooseCommandFile()
 {
 	QString command;
@@ -124,7 +124,7 @@ void QToolButtonPreference::slotChooseCommandFile()
 		qleCaption->setText(QFileInfo(command).baseName());
 	}
 }
-//
+
 void QToolButtonPreference::slotChooseWorkDir()
 {
 	QString dir;
@@ -138,7 +138,7 @@ void QToolButtonPreference::slotChooseWorkDir()
 	if (!dir.isEmpty())
 		qleWorkDir->setText(QDir::toNativeSeparators(dir));
 }
-//
+
 void QToolButtonPreference::slotChooseIconFile()
 {
 	QString iconFileName;
@@ -155,12 +155,12 @@ void QToolButtonPreference::slotChooseIconFile()
 	if (!iconFileName.isEmpty())
 		qleIconFile->setText(QDir::toNativeSeparators(iconFileName));
 }
-//
+
 void QToolButtonPreference::slotGetIconList(const QString& iconFileName)
 {
 #ifdef Q_WS_WIN
 	qlwIcons->clear();
-	HICON smallIcon,lageIcon;
+	HICON smallIcon = 0, lageIcon = 0;
 	UINT iconCount = ExtractIconEx((wchar_t*)iconFileName.utf16(), -1, 0, 0, 0);
 	QListWidgetItem* item;
 	for (int i = 0; i < int(iconCount); i++) {
@@ -190,7 +190,7 @@ void QToolButtonPreference::slotGetIconList(const QString& iconFileName)
 	qlwIcons->setCurrentItem(qlwIcons->item(0));
 #endif
 }
-//
+
 void QToolButtonPreference::setButton(const SToolBarButton& button)
 {
 	stbbButton = button;
@@ -201,9 +201,11 @@ void QToolButtonPreference::setButton(const SToolBarButton& button)
 	qleCaption->setText(button.qsCaption);
 	qlwIcons->setCurrentItem(qlwIcons->item(button.iconNumber));
 }
-//
+
 SToolBarButton QToolButtonPreference::getButton()
 {
+	if (qleCommand->text().isEmpty())
+		return SToolBarButton();
 	stbbButton.qsCommand = qleCommand->text();
 	stbbButton.qsParams = qleParams->text();
 	stbbButton.qsWorkDir = qleWorkDir->text();
@@ -215,10 +217,12 @@ SToolBarButton QToolButtonPreference::getButton()
 	}
 	return stbbButton;
 }
-//
+
 SToolBarButton QToolButtonPreference::getButton(const QString& command)
 {
 	SToolBarButton button;
+	if (command.isEmpty())
+		return button;
 	button.qsCommand = QDir::toNativeSeparators(command);
 	button.qsWorkDir = QDir::toNativeSeparators(QFileInfo(command).absolutePath());
 	button.qsIconFile = button.qsCommand;
@@ -251,4 +255,3 @@ SToolBarButton QToolButtonPreference::getButton(const QString& command)
 #endif
 	return button;
 }
-//
