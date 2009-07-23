@@ -3,7 +3,6 @@ DEPENDPATH	+= $$PWD
 
 HEADERS	+= $$PWD/appsettings.h \
 		$$PWD/mainwindowimpl.h \
-		$$PWD/qfilelistsortfilterproxymodel.h \
 		$$PWD/qfilepanel.h \
 		$$PWD/qfileoperationsdialog.h \
 		$$PWD/qfileoperationsthread.h \
@@ -16,7 +15,6 @@ HEADERS	+= $$PWD/appsettings.h \
 SOURCES	+= $$PWD/main.cpp \
 		$$PWD/appsettings.cpp \
 		$$PWD/mainwindowimpl.cpp \
-		$$PWD/qfilelistsortfilterproxymodel.cpp \
 		$$PWD/qfilepanel.cpp \
 		$$PWD/qfileoperationsdialog.cpp \
 		$$PWD/qfileoperationsthread.cpp \
