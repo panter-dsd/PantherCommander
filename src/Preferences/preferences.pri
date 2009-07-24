@@ -6,11 +6,13 @@ HEADERS		+= $$PWD/qabstractpreferencespage.h \
 		$$PWD/qpreferenceglobal.h \
 		$$PWD/qpreferencesdialog.h \
 		$$PWD/qtoolbuttonpreference.h \
-		$$PWD/pccommandsdialog.h
+		$$PWD/pccommandsdialog.h \
+		$$PWD/pccommandspreference.h
 
 SOURCES		+= $$PWD/qabstractpreferencespage.cpp \
 		$$PWD/qinterfacepreference.cpp \
 		$$PWD/qpreferenceglobal.cpp \
 		$$PWD/qpreferencesdialog.cpp \
 		$$PWD/qtoolbuttonpreference.cpp \
-		$$PWD/pccommandsdialog.cpp
+		$$PWD/pccommandsdialog.cpp \
+		$$PWD/pccommandspreference.cpp

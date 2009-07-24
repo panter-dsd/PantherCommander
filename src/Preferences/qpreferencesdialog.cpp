@@ -24,11 +24,12 @@
 
 #include <QtGui>
 #include "qpreferencesdialog.h"
-//
+
 #include "qpreferenceglobal.h"
 #include "qinterfacepreference.h"
-//
-QPreferencesDialog::QPreferencesDialog(QWidget * parent, Qt::WFlags f)
+#include "pccommandspreference.h"
+
+QPreferencesDialog::QPreferencesDialog(QWidget * parent, Qt::WindowFlags f)
 	: QDialog(parent,f)
 {
 	this->setWindowTitle(tr("Preferences"));
@@ -49,20 +50,28 @@ void QPreferencesDialog::createControls()
 	qlwPreferencesList=new QListWidget(this);
 	QStringList qslPreferenceItems;
 	qslPreferenceItems << QPreferenceGlobal::preferenceGroup()
-			<< QInterfacePreference::preferenceGroup();
+			<< QInterfacePreference::preferenceGroup()
+			<< PCCommandsPreference::preferenceGroup();
 	qlwPreferencesList->addItems(qslPreferenceItems);
 	qlwPreferencesList->setCurrentRow(0);
 	setMaximumSizePreferencesList();
 
 	QScrollArea *area;
 	qswPreferencesWidgets=new QStackedWidget();
+
 	area=new QScrollArea(this);
 	area->setWidgetResizable(true);
 	area->setWidget(new QPreferenceGlobal(qswPreferencesWidgets));
 	qswPreferencesWidgets->addWidget(area);
+
 	area=new QScrollArea(this);
 	area->setWidgetResizable(true);
 	area->setWidget(new QInterfacePreference(qswPreferencesWidgets));
+	qswPreferencesWidgets->addWidget(area);
+
+	area=new QScrollArea(this);
+	area->setWidgetResizable(true);
+	area->setWidget(new PCCommandsPreference(qswPreferencesWidgets));
 	qswPreferencesWidgets->addWidget(area);
 
 	qdbbButtons=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Apply|QDialogButtonBox::Cancel,

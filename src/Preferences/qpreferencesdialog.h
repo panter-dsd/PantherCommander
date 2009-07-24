@@ -48,7 +48,7 @@ private:
 	void setConnects();
 	void setMaximumSizePreferencesList();
 public:
-	QPreferencesDialog(QWidget * parent = 0, Qt::WFlags f = Qt::WindowSystemMenuHint);
+	QPreferencesDialog(QWidget * parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
 	~QPreferencesDialog();
 private Q_SLOTS:
 	void slotSavePreferences();

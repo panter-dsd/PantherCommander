@@ -25,10 +25,8 @@
 #ifndef PCCOMMANDSDIALOG_H
 #define PCCOMMANDSDIALOG_H
 
-class QListWidget;
-class QTableWidget;
+class PCCommandsPreference;
 class QDialogButtonBox;
-class QAction;
 
 #include <QDialog>
 
@@ -37,8 +35,7 @@ class PCCommandsDialog : public QDialog
 	Q_OBJECT
 
 private:
-	QListWidget *qlwCategoryList;
-	QTableWidget *qtwActionsTable;
+	PCCommandsPreference *commandReference;
 	QDialogButtonBox *qdbbButtons;
 
 public:
@@ -47,16 +44,11 @@ public:
 	QAction* getCurrentAction();
 	QString getCurrentActionName();
 
-private:
-	void createControls();
-	void setLayouts();
-	void loadCategories();
-	void setMaximumSizeCategoriesList();
 	void loadSettings();
 	void saveSetings();
 
 private Q_SLOTS:
-	void loadActions(const QString &category = 0);
+	void saveAndAccept();
 };
 
 #endif // PCCOMMANDSDIALOG_H

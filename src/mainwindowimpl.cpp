@@ -293,7 +293,7 @@ void MainWindowImpl::createActions()
 	connect(actionPreferences, SIGNAL(triggered(bool)),
 			this, SLOT(slotPreferences()));
 	addAction(actionPreferences);
-	PCCommands::instance()->addAction(tr("Preferences"), actionFindFiles);
+	PCCommands::instance()->addAction(tr("Preferences"), actionPreferences);
 }
 //
 void MainWindowImpl::createMenus()
