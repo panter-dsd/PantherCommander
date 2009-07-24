@@ -287,11 +287,11 @@ static QDateTime readMSDosDate(const uchar *src)
     quint64 uDate;
     uDate = (quint64)(dosDate >> 16);
     uint tm_mday = (uDate & 0x1f);
-    uint tm_mon =  ((uDate & 0x1E0) / 0x20);
-    uint tm_year = (((uDate & 0x0FE00) / 0x0200) + 1980);
-    uint tm_hour = ((dosDate & 0xF800) / 0x800);
-    uint tm_min =  ((dosDate & 0x7E0) / 0x20);
-    uint tm_sec =  ((dosDate & 0x1f) * 2);
+    uint tm_mon =  ((uDate & 0x1E0) >> 5);
+    uint tm_year = (((uDate & 0x0FE00) >> 9) + 1980);
+    uint tm_hour = ((dosDate & 0xF800) >> 11);
+    uint tm_min =  ((dosDate & 0x7E0) >> 5);
+    uint tm_sec =  ((dosDate & 0x1f) << 1);
 
     return QDateTime(QDate(tm_year, tm_mon, tm_mday), QTime(tm_hour, tm_min, tm_sec));
 }
