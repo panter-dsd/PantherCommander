@@ -32,6 +32,7 @@ class QPushButton;
 class QGroupBox;
 class QDialogButtonBox;
 class QHBoxLayout;
+class QVBoxLayout;
 class PCShortcutEdit;
 class PCShortcutWidget;
 
@@ -54,6 +55,8 @@ private:
 	QPushButton *qpbRemoveShortcut;
 	QHBoxLayout *qhblButtonsLayout;
 	QDialogButtonBox *qdbbButtons;
+
+	QVBoxLayout* m_shortcutsLayout;
 
 public:
 	PCCommandEditDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint);
