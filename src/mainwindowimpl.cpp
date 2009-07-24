@@ -1118,9 +1118,16 @@ void MainWindowImpl::slotSetDisc(const QString& path)
 
 void MainWindowImpl::slotAddToolBar()
 {
+	bool ok;
 	QString qsToolBarName = QInputDialog::getText(this,
 												  tr("Set toolbar name"),
-												  tr("Name"));
+												  tr("Name"),
+												  QLineEdit::Normal,
+												  QString(),
+												  &ok);
+	if (!ok)
+		return;
+
 	if (qsToolBarName.isEmpty()) {
 		QMessageBox::critical(this, "", tr("Toolbar name is empty. Break."));
 		return;
@@ -1177,11 +1184,15 @@ void MainWindowImpl::slotRenameToolBar()
 		return;
 
 	QString qsName = toolBar->name();
+	bool ok;
 	QString qsToolBarNewName = QInputDialog::getText(this,
 												  tr("Set toolbar name"),
 												  tr("Name"),
 												  QLineEdit::Normal,
-												  qsName);
+												  qsName,
+												  &ok);
+	if (!ok)
+		return;
 
 	if (qsToolBarNewName.isEmpty()) {
 		QMessageBox::critical(this, "", tr("Toolbar name is empty. Break."));
@@ -1282,7 +1293,7 @@ QMenu* MainWindowImpl::createToolBarsMenu(PCToolBar *currentToolBar)
 		menuAction->setCheckable(true);
 		menuAction->setChecked(toolBar->isVisible());
 		connect(menuAction, SIGNAL(triggered(bool)),
-				toolBar, SLOT(setShown(bool)));
+				toolBar, SLOT(setVisible(bool)));
 		showHideMenu->addAction(menuAction);
 		if (toolBar == currentToolBar)
 			showHideMenu->setDefaultAction(menuAction);

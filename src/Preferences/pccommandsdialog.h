@@ -42,7 +42,8 @@ private:
 	QDialogButtonBox *qdbbButtons;
 
 public:
-	PCCommandsDialog(QWidget* parent = 0);
+	PCCommandsDialog(QWidget* parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
+	~PCCommandsDialog();
 	QAction* getCurrentAction();
 	QString getCurrentActionName();
 
@@ -50,6 +51,9 @@ private:
 	void createControls();
 	void setLayouts();
 	void loadCategories();
+	void setMaximumSizeCategoriesList();
+	void loadSettings();
+	void saveSetings();
 
 private Q_SLOTS:
 	void loadActions(const QString &category = 0);

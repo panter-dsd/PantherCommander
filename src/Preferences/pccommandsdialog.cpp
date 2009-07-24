@@ -36,12 +36,19 @@
 
 const QString allCategoryName = QObject::tr("All");
 
-PCCommandsDialog::PCCommandsDialog(QWidget* parent)
-		:QDialog(parent)
+PCCommandsDialog::PCCommandsDialog(QWidget* parent, Qt::WindowFlags f)
+		:QDialog(parent, f)
 {
 	createControls();
 	setLayouts();
 	loadCategories();
+	setMaximumSizeCategoriesList();
+	loadSettings();
+}
+
+PCCommandsDialog::~PCCommandsDialog()
+{
+	saveSetings();
 }
 
 void PCCommandsDialog::createControls()
@@ -58,6 +65,7 @@ void PCCommandsDialog::createControls()
 			<< tr("Tool tip");
 	qtwActionsTable->setHorizontalHeaderLabels(columns);
 	qtwActionsTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+	qtwActionsTable->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
 	qdbbButtons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
 									   Qt::Horizontal,
@@ -89,11 +97,11 @@ void PCCommandsDialog::loadCategories()
 
 void PCCommandsDialog::loadActions(const QString &category)
 {
-	QString qsCategoty = (category == allCategoryName) ? QString() : category;
+	QString qsCategory = (category == allCategoryName) ? QString() : category;
 	QTableWidgetItem *item;
 
 	qtwActionsTable->setRowCount(0);
-	QList<QAction*> l = PCCommands::instance()->actions(qsCategoty);
+	QList<QAction*> l = PCCommands::instance()->actions(qsCategory);
 	qtwActionsTable->setRowCount(l.count());
 
 	int i = 0;
@@ -123,4 +131,39 @@ QString PCCommandsDialog::getCurrentActionName()
 {
 	QAction *action = getCurrentAction();
 	return action ? action->objectName() : QString();
+}
+
+void PCCommandsDialog::setMaximumSizeCategoriesList()
+{
+	qlwCategoryList->setMaximumWidth(50);
+	for (int i = 0; i < qlwCategoryList->count(); i++) {
+		int iWidth = QFontMetrics(qlwCategoryList->font()).width(qlwCategoryList->item(i)->text()) + 50;
+		if (qlwCategoryList->maximumWidth() < iWidth) {
+			qlwCategoryList->setMaximumWidth(iWidth);
+		}
+	}
+}
+
+void PCCommandsDialog::loadSettings()
+{
+	QSettings* settings = AppSettings::instance();
+	settings->beginGroup("CommandsDialog");
+	move(settings->value("pos", QPoint(0, 0)).toPoint());
+	resize(settings->value("size", QSize(640, 480)).toSize());
+	if(settings->value("IsMaximized", false).toBool())
+		showMaximized();
+	settings->endGroup();
+}
+
+void PCCommandsDialog::saveSetings()
+{
+	QSettings* settings = AppSettings::instance();
+	settings->beginGroup("CommandsDialog");
+	settings->setValue("IsMaximized", isMaximized());
+	if(!isMaximized()) {
+		settings->setValue("pos", pos());
+		settings->setValue("size", size());
+	}
+	settings->endGroup();
+	settings->sync();
 }
