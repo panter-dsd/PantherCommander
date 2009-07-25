@@ -165,11 +165,18 @@ void PCCommandsPreference::loadActions(const QString &category)
 		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 		qtwActionsTable->setItem(i, TOOLTTIP, item);
 
-		item = new QTableWidgetItem(action->shortcut().toString());
+		QStringList qslShortcuts;
+		foreach(const QKeySequence& ks, action->shortcuts()) {
+			qslShortcuts << ks;
+		}
+		item = new QTableWidgetItem(qslShortcuts.join(QLatin1String("\n")));
 		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 		qtwActionsTable->setItem(i++, SHORTCUT, item);
 	}
 	emit filterChange(qleFilter->text());
+	qtwActionsTable->resizeRowsToContents();
+	qtwActionsTable->resizeColumnsToContents();
+//	qtwActionsTable->resizeRowsToContents();
 }
 
 void PCCommandsPreference::filterChange(const QString &filter)
