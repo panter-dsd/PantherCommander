@@ -24,35 +24,43 @@
 
 #ifndef QPREFERENCESDIALOG_H
 #define QPREFERENCESDIALOG_H
-//
+
 class QListWidget;
 class QStackedWidget;
 class QDialogButtonBox;
 class QPushButton;
-//
+
 #include <QDialog>
-//
-#include "qabstractpreferencespage.h"
-//
+
 class QPreferencesDialog : public QDialog
 {
-Q_OBJECT
+	Q_OBJECT
+
 private:
-	QListWidget*					qlwPreferencesList;
-	QStackedWidget*			qswPreferencesWidgets;
-	QDialogButtonBox*		qdbbButtons;
-	QPushButton*					qpbSetDefaults;
+	QListWidget *qlwPreferencesList;
+	QStackedWidget *qswPreferencesWidgets;
+	QDialogButtonBox *qdbbButtons;
+	QPushButton *qpbSetDefaults;
+
 private:
 	void createControls();
 	void setLayouts();
 	void setConnects();
 	void setMaximumSizePreferencesList();
+	void loadSettings();
+	void saveSattings();
+
 public:
 	QPreferencesDialog(QWidget * parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
 	~QPreferencesDialog();
+
 private Q_SLOTS:
 	void slotSavePreferences();
-	void slotSavePreferencesAndExit() {slotSavePreferences(); close();}
+	void slotSavePreferencesAndExit()
+	{
+		slotSavePreferences();
+		close();
+	}
 	void slotSetApplyEnabled();
 	void slotSetDefaults();
 };

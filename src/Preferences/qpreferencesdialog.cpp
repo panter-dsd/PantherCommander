@@ -22,32 +22,40 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-#include <QtGui>
+#include <QtGui/QListWidget>
+#include <QtGui/QStackedWidget>
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QPushButton>
+#include <QtGui/QScrollArea>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
+
 #include "qpreferencesdialog.h"
 
+#include "qabstractpreferencespage.h"
 #include "qpreferenceglobal.h"
 #include "qinterfacepreference.h"
 #include "pccommandspreference.h"
+#include "appsettings.h"
 
 QPreferencesDialog::QPreferencesDialog(QWidget * parent, Qt::WindowFlags f)
 	: QDialog(parent,f)
 {
-	this->setWindowTitle(tr("Preferences"));
+	setWindowTitle(tr("Preferences"));
 	createControls();
 	setLayouts();
 	setConnects();
-	qdbbButtons->button(QDialogButtonBox::Apply)->setEnabled(false);
-	this->resize(640,480);
+	loadSettings();
 }
 //
 QPreferencesDialog::~QPreferencesDialog()
 {
-
+	saveSattings();
 }
 //
 void QPreferencesDialog::createControls()
 {
-	qlwPreferencesList=new QListWidget(this);
+	qlwPreferencesList = new QListWidget(this);
 	QStringList qslPreferenceItems;
 	qslPreferenceItems << QPreferenceGlobal::preferenceGroup()
 			<< QInterfacePreference::preferenceGroup()
@@ -57,100 +65,88 @@ void QPreferencesDialog::createControls()
 	setMaximumSizePreferencesList();
 
 	QScrollArea *area;
-	qswPreferencesWidgets=new QStackedWidget();
+	qswPreferencesWidgets = new QStackedWidget();
 
-	area=new QScrollArea(this);
+	area = new QScrollArea(this);
 	area->setWidgetResizable(true);
 	area->setWidget(new QPreferenceGlobal(qswPreferencesWidgets));
 	qswPreferencesWidgets->addWidget(area);
 
-	area=new QScrollArea(this);
+	area = new QScrollArea(this);
 	area->setWidgetResizable(true);
 	area->setWidget(new QInterfacePreference(qswPreferencesWidgets));
 	qswPreferencesWidgets->addWidget(area);
 
-	area=new QScrollArea(this);
+	area = new QScrollArea(this);
 	area->setWidgetResizable(true);
 	area->setWidget(new PCCommandsPreference(qswPreferencesWidgets));
 	qswPreferencesWidgets->addWidget(area);
 
-	qdbbButtons=new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Apply|QDialogButtonBox::Cancel,
-				Qt::Horizontal,
-				this);
+	qdbbButtons = new QDialogButtonBox(QDialogButtonBox::Ok
+									   |QDialogButtonBox::Apply
+									   |QDialogButtonBox::Cancel,
+									   Qt::Horizontal,
+									   this);
 
-	qpbSetDefaults=new QPushButton(tr("Default"),qdbbButtons);
-	qdbbButtons->addButton(qpbSetDefaults,QDialogButtonBox::ApplyRole);
+	qpbSetDefaults = new QPushButton(tr("Default"), qdbbButtons);
+	qdbbButtons->addButton(qpbSetDefaults, QDialogButtonBox::ApplyRole);
+	qdbbButtons->button(QDialogButtonBox::Apply)->setEnabled(false);
 }
 //
 void QPreferencesDialog::setLayouts()
 {
-	QHBoxLayout* qhblPreferencesLayout=new QHBoxLayout();
+	QHBoxLayout* qhblPreferencesLayout = new QHBoxLayout();
 	qhblPreferencesLayout->addWidget(qlwPreferencesList);
 	qhblPreferencesLayout->addWidget(qswPreferencesWidgets);
 
-	QVBoxLayout* qvblMainLayout=new QVBoxLayout();
+	QVBoxLayout* qvblMainLayout = new QVBoxLayout();
 	qvblMainLayout->addLayout(qhblPreferencesLayout);
 	qvblMainLayout->addWidget(qdbbButtons);
-	this->setLayout(qvblMainLayout);
+
+	setLayout(qvblMainLayout);
 }
 //
 void QPreferencesDialog::setConnects()
 {
-	connect(qdbbButtons,
-				SIGNAL(accepted()),
-				this,
-				SLOT(slotSavePreferencesAndExit()));
-	connect(qdbbButtons,
-				SIGNAL(rejected()),
-				this,
-				SLOT(reject()));
-	connect(qdbbButtons->button(QDialogButtonBox::Apply),
-				SIGNAL(clicked()),
-				this,
-				SLOT(slotSavePreferences()));
-	connect(qpbSetDefaults,
-			SIGNAL(clicked()),
-			this,
-			SLOT(slotSetDefaults()));
-	connect(qlwPreferencesList,
-				SIGNAL(currentRowChanged (int)),
-				qswPreferencesWidgets,
-				SLOT(setCurrentIndex(int)));
-	for (int i=0; i<qswPreferencesWidgets->count(); i++)
-	{
-		QScrollArea *area=qobject_cast<QScrollArea*>(qswPreferencesWidgets->widget(i));
+	connect(qdbbButtons, 	SIGNAL(accepted()),
+				this, SLOT(slotSavePreferencesAndExit()));
+	connect(qdbbButtons, SIGNAL(rejected()),
+				this, SLOT(reject()));
+	connect(qdbbButtons->button(QDialogButtonBox::Apply), SIGNAL(clicked()),
+				this, SLOT(slotSavePreferences()));
+	connect(qpbSetDefaults, SIGNAL(clicked()),
+			this, SLOT(slotSetDefaults()));
+
+	connect(qlwPreferencesList, SIGNAL(currentRowChanged (int)),
+				qswPreferencesWidgets, SLOT(setCurrentIndex(int)));
+
+	for (int i = 0; i < qswPreferencesWidgets->count(); i++) {
+		QScrollArea *area = qobject_cast<QScrollArea*>(qswPreferencesWidgets->widget(i));
 		if (!area)
 			continue;
-		QAbstractPreferencesPage *widget=qobject_cast<QAbstractPreferencesPage*>(area->widget());
+		QAbstractPreferencesPage *widget = qobject_cast<QAbstractPreferencesPage*>(area->widget());
 		if (widget)
-			connect(widget,
-						SIGNAL(modified()),
-						this,
-						SLOT(slotSetApplyEnabled()));
+			connect(widget, SIGNAL(modified()), this, SLOT(slotSetApplyEnabled()));
 	}
 }
 //
 void QPreferencesDialog::setMaximumSizePreferencesList()
 {
 	qlwPreferencesList->setMaximumWidth(50);
-	for (int i=0; i<qlwPreferencesList->count(); i++)
-	{
-		int iWidth=QFontMetrics(qlwPreferencesList->font()).width(qlwPreferencesList->item(i)->text())+50;
-		if (qlwPreferencesList->maximumWidth()<iWidth)
-		{
+	for (int i = 0; i < qlwPreferencesList->count(); i++) {
+		int iWidth = QFontMetrics(qlwPreferencesList->font()).width(qlwPreferencesList->item(i)->text()) + 50;
+		if (qlwPreferencesList->maximumWidth() < iWidth)
 			qlwPreferencesList->setMaximumWidth(iWidth);
-		}
 	}
 }
 //
 void QPreferencesDialog::slotSavePreferences()
 {
-	for (int i=0; i<qswPreferencesWidgets->count(); i++)
-	{
-		QScrollArea *area=qobject_cast<QScrollArea*>(qswPreferencesWidgets->widget(i));
+	for (int i = 0; i < qswPreferencesWidgets->count(); i++) {
+		QScrollArea *area = qobject_cast<QScrollArea*>(qswPreferencesWidgets->widget(i));
 		if (!area)
 			continue;
-		QAbstractPreferencesPage *widget=qobject_cast<QAbstractPreferencesPage*>(area->widget());
+		QAbstractPreferencesPage *widget = qobject_cast<QAbstractPreferencesPage*>(area->widget());
 		if (widget)
 			widget->saveSettings();
 	}
@@ -164,15 +160,38 @@ void QPreferencesDialog::slotSetApplyEnabled()
 //
 void QPreferencesDialog::slotSetDefaults()
 {
-	for (int i=0; i<qswPreferencesWidgets->count(); i++)
-	{
-		QScrollArea *area=qobject_cast<QScrollArea*>(qswPreferencesWidgets->widget(i));
+	for (int i = 0; i < qswPreferencesWidgets->count(); i++) {
+		QScrollArea *area = qobject_cast<QScrollArea*>(qswPreferencesWidgets->widget(i));
 		if (!area)
 			continue;
-		QAbstractPreferencesPage *widget=qobject_cast<QAbstractPreferencesPage*>(area->widget());
+		QAbstractPreferencesPage *widget = qobject_cast<QAbstractPreferencesPage*>(area->widget());
 		if (widget)
 			widget->setDefaults();
 	}
 }
 //
+
+void QPreferencesDialog::loadSettings()
+{
+	QSettings* settings = AppSettings::instance();
+	settings->beginGroup("PreferencesDialog");
+	move(settings->value("pos", QPoint(0, 0)).toPoint());
+	resize(settings->value("size", QSize(640, 480)).toSize());
+	if(settings->value("IsMaximized", false).toBool())
+		showMaximized();
+	settings->endGroup();
+}
+
+void QPreferencesDialog::saveSattings()
+{
+	QSettings* settings = AppSettings::instance();
+	settings->beginGroup("PreferencesDialog");
+	settings->setValue("IsMaximized", isMaximized());
+	if(!isMaximized()) {
+		settings->setValue("pos", pos());
+		settings->setValue("size", size());
+	}
+	settings->endGroup();
+	settings->sync();
+}
 
