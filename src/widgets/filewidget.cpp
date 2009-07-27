@@ -177,6 +177,8 @@ void FileWidgetPrivate::createWidgets()
 
 	QObject::connect(pathLineEdit, SIGNAL(returnPressed()),
 						q, SLOT(_q_addressChanged()));
+	QObject::connect(pathLineEdit, SIGNAL(returnPressed()),
+						treeView, SLOT(setFocus()));
 
 	createActions();
 	QFrame* frame = new QFrame(q);
@@ -594,12 +596,16 @@ void FileWidgetPrivate::_q_addressChanged()
 {
 	Q_Q(FileWidget);
 
-	q->setDirectory(pathLineEdit->text());
+	QString newPath = QDir::fromNativeSeparators(pathLineEdit->text());
+	q->setDirectory(newPath);
 
 	QString path = rootPath();
-	if(QFileOperationsThread::isLocalFileSystem(path))
-		path = QDir::toNativeSeparators(path);
-	pathLineEdit->setText(path);
+	if(path != newPath)
+	{
+		if(QFileOperationsThread::isLocalFileSystem(path))
+			path = QDir::toNativeSeparators(path);
+		pathLineEdit->setText(path);
+	}
 }
 
 /*!
@@ -640,12 +646,6 @@ void FileWidgetPrivate::_q_pathChanged(const QString& newPath)
 		path = QDir::toNativeSeparators(newPath);
 
 	pathLineEdit->setText(path);
-
-/*	if(path.endsWith(QLatin1Char('/')))
-		d->completer->setCompletionPrefix(path);
-	else
-		d->completer->setCompletionPrefix(path + QLatin1Char('/'));
-*/
 
 	dirInfo.clear();
 
