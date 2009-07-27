@@ -452,13 +452,6 @@ void MainWindowImpl::saveSettings()
 void MainWindowImpl::loadSettings()
 {
 	QSettings* settings = AppSettings::instance();
-	settings->beginGroup("MainWindow");
-	move(settings->value("pos", QPoint(0, 0)).toPoint());
-	resize(settings->value("size", QSize(640, 480)).toSize());
-	if(settings->value("IsMaximized", false).toBool())
-		showMaximized();
-	qsplitSplitter->restoreState(settings->value("Splitter").toByteArray());
-	settings->endGroup();
 
 	settings->beginGroup("Global");
 	setCommandHistory(settings->value("CommandHistory").toStringList());
@@ -486,7 +479,14 @@ void MainWindowImpl::loadSettings()
 	qcbConsoleCommand->setVisible(qlConsolePath->isVisible());
 	qfCommandButtons->setVisible(settings->value("Interface/ShowFunctionButtons", true).toBool());
 
-	this->restoreState(settings->value("MainWindow/State", QByteArray()).toByteArray());
+	settings->beginGroup("MainWindow");
+	this->restoreState(settings->value("State", QByteArray()).toByteArray());
+	move(settings->value("pos", QPoint(0, 0)).toPoint());
+	resize(settings->value("size", QSize(640, 480)).toSize());
+	if(settings->value("IsMaximized", false).toBool())
+		showMaximized();
+	qsplitSplitter->restoreState(settings->value("Splitter").toByteArray());
+	settings->endGroup();
 }
 //
 void MainWindowImpl::showSplitterContextMenu(const QPoint& pos)
