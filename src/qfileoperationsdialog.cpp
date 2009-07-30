@@ -151,7 +151,8 @@ void QFileOperationsDialog::setConnects()
 	connect(qfotOperatinThread,
 			SIGNAL(currentFileCopyChanged(QString,QString)),
 			this,
-			SLOT(slotCurrentFileCopyChanged(QString,QString)));
+			SLOT(slotCurrentFileCopyChanged(QString,QString)),
+			Qt::BlockingQueuedConnection);
 	connect(qfotOperatinThread,
 			SIGNAL(operationError()),
 			this,
@@ -366,11 +367,17 @@ void QFileOperationsDialog::slotValueChanged(qint64 value)
 //
 void QFileOperationsDialog::slotCurrentFileCopyChanged(const QString& sourceFile,const QString& destFile)
 {
+	QString source = QDir::toNativeSeparators(sourceFile);
+
+	qlFrom->setText(qlFrom->fontMetrics().elidedText(source,Qt::ElideMiddle,qlFrom->width()));
+	qlFrom->setToolTip(source);
+
+	if (!destFile.isEmpty()) {
+		QString dest = QDir::toNativeSeparators(destFile);
+		qlTo->setText(qlTo->fontMetrics().elidedText(dest,Qt::ElideMiddle,qlTo->width()));
+		qlTo->setToolTip(dest);
+	}
 	qApp->processEvents();
-	qlFrom->setText(qlFrom->fontMetrics().elidedText(sourceFile,Qt::ElideMiddle,qlFrom->width()));
-	qlFrom->setToolTip(sourceFile);
-	qlTo->setText(qlTo->fontMetrics().elidedText(destFile,Qt::ElideMiddle,qlTo->width()));
-	qlTo->setToolTip(destFile);
 }
 //
 QString QFileOperationsDialog::jobName()

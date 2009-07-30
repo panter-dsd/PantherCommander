@@ -722,11 +722,10 @@ void MainWindowImpl::slotRemove(const QStringList& fileList)
 
 	QLabel* qlQuestion=new QLabel(tr("Do you really want to delete this file(s)?"),qdRemoveDialog);
 
-	QStringListModel* qslmStrings;
 	QStringList qslFiles = fileList.isEmpty() ? sourcePanel->selectedFiles() : fileList;
 	for (int i = 0; i < qslFiles.size(); i++)
 		qslFiles[i] = QDir::toNativeSeparators(qslFiles[i]);
-	qslmStrings=new QStringListModel(qslFiles, qdRemoveDialog);
+	QStringListModel *qslmStrings=new QStringListModel(qslFiles, qdRemoveDialog);
 
 	QListView* qlvStrings=new QListView(qdRemoveDialog);
 	qlvStrings->setModel(qslmStrings);
@@ -767,16 +766,16 @@ void MainWindowImpl::slotRemove(const QStringList& fileList)
 		{
 			queue=qlQueueList.at(queueIndex);
 		}
-		for (int i=0; i<qslmStrings->rowCount(); i++)
+		for (int i=0; i<qslFiles.count(); i++)
 		{
-			if (QFileInfo(qslmStrings->stringList().at(i)).isDir())
+			if (QFileInfo(qslFiles.at(i)).isDir())
 				queue=addJob(queue,
 					QFileOperationsThread::RemoveDirOperation,
-					QStringList() << qslmStrings->stringList().at(i)+QDir::separator());
+					QStringList() << qslFiles.at(i));
 			else
 				queue=addJob(queue,
 					QFileOperationsThread::RemoveFileOperation,
-					QStringList() << qslmStrings->stringList().at(i));
+					QStringList() << qslFiles.at(i));
 		}
 		queue->setBlocked(false);
 		sourcePanel->clearSelection();

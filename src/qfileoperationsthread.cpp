@@ -64,28 +64,33 @@ QFileOperationsThread::QFileOperationsThread(QObject* parent) : QThread(parent)
 
 bool QFileOperationsThread::copyFile(const QString& qsSourceFileName,const QString& qsDestFileName)
 {
+	QString source = qsSourceFileName, dest = qsDestFileName;
+	if (QFileInfo(dest).isDir()) {
+		dest += QFileInfo(source).fileName();
+	}
+
 	QStringList params;
-	params << QDir::toNativeSeparators(qsSourceFileName)
-			<< QDir::toNativeSeparators(qsDestFileName);
+	params << QDir::toNativeSeparators(source)
+			<< QDir::toNativeSeparators(dest);
 	lastError=FO_NO_ERROR;
 	lastErrorString.clear();
-	int bufSize=(isSameDisc(qsSourceFileName,qsDestFileName))
+	int bufSize=(isSameDisc(source,dest))
 			? iLocalBufferSize
 			: iNoLocalBufferSize;
-	emit currentFileCopyChanged(QDir::toNativeSeparators(qsSourceFileName),
-							QDir::toNativeSeparators(qsDestFileName));
+	emit currentFileCopyChanged(source,
+							dest);
 
-	if (qsSourceFileName==qsDestFileName)
+	if (source==dest)
 		return false;
 
-	QFile qfFirstFile(qsSourceFileName);
-	QFile qfSecondFile(qsDestFileName);
+	QFile qfFirstFile(source);
+	QFile qfSecondFile(dest);
 	if (qfSecondFile.exists())
 	{
 		lastError=FO_DEST_FILE_EXISTS;
 		if (!error(params))
 			return false;
-		if (!removeFile(qsDestFileName))
+		if (!removeFile(dest))
 			return false;
 	}
 	while (!qfFirstFile.open(QIODevice::ReadOnly))
@@ -175,12 +180,12 @@ bool QFileOperationsThread::copyFile(const QString& qsSourceFileName,const QStri
 	qfFirstFile.close();
 	qfSecondFile.close();
 //Change file date
-	copyFileTime(qsSourceFileName,qsDestFileName);
+	copyFileTime(source,dest);
 #ifndef Q_CC_MSVC
 	#warning "Need error?"
 #endif
 //Change attributes
-	copyPermisions(qsSourceFileName,qsDestFileName);
+	copyPermisions(source,dest);
 #ifndef Q_CC_MSVC
 	#warning "Need error?"
 #endif
@@ -265,7 +270,7 @@ bool QFileOperationsThread::removeFile(const QString& qsFileName)
 	lastError=FO_NO_ERROR;
 	lastErrorString.clear();
 
-	emit currentFileCopyChanged(QDir::toNativeSeparators(qsFileName),"");
+	emit currentFileCopyChanged(qsFileName,"");
 	emit changedPercent(0);
 	QFile file(qsFileName);
 	QFileInfo fileInfo(file);
@@ -336,24 +341,18 @@ void QFileOperationsThread::calculateDirSize(const QString& qsDir)
 {
 	QDir dir(qsDir);
 	dir.setFilter(QDir::AllEntries | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot);
-	QDirIterator it(dir);
-	while(it.hasNext())
-	{
+	QDirIterator it(dir, QDirIterator::Subdirectories);
+	while(it.hasNext()) {
 		it.next();
 
 		QFileInfo info(it.fileInfo());
-		if(info.isDir())
-		{
+		if(info.isDir()) {
 			++dirsCount;
-			calculateDirSize(info.absolutePath());
-		}
-		else
-		{
+		} else {
 			++filesCount;
 			dirSize += info.size();
 		}
 	}
-
 	emit changedDirSize(dirSize, dirsCount, filesCount);
 }
 
@@ -428,12 +427,12 @@ bool QFileOperationsThread::copyDir(const QString& qsDirName, const QString& qsD
 		QFileInfo info(it.fileInfo());
 		if(info.isDir())
 		{
-			if(!copyDir(info.absolutePath(), destDir.absolutePath()))
+			if(!copyDir(info.absoluteFilePath(), destDir.absolutePath()))
 				return false;
 		}
 		else
 		{
-			if(!copyFile(info.absoluteFilePath(), destDir.absolutePath() + QDir::separator() + info.fileName()))
+			if(!copyFile(info.absoluteFilePath(), destDir.absolutePath() + QDir::separator()))
 			{
 				if (isSkipFile || (confirmation & SKIP_ALL))
 				{
@@ -478,12 +477,11 @@ bool QFileOperationsThread::removeDir(const QString& qsDirName)
 		QFileInfo info(it.fileInfo());
 		if(info.isDir())
 		{
-			if(!removeDir(info.absolutePath()))
+			if(!removeDir(info.absoluteFilePath()))
 				return false;
 		}
 		else
 		{
-			emit currentFileCopyChanged(info.absoluteFilePath(), QString());
 			if(!removeFile(info.absoluteFilePath()))
 			{
 				if (isSkipFile || (confirmation & SKIP_ALL))
@@ -503,6 +501,7 @@ bool QFileOperationsThread::removeDir(const QString& qsDirName)
 	SetFileAttributes((wchar_t*)qsDirName.utf16(), 0);
 #endif
 //
+	emit currentFileCopyChanged(dir.absoluteFilePath(qsDirName), QString());
 	while (!dir.rmdir(qsDirName))
 	{
 		lastError=FO_REMOVE_ERROR;
