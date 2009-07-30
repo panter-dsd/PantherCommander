@@ -24,11 +24,11 @@ ${CMAKE_CURRENT_SOURCE_DIR}
 ################################################################
 
 set( exp_SOURCE
-exp/filecontextmenu.cpp
+#exp/filecontextmenu.cpp
 )
 
 set( exp_HEADERS
-exp/filecontextmenu.h
+#exp/filecontextmenu.h
 )
 
 
@@ -159,7 +159,7 @@ src/Preferences/qtoolbuttonpreference.h
 
 
 ################################################################
-# tools
+# tools 
 ################################################################
 
 set( tools_SOURCE
@@ -192,41 +192,42 @@ src/widgets/pcshortcutedit.h
 src/widgets/tabbar.h
 )
 
-set (SOURCES
-	${exp_SOURCE}
-	${src_SOURCE}
-	${models_SOURCE}
-	${dialogs_SOURCE}
+
+
+
+#qt4_wrap_cpp( MOC_SOURCES 
+#	${exp_HEADERS} 
+#	${src_HEADERS}
+#	${dialogs_HEADERS}  
+#	${io_HEADERS}
+#	${models_HEADERS} 
+#	${PantherViewer_HEADERS} 
+#	${Preferences_HEADERS} 
+#	${tools_HEADERS} 
+#	${widgets_HEADER})
+qt4_wrap_cpp( MOC_SOURCES 
+	${exp_SOURCE} 
+	${src_SOURCE} 
+	${models_SOURCE} 
+	${dialogs_SOURCE}  
 	${io_SOURCE}
-	${PantherViewer_SOURCE}
-	${Preferences_SOURCE}
-	${tools_SOURCE}
-	${widgets_SOURCE}
-)
-
-set (HEADERS
-	${exp_HEADERS}
-	${src_HEADERS}
-	${dialogs_HEADERS}
-	${io_HEADERS}
-	${models_HEADERS}
-	${PantherViewer_HEADERS}
-	${Preferences_HEADERS}
-	${tools_HEADERS}
-	${widgets_HEADER}
+	${PantherViewer_SOURCE} 
+	${Preferences_SOURCE} 
+	${tools_SOURCE} 
+	${widgets_SOURCE} 
 )
 
 
-qt4_wrap_cpp( MOC_SOURCES
-${HEADERS}
-)
-
-QT4_AUTOMOC(
-${SOURCES}
-)
-
-add_executable( PantherCommander
-${SOURCES}
+add_executable( PantherCommander 
+	${exp_SOURCE} 
+	${src_SOURCE} 
+	${models_SOURCE} 
+	${dialogs_SOURCE}  
+	${io_SOURCE}
+	${PantherViewer_SOURCE} 
+	${Preferences_SOURCE} 
+	${tools_SOURCE} 
+	${widgets_SOURCE} 
 	${MOC_SOURCES}
  )
 
