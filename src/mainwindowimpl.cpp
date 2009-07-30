@@ -474,7 +474,8 @@ void MainWindowImpl::loadSettings()
 
 	qdbDriveBarLeft->setVisible(settings->value("Interface/ShowDriveBar", true).toBool());
 	qdbDriveBarRight->setVisible(settings->value("Interface/ShowTwoDriveBar", true).toBool()
-				&& qdbDriveBarLeft->isVisible());
+				&& settings->value("Interface/ShowDriveBar", true).toBool());
+
 	qlConsolePath->setVisible(settings->value("Interface/ShowCommandLine", true).toBool());
 	qcbConsoleCommand->setVisible(qlConsolePath->isVisible());
 	qfCommandButtons->setVisible(settings->value("Interface/ShowFunctionButtons", true).toBool());

@@ -567,6 +567,8 @@ QString QFileOperationsDialog::normalizeFileName(const QString& name)
 
 	QString res(name);
 	res.replace(sep, QDir::separator());
+	if (res.startsWith(QDir::separator()))
+		res.insert(0, QDir::separator());
 	return res;
 }
 //
