@@ -83,6 +83,7 @@ private:
 	void createControls();
 	void setLayouts();
 	void setConnects();
+	static QIcon getIcon(const QString& fileName, int number);
 
 private Q_SLOTS:
 	void slotChooseCommandFile();

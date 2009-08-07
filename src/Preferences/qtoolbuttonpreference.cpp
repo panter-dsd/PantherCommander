@@ -195,32 +195,42 @@ void QToolButtonPreference::slotChooseIconFile()
 		qleIconFile->setText(QDir::toNativeSeparators(iconFileName));
 }
 
+QIcon QToolButtonPreference::getIcon(const QString& fileName, int number)
+{
+	QIcon icon;
+#ifdef Q_WS_WIN
+	HICON smallIcon, lageIcon;
+	if (ExtractIconEx((wchar_t*)fileName.utf16(), number, &lageIcon, &smallIcon, 1) > 0) {
+		ICONINFO info;
+		QPixmap pixmap;
+		//Lage
+		if (GetIconInfo(lageIcon, &info)) {
+			pixmap = QPixmap::fromWinHBITMAP(info.hbmColor, QPixmap::NoAlpha);
+			pixmap.setMask(QPixmap::fromWinHBITMAP(info.hbmMask, QPixmap::NoAlpha));
+			icon.addPixmap(pixmap);
+		}
+		//Small
+		if (GetIconInfo(smallIcon, &info)) {
+			pixmap = QPixmap::fromWinHBITMAP(info.hbmColor, QPixmap::NoAlpha);
+			pixmap.setMask(QPixmap::fromWinHBITMAP(info.hbmMask, QPixmap::NoAlpha));
+			icon.addPixmap(pixmap);
+		}
+		DestroyIcon(smallIcon);
+		DestroyIcon(lageIcon);
+	}
+#endif
+	return icon;
+}
+
 void QToolButtonPreference::slotGetIconList(const QString& iconFileName)
 {
 #ifdef Q_WS_WIN
 	qlwIcons->clear();
-	HICON smallIcon = 0, lageIcon = 0;
-	UINT iconCount = ExtractIconEx((wchar_t*)iconFileName.utf16(), -1, 0, 0, 0);
+	int iconCount = (int)ExtractIconEx((wchar_t*)iconFileName.utf16(), -1, 0, 0, 0);
 	QListWidgetItem* item;
-	for (int i = 0; i < int(iconCount); i++) {
-		if (ExtractIconEx((wchar_t*)iconFileName.utf16(), i, &lageIcon, &smallIcon, 1)) {
-			ICONINFO info;
-			QPixmap pixmap;
-			QIcon icon;
-			//Lage
-			GetIconInfo(lageIcon, &info);
-			pixmap = QPixmap::fromWinHBITMAP(info.hbmColor, QPixmap::NoAlpha);
-			pixmap.setMask(QPixmap::fromWinHBITMAP(info.hbmMask, QPixmap::NoAlpha));
-			icon.addPixmap(pixmap);
-			//Small
-			GetIconInfo(smallIcon, &info);
-			pixmap = QPixmap::fromWinHBITMAP(info.hbmColor, QPixmap::NoAlpha);
-			pixmap.setMask(QPixmap::fromWinHBITMAP(info.hbmMask, QPixmap::NoAlpha));
-			icon.addPixmap(pixmap);
-			//
-			item = new QListWidgetItem(icon, QString::number(i), qlwIcons);
+	for (int i = 0; i < iconCount; i++) {
+			item = new QListWidgetItem(getIcon(iconFileName, i), QString::number(i), qlwIcons);
 			qlwIcons->addItem(item);
-		}
 	}
 	if (qlwIcons->count() == 0) {
 		item = new QListWidgetItem(QFileIconProvider().icon(QFileInfo(iconFileName)), QString::number(0), qlwIcons);
@@ -268,23 +278,8 @@ SToolBarButton QToolButtonPreference::getButton(const QString& command)
 	button.qsCaption = QFileInfo(command).baseName();
 	button.iconNumber = -1;
 #ifdef Q_WS_WIN
-	HICON smallIcon, lageIcon;
-	UINT iconCount = ExtractIconEx((wchar_t*)button.qsIconFile.utf16(),-1,0,0,0);
-	if ((iconCount > 0) && (ExtractIconEx((wchar_t*)button.qsIconFile.utf16(), 0, &lageIcon, &smallIcon, 1) > 0)) {
-		ICONINFO info;
-		QPixmap pixmap;
-		QIcon icon;
-		//Lage
-		GetIconInfo(lageIcon, &info);
-		pixmap = QPixmap::fromWinHBITMAP(info.hbmColor, QPixmap::NoAlpha);
-		pixmap.setMask(QPixmap::fromWinHBITMAP(info.hbmMask, QPixmap::NoAlpha));
-		icon.addPixmap(pixmap);
-		//Small
-		GetIconInfo(smallIcon, &info);
-		pixmap = QPixmap::fromWinHBITMAP(info.hbmColor, QPixmap::NoAlpha);
-		pixmap.setMask(QPixmap::fromWinHBITMAP(info.hbmMask, QPixmap::NoAlpha));
-		icon.addPixmap(pixmap);
-		//
+	QIcon icon = getIcon(button.qsIconFile, 0);
+	if (!icon.isNull()) {
 		button.iconNumber = 0;
 		button.qiIcon = icon;
 	} else {
