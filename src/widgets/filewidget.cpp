@@ -704,8 +704,9 @@ void FileWidgetPrivate::_q_navigateToParent()
 {
 	Q_Q(FileWidget);
 
-	QString newDirectory;
+	QString newDirectory, oldDirectory;
 	QDir dir(model->rootDirectory());
+	oldDirectory = dir.dirName();
 	if(!dir.isRoot() && dir.cdUp())
 		newDirectory = dir.absolutePath();
 	if(newDirectory.isEmpty())
@@ -714,6 +715,7 @@ void FileWidgetPrivate::_q_navigateToParent()
 	const QPersistentModelIndex idx = rootIndex();
 	q->setDirectory(newDirectory);
 	(void)setCurrentIndex(idx);
+	setCurrentIndex(model->index(oldDirectory));
 }
 
 /*!
@@ -907,6 +909,7 @@ void FileWidget::setDirectory(const QString& directory)
 	d->newFolderAction->setEnabled(d->model->flags(root) & Qt::ItemIsDropEnabled);
 	if(root != d->rootIndex())
 		d->setRootIndex(root);
+	d->setCurrentIndex(d->model->index(0, 0, root));
 	emit directoryEntered(newDirectory);
 
 	//setUpdatesEnabled(true);
