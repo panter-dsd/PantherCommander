@@ -429,6 +429,40 @@ QString FileWidgetPrivate::size(qint64 bytes) const
 
 void FileWidgetPrivate::updateDirInfo()
 {
+	dirInfo.clear();
+
+	const QModelIndex parent = treeView->rootIndex();
+	int rowCount = treeView->model()->rowCount(parent);
+	for(int row = 0; row < rowCount; ++row)
+	{
+		const QModelIndex sourceIndex = mapToSource(treeView->model()->index(row, 0, parent));
+		if(model->isDir(sourceIndex))
+		{
+			if(model->fileName(sourceIndex) != QLatin1String(".."))
+				++dirInfo.dirsCount;
+		}
+		else
+		{
+			++dirInfo.filesCount;
+			dirInfo.filesSize += model->size(sourceIndex);
+		}
+	}
+
+	foreach(const QModelIndex& index, treeView->selectionModel()->selectedRows())
+	{
+		const QModelIndex sourceIndex = mapToSource(index);
+		if(model->isDir(sourceIndex))
+		{
+			if(model->fileName(sourceIndex) != QLatin1String(".."))
+				++dirInfo.dirsSelectedCount;
+		}
+		else
+		{
+			++dirInfo.filesSelectedCount;
+			dirInfo.filesSelectedSize += model->size(sourceIndex);
+		}
+	}
+
 	QString information = FileWidget::tr(
 		"Selected <b>%1</b> from <b>%2</b> in <b>%3</b>/<b>%4</b> files and <b>%5</b>/<b>%6</b> dirs"
 	).arg(size(dirInfo.filesSelectedSize))
@@ -448,7 +482,7 @@ void FileWidgetPrivate::updateDirInfo()
 */
 void FileWidgetPrivate::_q_rowsInserted(const QModelIndex& parent, int start, int end)
 {
-	for(int row = start; row <= end; ++row)
+/*	for(int row = start; row <= end; ++row)
 	{
 		const QModelIndex index = model->index(row, 0, parent);
 		if(model->isDir(index))
@@ -460,13 +494,13 @@ void FileWidgetPrivate::_q_rowsInserted(const QModelIndex& parent, int start, in
 			++dirInfo.filesCount;
 			dirInfo.filesSize += model->size(index);
 		}
-	}
+	}*/
 	updateDirInfo();
 }
 
 void FileWidgetPrivate::_q_rowsAboutToBeRemoved(const QModelIndex& parent, int start, int end)
 {
-	for(int row = start; row <= end; ++row)
+/*	for(int row = start; row <= end; ++row)
 	{
 		const QModelIndex index = model->index(row, 0, parent);
 		if(model->isDir(index))
@@ -478,30 +512,30 @@ void FileWidgetPrivate::_q_rowsAboutToBeRemoved(const QModelIndex& parent, int s
 			--dirInfo.filesCount;
 			dirInfo.filesSize -= model->size(index);
 		}
-	}
+	}*/
 	updateDirInfo();
 }
 
 void FileWidgetPrivate::_q_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
-	QList<int> rows;
+/*	QList<int> rows;
 
 	foreach(const QModelIndex& index, selected.indexes())
 	{
 		if(!rows.contains(index.row()))
+		{
 			rows.append(index.row());
-		else
-			continue;
 
-		const QModelIndex sourceIndex = mapToSource(index);
-		if(model->isDir(sourceIndex))
-		{
-			++dirInfo.dirsSelectedCount;
-		}
-		else
-		{
-			++dirInfo.filesSelectedCount;
-			dirInfo.filesSelectedSize += model->size(sourceIndex);
+			const QModelIndex sourceIndex = mapToSource(index);
+			if(model->isDir(sourceIndex))
+			{
+				++dirInfo.dirsSelectedCount;
+			}
+			else
+			{
+				++dirInfo.filesSelectedCount;
+				dirInfo.filesSelectedSize += model->size(sourceIndex);
+			}
 		}
 	}
 
@@ -510,22 +544,22 @@ void FileWidgetPrivate::_q_selectionChanged(const QItemSelection& selected, cons
 	foreach(const QModelIndex& index, deselected.indexes())
 	{
 		if(!rows.contains(index.row()))
+		{
 			rows.append(index.row());
-		else
-			continue;
 
-		const QModelIndex sourceIndex = mapToSource(index);
-		if(model->isDir(sourceIndex))
-		{
-			--dirInfo.dirsSelectedCount;
-		}
-		else
-		{
-			--dirInfo.filesSelectedCount;
-			dirInfo.filesSelectedSize -= model->size(sourceIndex);
+			const QModelIndex sourceIndex = mapToSource(index);
+			if(model->isDir(sourceIndex))
+			{
+				--dirInfo.dirsSelectedCount;
+			}
+			else
+			{
+				--dirInfo.filesSelectedCount;
+				dirInfo.filesSelectedSize -= model->size(sourceIndex);
+			}
 		}
 	}
-
+*/
 	updateDirInfo();
 }
 
@@ -647,8 +681,6 @@ void FileWidgetPrivate::_q_pathChanged(const QString& newPath)
 
 	pathLineEdit->setText(path);
 
-	dirInfo.clear();
-
 	QDir dir(model->rootDirectory());
 	navigateToParentAction->setEnabled(!dir.isRoot() && dir.exists());
 
@@ -667,6 +699,8 @@ void FileWidgetPrivate::_q_pathChanged(const QString& newPath)
 	navigateForwardAction->setEnabled(historyLocation + 1 < history.size());
 
 	treeView->setFocus();
+
+	updateDirInfo();
 }
 
 /*!

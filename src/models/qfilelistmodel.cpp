@@ -635,6 +635,9 @@ QModelIndex QFileListModel::setRootPath(const QString& path)
 
 	d->rootDir.setPath(path);
 	d->root.setFileInfo(QFileInfo(path));
+
+	emit rootPathChanged(d->rootDir.absolutePath());
+
 	d->fetchFileList();
 
 #ifndef QT_NO_FILESYSTEMWATCHER
@@ -645,8 +648,6 @@ QModelIndex QFileListModel::setRootPath(const QString& path)
 #endif
 		d->fileSystemWatcher->addPath(d->rootDir.absolutePath());
 #endif
-
-	emit rootPathChanged(d->rootDir.absolutePath());
 
 	return QModelIndex();
 }
