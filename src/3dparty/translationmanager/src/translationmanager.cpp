@@ -64,7 +64,7 @@ struct TranslationsData
 		// Qt's translations path
 		defaultPaths.append(QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 
-		foreach(const QString path, defaultPaths)
+		foreach(const QString& path, defaultPaths)
 		{
 			QDir dir(path);
 			if(dir.exists() && dir.isReadable())
@@ -102,7 +102,7 @@ struct TranslationsData
 		}
 		const QRegExp regexp(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
 		const QStringList nameFilter(pattern);
-		foreach(const QString path, searchPaths)
+		foreach(const QString& path, searchPaths)
 		{
 			QDir dir(path);
 			if(!dir.exists() || !dir.isReadable())
@@ -110,7 +110,7 @@ struct TranslationsData
 
 			QFileInfo fileInfo;
 			const QStringList fileNameList = dir.entryList(nameFilter);
-			foreach(const QString fname, fileNameList)
+			foreach(const QString& fname, fileNameList)
 			{
 				fileInfo.setFile(fname);
 				if(fileInfo.isReadable())
@@ -152,7 +152,7 @@ struct TranslationsData
 			QString translationFileName = nameFilters[i];
 			translationFileName.replace(QLatin1Char('*'), currentLanguage);
 
-			foreach(const QString path, searchPaths)
+			foreach(const QString& path, searchPaths)
 			{
 				const QString key = QString(nameFilters[i]).append(QLatin1Char('?')).append(path);
 				if(keys.contains(key))
