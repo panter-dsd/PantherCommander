@@ -819,14 +819,18 @@ bool QFileListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, 
 	Q_UNUSED(row);
 	Q_UNUSED(column);
 
-	if(!data->hasFormat("text/uri-list") || !parent.isValid() || isReadOnly())
+	if(!data->hasFormat("text/uri-list") || data->urls().isEmpty() || isReadOnly())
+		return false;
+
+	if(!(flags(parent) & (Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable)))
 		return false;
 
 	bool success = true;
-	QString to = filePath(parent) + QDir::separator();
 
 	QList<QUrl> urls = data->urls();
 	QList<QUrl>::const_iterator it = urls.constBegin();
+
+	QString destination = filePath(parent) + QDir::separator();
 
 	switch(action)
 	{
@@ -834,14 +838,14 @@ bool QFileListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, 
 			for(; it != urls.constEnd(); ++it)
 			{
 				QString path = (*it).scheme() == QLatin1String("file") ? (*it).toLocalFile() : (*it).toString();
-				success = QFile::copy(path, to + QFileInfo(path).fileName()) && success;
+				success = QFile::copy(path, destination + QFileInfo(path).fileName()) && success;
 			}
 			break;
 		case Qt::LinkAction:
 			for(; it != urls.constEnd(); ++it)
 			{
 				QString path = (*it).scheme() == QLatin1String("file") ? (*it).toLocalFile() : (*it).toString();
-				success = QFile::link(path, to + QFileInfo(path).fileName()) && success;
+				success = QFile::link(path, destination + QFileInfo(path).fileName()) && success;
 			}
 			break;
 		case Qt::MoveAction:
