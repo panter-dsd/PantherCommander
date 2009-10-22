@@ -1,5 +1,6 @@
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
+
 HEADERS += $$PWD/findfilesdialog.h \
 	$$PWD/pccopymovedialog.h \
 	$$PWD/pccommandeditdialog.h

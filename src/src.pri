@@ -1,5 +1,6 @@
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
+
 HEADERS += $$PWD/appsettings.h \
 	$$PWD/mainwindowimpl.h \
 	$$PWD/qfilepanel.h \
