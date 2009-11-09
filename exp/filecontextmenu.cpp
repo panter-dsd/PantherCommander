@@ -355,7 +355,7 @@ void FileContextMenu::setPath(const QString& path)
 
 static UINT GetPIDLSize (LPCITEMIDLIST pidl)
 {
-	if (!pidl) 
+	if (!pidl)
 		return 0;
 	int nSize = 0;
 	LPITEMIDLIST pidlTemp = (LPITEMIDLIST) pidl;
@@ -391,7 +391,7 @@ void FileContextMenu::setPaths(const QStringList& paths1)
 
 	QStringList paths;
 	foreach(const QString& path, paths1)
-		paths.append(QDir::toNativeSeparators(path));
+		paths.append(QDir::toNativeSeparators(QDir::cleanPath(path)));
 
 	// get IShellFolder interface of Desktop (root of shell namespace)
 	IShellFolder* psfDesktop = 0;
