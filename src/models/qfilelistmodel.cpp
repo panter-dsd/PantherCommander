@@ -852,7 +852,7 @@ bool QFileListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, 
 			for(; it != urls.constEnd(); ++it)
 			{
 				QString path = (*it).scheme() == QLatin1String("file") ? (*it).toLocalFile() : (*it).toString();
-				success = QFile::copy(path, to + QFileInfo(path).fileName()) && QFile::remove(path) && success;
+				success = QFile::copy(path, destination + QFileInfo(path).fileName()) && QFile::remove(path) && success;
 			}
 			break;
 		default:
