@@ -52,11 +52,11 @@
 inline static QString _helper_get_directory(const QString& path)
 {
 	QFileInfo info = QFileInfo(QDir::current(), path);
-	if(info.exists() && info.isDir())
+	if (info.exists() && info.isDir())
 		return QDir::cleanPath(info.absoluteFilePath());
 
 	info.setFile(info.absolutePath());
-	if(info.exists() && info.isDir())
+	if (info.exists() && info.isDir())
 		return info.absoluteFilePath();
 
 	return QString();
@@ -152,10 +152,10 @@ void FileWidgetPrivate::createWidgets()
 
 	QAbstractItemModel* abstractModel = model;
 #ifndef QT_NO_PROXYMODEL
-	if(proxyModel)
+	if (proxyModel)
 		abstractModel = proxyModel;
 #endif
-	for(int i = 1, n = abstractModel->columnCount(QModelIndex()); i < n; ++i)
+	for (int i = 1, n = abstractModel->columnCount(QModelIndex()); i < n; ++i)
 	{
 		QAction* showHeaderAction = new QAction(showActionGroup);
 		showHeaderAction->setCheckable(true);
@@ -187,7 +187,7 @@ void FileWidgetPrivate::createWidgets()
 	QHBoxLayout* frameLayout = new QHBoxLayout;
 	frameLayout->setContentsMargins(0, 0, 0, 0);
 	frameLayout->addWidget(pathLineEdit);
-	foreach(QAction* action, q->actions())
+	foreach (QAction* action, q->actions())
 	{
 		QSize fixedSize(16, 16);
 		QToolButton* button = new QToolButton(frame);
@@ -318,11 +318,11 @@ void FileWidgetPrivate::retranslateStrings()
 	const QList<QAction*>& actions = treeView->header()->actions();
 	QAbstractItemModel* abstractModel = model;
 #ifndef QT_NO_PROXYMODEL
-	if(proxyModel)
+	if (proxyModel)
 		abstractModel = proxyModel;
 #endif
 	int total = qMin(abstractModel->columnCount(QModelIndex()), actions.count() + 1);
-	for(int i = 1; i < total; ++i)
+	for (int i = 1; i < total; ++i)
 	{
 		QString text = abstractModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
 		actions[i - 1]->setText(FileWidget::tr("Show %1").arg(text));
@@ -336,15 +336,15 @@ void FileWidgetPrivate::retranslateStrings()
 */
 QString FileWidgetPrivate::workingDirectory(const QString& path) const
 {
-	if(!path.isEmpty())
+	if (!path.isEmpty())
 	{
 		QString directory = _helper_get_directory(path);
-		if(!directory.isEmpty())
+		if (!directory.isEmpty())
 			return directory;
 	}
 /*?
 	QString directory = _helper_get_directory(lastVisitedDir);
-	if(!directory.isEmpty())
+	if (!directory.isEmpty())
 		return directory;
 */
 	return QDir::rootPath();
@@ -384,7 +384,7 @@ QModelIndex FileWidgetPrivate::setCurrentIndex(const QModelIndex& sourceIndex) c
 	Q_ASSERT(sourceIndex.isValid() ? sourceIndex.model() == model : true);
 
 	const QModelIndex index = mapFromSource(sourceIndex);
-	if(index.isValid())
+	if (index.isValid())
 		treeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
 
 	return index;
@@ -401,7 +401,7 @@ QModelIndex FileWidgetPrivate::select(const QModelIndex& sourceIndex) const
 	Q_ASSERT(sourceIndex.isValid() ? sourceIndex.model() == model : true);
 
 	const QModelIndex index = mapFromSource(sourceIndex);
-	if(index.isValid() && !treeView->selectionModel()->isSelected(index))
+	if (index.isValid() && !treeView->selectionModel()->isSelected(index))
 		treeView->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
 
 	return index;
@@ -433,12 +433,12 @@ void FileWidgetPrivate::updateDirInfo()
 
 	const QModelIndex parent = treeView->rootIndex();
 	int rowCount = treeView->model()->rowCount(parent);
-	for(int row = 0; row < rowCount; ++row)
+	for (int row = 0; row < rowCount; ++row)
 	{
 		const QModelIndex sourceIndex = mapToSource(treeView->model()->index(row, 0, parent));
-		if(model->isDir(sourceIndex))
+		if (model->isDir(sourceIndex))
 		{
-			if(model->fileName(sourceIndex) != QLatin1String(".."))
+			if (model->fileName(sourceIndex) != QLatin1String(".."))
 				++dirInfo.dirsCount;
 		}
 		else
@@ -448,12 +448,12 @@ void FileWidgetPrivate::updateDirInfo()
 		}
 	}
 
-	foreach(const QModelIndex& index, treeView->selectionModel()->selectedRows())
+	foreach (const QModelIndex& index, treeView->selectionModel()->selectedRows())
 	{
 		const QModelIndex sourceIndex = mapToSource(index);
-		if(model->isDir(sourceIndex))
+		if (model->isDir(sourceIndex))
 		{
-			if(model->fileName(sourceIndex) != QLatin1String(".."))
+			if (model->fileName(sourceIndex) != QLatin1String(".."))
 				++dirInfo.dirsSelectedCount;
 		}
 		else
@@ -482,10 +482,10 @@ void FileWidgetPrivate::updateDirInfo()
 */
 void FileWidgetPrivate::_q_rowsInserted(const QModelIndex& parent, int start, int end)
 {
-/*	for(int row = start; row <= end; ++row)
+/*	for (int row = start; row <= end; ++row)
 	{
 		const QModelIndex index = model->index(row, 0, parent);
-		if(model->isDir(index))
+		if (model->isDir(index))
 		{
 			++dirInfo.dirsCount;
 		}
@@ -500,10 +500,10 @@ void FileWidgetPrivate::_q_rowsInserted(const QModelIndex& parent, int start, in
 
 void FileWidgetPrivate::_q_rowsAboutToBeRemoved(const QModelIndex& parent, int start, int end)
 {
-/*	for(int row = start; row <= end; ++row)
+/*	for (int row = start; row <= end; ++row)
 	{
 		const QModelIndex index = model->index(row, 0, parent);
-		if(model->isDir(index))
+		if (model->isDir(index))
 		{
 			--dirInfo.dirsCount;
 		}
@@ -520,14 +520,14 @@ void FileWidgetPrivate::_q_selectionChanged(const QItemSelection& selected, cons
 {
 /*	QList<int> rows;
 
-	foreach(const QModelIndex& index, selected.indexes())
+	foreach (const QModelIndex& index, selected.indexes())
 	{
-		if(!rows.contains(index.row()))
+		if (!rows.contains(index.row()))
 		{
 			rows.append(index.row());
 
 			const QModelIndex sourceIndex = mapToSource(index);
-			if(model->isDir(sourceIndex))
+			if (model->isDir(sourceIndex))
 			{
 				++dirInfo.dirsSelectedCount;
 			}
@@ -541,14 +541,14 @@ void FileWidgetPrivate::_q_selectionChanged(const QItemSelection& selected, cons
 
 	rows.clear();
 
-	foreach(const QModelIndex& index, deselected.indexes())
+	foreach (const QModelIndex& index, deselected.indexes())
 	{
-		if(!rows.contains(index.row()))
+		if (!rows.contains(index.row()))
 		{
 			rows.append(index.row());
 
 			const QModelIndex sourceIndex = mapToSource(index);
-			if(model->isDir(sourceIndex))
+			if (model->isDir(sourceIndex))
 			{
 				--dirInfo.dirsSelectedCount;
 			}
@@ -568,7 +568,7 @@ void FileWidgetPrivate::_q_showHeader(QAction* action)
 	Q_Q(FileWidget);
 
 	QActionGroup* actionGroup = qobject_cast<QActionGroup*>(q->sender());
-	if(actionGroup)
+	if (actionGroup)
 		treeView->header()->setSectionHidden(actionGroup->actions().indexOf(action) + 1, !action->isChecked());
 }
 
@@ -590,14 +590,14 @@ void FileWidgetPrivate::_q_showContextMenu(const QPoint& position)
 
 #ifdef Q_WS_WIN
 	FileContextMenu menu(view);
-	if(!index.isValid())
+	if (!index.isValid())
 		menu.setPath(model->filePath(index));
 	else
 		menu.setPaths(q_ptr->selectedFiles());
 	menu.executeNativeMenu(globalPos);
 #else
 	QMenu menu(view);
-	if(index.isValid())
+	if (index.isValid())
 	{
 		// file context menu
 		QFile::Permissions p = model->permissions(index);
@@ -607,7 +607,7 @@ void FileWidgetPrivate::_q_showContextMenu(const QPoint& position)
 		menu.addAction(deleteAction);
 		menu.addSeparator();
 	}
-	if(newFolderAction->isVisible())
+	if (newFolderAction->isVisible())
 	{
 		newFolderAction->setEnabled(newFolderAction->isEnabled());
 		menu.addAction(newFolderAction);
@@ -634,9 +634,9 @@ void FileWidgetPrivate::_q_addressChanged()
 	q->setDirectory(newPath);
 
 	QString path = rootPath();
-	if(path != newPath)
+	if (path != newPath)
 	{
-		if(QFileOperationsThread::isLocalFileSystem(path))
+		if (QFileOperationsThread::isLocalFileSystem(path))
 			path = QDir::toNativeSeparators(path);
 		pathLineEdit->setText(path);
 	}
@@ -655,9 +655,9 @@ void FileWidgetPrivate::_q_activate(const QModelIndex& index)
 	// My Computer or a directory
 	QModelIndex sourceIndex = mapToSource(index);
 	QString path = model->filePath(sourceIndex);
-	if(model->isDir(sourceIndex))
+	if (model->isDir(sourceIndex))
 	{
-		if(model->fileName(sourceIndex) == QLatin1String(".."))
+		if (model->fileName(sourceIndex) == QLatin1String(".."))
 			_q_navigateToParent();
 		else
 			q->setDirectory(path);
@@ -676,7 +676,7 @@ void FileWidgetPrivate::_q_activate(const QModelIndex& index)
 void FileWidgetPrivate::_q_pathChanged(const QString& newPath)
 {
 	QString path = newPath;
-	if(QFileOperationsThread::isLocalFileSystem(newPath))
+	if (QFileOperationsThread::isLocalFileSystem(newPath))
 		path = QDir::toNativeSeparators(newPath);
 
 	pathLineEdit->setText(path);
@@ -684,10 +684,10 @@ void FileWidgetPrivate::_q_pathChanged(const QString& newPath)
 	QDir dir(model->rootDirectory());
 	navigateToParentAction->setEnabled(!dir.isRoot() && dir.exists());
 
-	if(historyLocation < 0 || history.value(historyLocation) != path)
+	if (historyLocation < 0 || history.value(historyLocation) != path)
 	{
 		// remove unneeded forward entries
-		while(historyLocation >= 0 && historyLocation + 1 < history.count())
+		while (historyLocation >= 0 && historyLocation + 1 < history.count())
 			history.removeLast();
 		// remove duplicates of new path
 		historyLocation -= history.removeAll(path);
@@ -712,7 +712,7 @@ void FileWidgetPrivate::_q_navigateBackward()
 {
 	Q_Q(FileWidget);
 
-	if(!history.isEmpty() && historyLocation > 0)
+	if (!history.isEmpty() && historyLocation > 0)
 		q->setDirectory(history.at(--historyLocation));
 }
 
@@ -725,7 +725,7 @@ void FileWidgetPrivate::_q_navigateForward()
 {
 	Q_Q(FileWidget);
 
-	if(historyLocation + 1 < history.size())
+	if (historyLocation + 1 < history.size())
 		q->setDirectory(history[++historyLocation]);
 }
 
@@ -741,9 +741,9 @@ void FileWidgetPrivate::_q_navigateToParent()
 	QString newDirectory, oldDirectory;
 	QDir dir(model->rootDirectory());
 	oldDirectory = dir.dirName();
-	if(!dir.isRoot() && dir.cdUp())
+	if (!dir.isRoot() && dir.cdUp())
 		newDirectory = dir.absolutePath();
-	if(newDirectory.isEmpty())
+	if (newDirectory.isEmpty())
 		newDirectory = model->myComputer().toString();
 
 	const QPersistentModelIndex idx = rootIndex();
@@ -844,7 +844,7 @@ bool FileWidget::restoreState(const QByteArray& state)
 	int version = 1;
 	QByteArray sd = state;
 	QDataStream stream(&sd, QIODevice::ReadOnly);
-	if(stream.atEnd())
+	if (stream.atEnd())
 		return false;
 
 	qint32 magic;
@@ -855,7 +855,7 @@ bool FileWidget::restoreState(const QByteArray& state)
 
 	stream >> magic;
 	stream >> v;
-	if(magic != FileWidgetMagic || v != version)
+	if (magic != FileWidgetMagic || v != version)
 		return false;
 
 	stream >> history;
@@ -864,7 +864,7 @@ bool FileWidget::restoreState(const QByteArray& state)
 
 	setHistory(history);
 	setDirectory(!currentDirectory.isEmpty() ? currentDirectory : d->lastVisitedDir);
-	if(!d->treeView->header()->restoreState(headerData))
+	if (!d->treeView->header()->restoreState(headerData))
 		return false;
 
 	return true;
@@ -894,14 +894,14 @@ QDir FileWidget::directory() const
 #endif
 void FileWidget::setDirectory(const QString& directory)
 {
-	if(directory.isEmpty())
+	if (directory.isEmpty())
 		return;
 
 	Q_D(FileWidget);
 
 	// we remove .. and . from the given path if exist
 	QString newDirectory = QDir::cleanPath(directory);
-	if(newDirectory.isEmpty() || d->rootPath() == newDirectory)
+	if (newDirectory.isEmpty() || d->rootPath() == newDirectory)
 		return;
 
 	QDir dir(newDirectory);
@@ -910,7 +910,7 @@ void FileWidget::setDirectory(const QString& directory)
 	isReadable = dir.isReadable();
 #else
 /*3**/
-	if(newDirectory.startsWith(QLatin1String("//"))
+	if (newDirectory.startsWith(QLatin1String("//"))
 		&& newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1)
 	{
 		isReadable = true;
@@ -923,7 +923,7 @@ void FileWidget::setDirectory(const QString& directory)
 	}
 /**3*/
 #endif
-	if(!isReadable)
+	if (!isReadable)
 	{
 #ifndef Q_CC_MSVC
 	#warning "TODO: must be configurable (message, beep, or something else)"
@@ -941,7 +941,7 @@ void FileWidget::setDirectory(const QString& directory)
 	d->treeView->clearSelection();
 	const QModelIndex root = d->model->setRootPath(newDirectory);
 	d->newFolderAction->setEnabled(d->model->flags(root) & Qt::ItemIsDropEnabled);
-	if(root != d->rootIndex())
+	if (root != d->rootIndex())
 		d->setRootIndex(root);
 	d->setCurrentIndex(d->model->index(0, 0, root));
 	emit directoryEntered(newDirectory);
@@ -953,7 +953,7 @@ void FileWidget::changeEvent(QEvent* event)
 {
 	Q_D(FileWidget);
 
-	if(event->type() == QEvent::LanguageChange)
+	if (event->type() == QEvent::LanguageChange)
 		d->retranslateStrings();
 
 	QWidget::changeEvent(event);
@@ -963,12 +963,12 @@ bool FileWidget::eventFilter(QObject* object, QEvent* event)
 {
 	Q_D(FileWidget);
 
-	if(object == d->pathLineEdit)
+	if (object == d->pathLineEdit)
 	{
 	}
-	else if(object == d->treeView)
+	else if (object == d->treeView)
 	{
-		if(event->type() == QEvent::KeyPress)
+		if (event->type() == QEvent::KeyPress)
 		{
 			QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
 			switch(keyEvent->key())
@@ -976,10 +976,10 @@ bool FileWidget::eventFilter(QObject* object, QEvent* event)
 				case Qt::Key_Insert:
 				{
 					QKeyEvent e1(event->type(), Qt::Key_Space, Qt::ControlModifier);
-					if(QCoreApplication::sendEvent(d->treeView, &e1))
+					if (QCoreApplication::sendEvent(d->treeView, &e1))
 					{
 						QKeyEvent e2(event->type(), Qt::Key_Down, Qt::ControlModifier);
-						if(QCoreApplication::sendEvent(d->treeView, &e2))
+						if (QCoreApplication::sendEvent(d->treeView, &e2))
 						{
 							event->accept();
 							return true;
@@ -988,7 +988,7 @@ bool FileWidget::eventFilter(QObject* object, QEvent* event)
 				}
 					break;
 				case Qt::Key_Asterisk:
-					if(d->treeView->selectionModel())
+					if (d->treeView->selectionModel())
 					{
 						QModelIndex root = d->treeView->rootIndex();
 						QModelIndex tl = d->treeView->model()->index(0, 0, root);
@@ -1006,16 +1006,16 @@ bool FileWidget::eventFilter(QObject* object, QEvent* event)
 			}
 		}
 	}
-/*1	else if(object == qleRenameEditor)
+/*1	else if (object == qleRenameEditor)
 	{
-		if(event->type() == QEvent::FocusOut)
+		if (event->type() == QEvent::FocusOut)
 		{
 			qleRenameEditor->close();
 		}
-		if(event->type() == QEvent::KeyRelease)
+		if (event->type() == QEvent::KeyRelease)
 		{
 			QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-			if(keyEvent->key() == Qt::Key_Escape)
+			if (keyEvent->key() == Qt::Key_Escape)
 				qleRenameEditor->close();
 		}
 	}*/
@@ -1030,7 +1030,7 @@ void FileWidget::slotRename()
 	QModelIndex index = d->treeView->currentIndex();
 	QString filePath = d->model->filePath(d->mapToSource(index));
 
-	if(!(index.flags() & Qt::ItemIsEditable))
+	if (!(index.flags() & Qt::ItemIsEditable))
 		return;
 
 	index = d->treeView->model()->index(index.row(), 0, index.parent());
@@ -1038,7 +1038,7 @@ void FileWidget::slotRename()
 	return;
 
 
-/*1	if(!qleRenameEditor)
+/*1	if (!qleRenameEditor)
 	{
 		qleRenameEditor = new QLineEdit(fi.fileName(), d->treeView);
 		qleRenameEditor->setAttribute(Qt::WA_DeleteOnClose);
@@ -1067,7 +1067,7 @@ void FileWidget::slotRename()
 #endif
 /*1	QString qsFileName = qleRenameEditor->text();
 	int pos = qsFileName.lastIndexOf(".");
-	if(!selectOnlyFileName || qleRenameEditor->selectedText() == qsFileName.left(pos) || qleRenameEditor->selectedText().isEmpty())
+	if (!selectOnlyFileName || qleRenameEditor->selectedText() == qsFileName.left(pos) || qleRenameEditor->selectedText().isEmpty())
 		qleRenameEditor->selectAll();
 	else
 		qleRenameEditor->setSelection(0, pos);*/
@@ -1125,11 +1125,11 @@ void FileWidget::setHistory(const QStringList& paths)
 {
 	Q_D(FileWidget);
 
-	if(paths.isEmpty() || d->history == paths)
+	if (paths.isEmpty() || d->history == paths)
 		return;
 
 	d->history = paths;
-	while(d->history.size() > 20)
+	while (d->history.size() > 20)
 		d->history.removeFirst();
 	d->historyLocation = d->history.size() - 1;
 
@@ -1208,17 +1208,17 @@ QString FileWidget::currentFile() const
 */
 void FileWidget::setCurrentFile(const QString& fileName)
 {
-	if(fileName.isEmpty())
+	if (fileName.isEmpty())
 		return;
 
 	Q_D(FileWidget);
 
-	if(!QDir::isRelativePath(fileName))
+	if (!QDir::isRelativePath(fileName))
 	{
 		QFileInfo info(fileName);
 		QString filePath = info.absoluteDir().path();
 
-		if(d->model->rootPath() != filePath)
+		if (d->model->rootPath() != filePath)
 			setDirectory(filePath);
 	}
 
@@ -1238,13 +1238,17 @@ QStringList FileWidget::selectedFiles() const
 
 	QStringList files;
 
-	foreach(const QModelIndex& index, d->treeView->selectionModel()->selectedRows())
-		files.append(d->model->filePath(d->mapToSource(index)));
+	foreach (const QModelIndex& index, d->treeView->selectionModel()->selectedRows())
+	{
+		QString file = d->model->filePath(d->mapToSource(index));
+		if (file != QLatin1String(".."))
+			files.append(file);
+	}
 
 #ifndef Q_CC_MSVC
 	#warning "TODO: check behavior"
 #endif
-	if(files.isEmpty())
+	if (files.isEmpty() && currentFile() != QLatin1String(".."))
 		files.append(currentFile());
 
 	return files;
@@ -1257,24 +1261,24 @@ QStringList FileWidget::selectedFiles() const
 */
 void FileWidget::selectFile(const QString& fileName, bool clearSelection)
 {
-	if(fileName.isEmpty())
+	if (fileName.isEmpty() || fileName == QLatin1String(".."))
 		return;
 
 	Q_D(FileWidget);
 
-	if(!QDir::isRelativePath(fileName))
+	if (!QDir::isRelativePath(fileName))
 	{
 		QFileInfo info(fileName);
 		QString filePath = info.absoluteDir().path();
 
-		if(d->model->rootPath() != filePath)
+		if (d->model->rootPath() != filePath)
 			setDirectory(filePath);
 	}
 
 	const QModelIndex index = d->model->index(fileName);
-	if(index.isValid())
+	if (index.isValid())
 	{
-		if(clearSelection)
+		if (clearSelection)
 			d->treeView->clearSelection();
 		d->select(index);
 	}
