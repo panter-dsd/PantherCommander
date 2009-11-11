@@ -399,7 +399,7 @@ Qt::ItemFlags QFileListModel::flags(const QModelIndex& index) const
 	if(!dotDot)
 		flags |= Qt::ItemIsSelectable;
 	QFile::Permissions perms = node->permissions();
-	if(!dotDot && perms & QFile::ReadUser)
+	if(!dotDot && (perms & QFile::ReadUser))
 		flags |= Qt::ItemIsDragEnabled;
 	if(perms & QFile::WriteUser)
 	{
