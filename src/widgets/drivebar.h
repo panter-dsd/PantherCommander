@@ -25,26 +25,32 @@
 #ifndef DRIVEBAR_H
 #define DRIVEBAR_H
 
-#include <QtGui/QFrame>
-
 class QAction;
 class QActionGroup;
+class VolumeInfoProvider;
+class QFileIconProvider;
+
+#include <QtGui/QFrame>
 
 class DriveBar : public QFrame
 {
 	Q_OBJECT
 
 private:
-	QAction*					qaLastChecked;
-	QActionGroup*		qagDrives;
-	QString					qsCurrentPath;
+	QAction *lastChecked;
+	QActionGroup *actionGroup;
+	QString currentPath;
+	VolumeInfoProvider *provider;
+	QFileIconProvider *iconProvider;
 
 public:
 	explicit DriveBar(QWidget* parent = 0);
 	virtual ~DriveBar();
 
+private:
+	void loadDrivesList();
+
 public Q_SLOTS:
-	void slotRefresh();
 	void slotSetDisc(const QString& path);
 
 Q_SIGNALS:
@@ -53,6 +59,8 @@ Q_SIGNALS:
 private Q_SLOTS:
 	void _q_actionTriggered(QAction* action);
 	void _q_showContextMenu(const QPoint& position);
+	void volumeAdd(const QString&);
+	void volumeRemove(const QString&);
 
 private:
 	bool m_inRefresh;
