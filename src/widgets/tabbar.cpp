@@ -151,14 +151,15 @@ void TabBar::contextMenuRequested(const QPoint& pos)
 	{
 		action = menu.addAction(tr("Duplicate Tab"), this, SLOT(cloneTab()));
 		action->setData(index);
+		if (count() > 1) {
+			menu.addSeparator();
 
-		menu.addSeparator();
+			action = menu.addAction(tr("&Close Tab"), this, SLOT(closeTab()), QKeySequence::Close);
+			action->setData(index);
 
-		action = menu.addAction(tr("&Close Tab"), this, SLOT(closeTab()), QKeySequence::Close);
-		action->setData(index);
-
-		action = menu.addAction(tr("Close &Other Tabs"), this, SLOT(closeOtherTabs()));
-		action->setData(index);
+			action = menu.addAction(tr("Close &Other Tabs"), this, SLOT(closeOtherTabs()));
+			action->setData(index);
+		}
 	}
 	menu.exec(mapToGlobal(pos));
 }
