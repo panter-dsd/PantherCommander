@@ -133,6 +133,8 @@ void TabBar::closeOtherTabs()
 		int index = action->data().toInt();
 		if(index != -1)
 		{
+			if (currentIndex() != index)
+				setCurrentIndex(index);
 			for(int i = count() - 1; i > index; --i)
 				removeTab(i);
 			for(int i = index - 1; i >= 0; --i)
