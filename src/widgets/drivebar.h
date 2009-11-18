@@ -39,7 +39,6 @@ class DriveBar : public QFrame
 private:
 	QAction *lastChecked;
 	QActionGroup *actionGroup;
-	QString currentPath;
 	VolumeInfoProvider *provider;
 	QFileIconProvider *iconProvider;
 
@@ -61,9 +60,6 @@ private Q_SLOTS:
 	void _q_showContextMenu(const QPoint& position);
 	void volumeAdd(const QString&);
 	void volumeRemove(const QString&);
-
-private:
-	bool m_inRefresh;
 };
 
 #endif // DRIVEBAR_H

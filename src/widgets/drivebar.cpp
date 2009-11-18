@@ -22,19 +22,16 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-#include "drivebar.h"
-
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
-#include <QtCore/QList>
 
 #include <QtGui/QAction>
 #include <QtGui/QActionGroup>
 #include <QtGui/QFileIconProvider>
-#include <QtGui/QLayout>
 #include <QtGui/QMessageBox>
 #include <QtGui/QToolButton>
 
+#include "drivebar.h"
 #include "appsettings.h"
 #ifdef Q_WS_WIN
 #  include "filecontextmenu.h"
@@ -50,8 +47,8 @@ static bool isDrive(const QString& path)
 }
 
 
-DriveBar::DriveBar(QWidget* parent) : QFrame(parent),
-	m_inRefresh(false)
+DriveBar::DriveBar(QWidget* parent)
+		: QFrame(parent)
 {
 	setFocusPolicy(Qt::NoFocus);
 
@@ -73,18 +70,21 @@ DriveBar::DriveBar(QWidget* parent) : QFrame(parent),
 
 DriveBar::~DriveBar()
 {
+	delete iconProvider;
 }
 
 void DriveBar::loadDrivesList()
 {
-	const QList<QFileInfo>& volumes = VolumeInfoProvider().volumes();
-	QAction *action;
-	QToolButton *button;
-	FlowLayout* layout = new FlowLayout();
+	FlowLayout *layout = new FlowLayout();
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(0);
-	foreach(const QFileInfo& fi, volumes) {
-		const QString path = fi.path();
+
+	QAction *action;
+	QToolButton *button;
+
+	foreach(const QFileInfo& fi, VolumeInfoProvider().volumes()) {
+		const QString& path = fi.path();
+
 		action = new QAction(this);
 		action->setText(isDrive(path) ? path.left(1) : fi.fileName());
 #ifdef Q_WS_WIN
@@ -135,34 +135,28 @@ void DriveBar::_q_actionTriggered(QAction* action)
 	if(!action)
 		return;
 
-	const QString path = action->data().toString();
-	if(QFileInfo(path).isReadable())
-	{
+	const QString& path = action->data().toString();
+	if(QFileInfo(path).isReadable()) {
 		lastChecked = action;
-		currentPath = path;
 		emit discChanged(path);
-	}
-	else
-	{
+	} else {
 		QMessageBox::critical(this, "", tr("Drive %1 is not ready.").arg(QDir::toNativeSeparators(path)));
 		if(lastChecked)
 			lastChecked->setChecked(true);
 	}
 }
 
-void DriveBar::slotSetDisc(const QString& volume)
+void DriveBar::slotSetDisc(const QString& path)
 {
-	QString path = QDir::fromNativeSeparators(volume);
-	const QList<QAction*>& actionList = actionGroup->actions();
-	for(int i = 0; i < actionList.size(); ++i)
-	{
-		if(path.toUpper() == actionList.at(i)->data().toString().toUpper())
-		{
-			currentPath = path;
-			actionList.at(i)->setChecked(true);
-			lastChecked = actionList.at(i);
+	const QString& m_path = QDir::fromNativeSeparators(path);
+
+	foreach(QAction *action, actionGroup->actions()) {
+		if(m_path.startsWith(action->data().toString())) {
+			action->setChecked(true);
+			lastChecked = action;
 			break;
 		}
+		action->setChecked(false);
 	}
 }
 
@@ -171,10 +165,11 @@ void DriveBar::_q_showContextMenu(const QPoint& position)
 #ifdef QT_NO_MENU
 	Q_UNUSED(position);
 #else
-	QToolButton* button = qobject_cast<QToolButton*> (sender());
+	QToolButton *button = qobject_cast<QToolButton*> (sender());
 	if (!button)
 		return;
-	QString path = button->defaultAction()->data().toString();
+
+	const QString& path = button->defaultAction()->data().toString();
 
 	QPoint globalPos = button->mapToGlobal(position);
 #ifdef Q_WS_WIN
