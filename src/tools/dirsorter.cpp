@@ -151,13 +151,13 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 	const DirSortItem* f1 = &n1;
 	const DirSortItem* f2 = &n2;
 
-	bool isF1Dir = f1->item.isDir() && !f1->item.isSymLink();
-	bool isF2Dir = f2->item.isDir() && !f2->item.isSymLink();
+	bool isDir1 = f1->item.isDir() && f1->item.exists();
+	bool isDir2 = f2->item.isDir() && f2->item.exists();
 
-	if((sort_flags & QDir::DirsFirst) && (isF1Dir != isF2Dir))
-		return isF1Dir;
-	if((sort_flags & QDir::DirsLast) && (isF1Dir != isF2Dir))
-		return !isF1Dir;
+	if((sort_flags & QDir::DirsFirst) && isDir1 != isDir2)
+		return isDir1;
+	if((sort_flags & QDir::DirsLast) && isDir1 != isDir2)
+		return !isDir1;
 
 	if((sort_flags & QDir::DirsFirst) || (sort_flags & QDir::DirsLast))
 	{
@@ -173,8 +173,7 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 	int sortBy = (sort_flags & QDir::SortByMask) | (sort_flags & QDir::Type);
 	if((sort_flags & QDir::DirsFirst) || (sort_flags & QDir::DirsLast))
 	{
-		if(sort_flags & 0x100/*QDir::AlwaysSortDirsByName*/ && sortBy != QDir::Name
-			&& isF1Dir && isF2Dir)
+		if(sort_flags & 0x100/*QDir::AlwaysSortDirsByName*/ && sortBy != QDir::Name && isDir1 && isDir2)
 		{
 			sortBy = QDir::Name;
 		}
@@ -196,9 +195,9 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 			{
 				if(sort_flags & 0x300/*QDir::Suffix*/)
 				{
-					f1->suffix_cache = isF1Dir ? QLatin1String("") :
-														ic ? suffix(f1->item.fileName()).toLower()
-															: suffix(f1->item.fileName());
+					f1->suffix_cache = isDir1 ? QLatin1String("") :
+													ic ? suffix(f1->item.fileName()).toLower()
+														: suffix(f1->item.fileName());
 				}
 				else
 				{
@@ -210,9 +209,9 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 			{
 				if(sort_flags & 0x300/*QDir::Suffix*/)
 				{
-					f2->suffix_cache = isF2Dir ? QLatin1String("") :
-														ic ? suffix(f2->item.fileName()).toLower()
-															: suffix(f2->item.fileName());
+					f2->suffix_cache = isDir2 ? QLatin1String("") :
+													ic ? suffix(f2->item.fileName()).toLower()
+														: suffix(f2->item.fileName());
 				}
 				else
 				{
