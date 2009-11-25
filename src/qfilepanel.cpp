@@ -451,11 +451,15 @@ void QFilePanel::timerEvent(QTimerEvent */*event*/)
 //
 void QFilePanel::slotSelectDisc()
 {
-	QSelectDiscDialog* dialog = new QSelectDiscDialog(this);
+	QSelectDiscDialog *dialog = new QSelectDiscDialog(this);
+	dialog->setPath(path());
+	connect(dialog, SIGNAL(setectedDisc(QString)), this, SLOT(setPath(QString)));
+
 	dialog->setWindowFlags(Qt::Popup);
+	dialog->setAttribute(Qt::WA_DeleteOnClose);
+
 	QPoint point(qtbDriveButton->x(), qtbDriveButton->y() + qtbDriveButton->height());
 	dialog->move(qtbDriveButton->mapToGlobal(point));
-	if(dialog->exec())
-		setPath(dialog->discName());
-	delete dialog;
+
+	dialog->show();
 }

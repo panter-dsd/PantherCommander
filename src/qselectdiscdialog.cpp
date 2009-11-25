@@ -31,28 +31,45 @@
 
 #include "volumeinfoprovider.h"
 
-QSelectDiscDialog::QSelectDiscDialog(QWidget* parent) : QDialog(parent)
+QSelectDiscDialog::QSelectDiscDialog(QWidget* parent)
+		:QDialog(parent)
 {
-	//resize(width(), 200);
-	qlwDiscList=new QListWidget(this);
-	foreach(const QFileInfo& fi, VolumeInfoProvider().volumes())
-	{
-		QString path = fi.absoluteFilePath();
-		qlwDiscList->addItem(QDir::toNativeSeparators(path));
-	}
-	qlwDiscList->setCurrentRow(0);
-	connect(qlwDiscList, SIGNAL(itemActivated(QListWidgetItem*)),
-			this, SLOT(accept()));
-	connect(qlwDiscList, SIGNAL(itemClicked(QListWidgetItem*)),
-			this, SLOT(accept()));
+	discList = new QListWidget(this);
 
-	QVBoxLayout* layout = new QVBoxLayout;
+	QListWidgetItem *item;
+	foreach(const QFileInfo& fi, VolumeInfoProvider().volumes()) {
+		item = new QListWidgetItem(QDir::toNativeSeparators(fi.absoluteFilePath()), discList);
+		item->setData(Qt::EditRole, fi.absoluteFilePath());
+		discList->addItem(item);
+	}
+
+	discList->setCurrentRow(0);
+
+	connect(discList, SIGNAL(itemActivated(QListWidgetItem*)),
+			this, SLOT(selectDisc(QListWidgetItem*)));
+	connect(discList, SIGNAL(itemClicked(QListWidgetItem*)),
+			this, SLOT(selectDisc(QListWidgetItem*)));
+
+	QVBoxLayout *layout = new QVBoxLayout();
 	layout->setContentsMargins(0, 0, 0, 0);
-	layout->addWidget(qlwDiscList);
+	layout->addWidget(discList);
 	setLayout(layout);
+
+	discList->setFocus();
 }
 
-QString QSelectDiscDialog::discName() const
+void QSelectDiscDialog::selectDisc(QListWidgetItem *item)
 {
-	return qlwDiscList->currentItem()->text();
+	emit setectedDisc(item->text());
+	accept();
+}
+
+void QSelectDiscDialog::setPath(const QString& path)
+{
+	for (int i = 0; i < discList->count(); i++) {
+		if (path.startsWith(discList->item(i)->data(Qt::EditRole).toString())) {
+			discList->setCurrentItem(discList->item(i));
+			break;
+		}
+	}
 }

@@ -25,9 +25,10 @@
 #ifndef QSELECTDISCDIALOG_H
 #define QSELECTDISCDIALOG_H
 
-#include <QtGui/QDialog>
-
 class QListWidget;
+class QListWidgetItem;
+
+#include <QtGui/QDialog>
 
 class QSelectDiscDialog : public QDialog
 {
@@ -35,11 +36,16 @@ class QSelectDiscDialog : public QDialog
 
 public:
 	QSelectDiscDialog(QWidget* parent = 0);
-
-	QString discName() const;
+	void setPath(const QString& path);
 
 private:
-	QListWidget* qlwDiscList;
+	QListWidget* discList;
+
+Q_SIGNALS:
+	void setectedDisc(const QString& disc);
+
+private Q_SLOTS:
+	void selectDisc(QListWidgetItem *item);
 };
 
 #endif // QSELECTDISCDIALOG_H

@@ -56,7 +56,6 @@ public:
 
 	void setDisc(const QString& name);
 	QString path() const;
-	void setPath(const QString& path);
 	QString currentFileName() const;
 	QStringList selectedFiles() const;
 	void clearSelection();
@@ -77,6 +76,9 @@ private Q_SLOTS:
 	void slotSetDisc();
 	void slotInformationChanged();
 	void slotSelectDisc();
+
+public Q_SLOTS:
+	void setPath(const QString& path);
 
 private:
 	void createWidgets();
