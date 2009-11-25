@@ -151,10 +151,13 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 	const DirSortItem* f1 = &n1;
 	const DirSortItem* f2 = &n2;
 
-	if((sort_flags & QDir::DirsFirst) && (f1->item.isDir() != f2->item.isDir()))
-		return f1->item.isDir();
-	if((sort_flags & QDir::DirsLast) && (f1->item.isDir() != f2->item.isDir()))
-		return !f1->item.isDir();
+	bool isF1Dir = f1->item.isDir() && !f1->item.isSymLink();
+	bool isF2Dir = f2->item.isDir() && !f2->item.isSymLink();
+
+	if((sort_flags & QDir::DirsFirst) && (isF1Dir != isF2Dir))
+		return isF1Dir;
+	if((sort_flags & QDir::DirsLast) && (isF1Dir != isF2Dir))
+		return !isF1Dir;
 
 	if((sort_flags & QDir::DirsFirst) || (sort_flags & QDir::DirsLast))
 	{
@@ -171,7 +174,7 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 	if((sort_flags & QDir::DirsFirst) || (sort_flags & QDir::DirsLast))
 	{
 		if(sort_flags & 0x100/*QDir::AlwaysSortDirsByName*/ && sortBy != QDir::Name
-			&& f1->item.isDir() && f2->item.isDir())
+			&& isF1Dir && isF2Dir)
 		{
 			sortBy = QDir::Name;
 		}
@@ -193,7 +196,7 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 			{
 				if(sort_flags & 0x300/*QDir::Suffix*/)
 				{
-					f1->suffix_cache = f1->item.isDir() ? QLatin1String("") :
+					f1->suffix_cache = isF1Dir ? QLatin1String("") :
 														ic ? suffix(f1->item.fileName()).toLower()
 															: suffix(f1->item.fileName());
 				}
@@ -207,7 +210,7 @@ bool DirSortItemComparator::operator()(const DirSortItem& n1, const DirSortItem&
 			{
 				if(sort_flags & 0x300/*QDir::Suffix*/)
 				{
-					f2->suffix_cache = f2->item.isDir() ? QLatin1String("") :
+					f2->suffix_cache = isF2Dir ? QLatin1String("") :
 														ic ? suffix(f2->item.fileName()).toLower()
 															: suffix(f2->item.fileName());
 				}
