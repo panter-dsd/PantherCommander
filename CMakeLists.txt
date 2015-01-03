@@ -1,10 +1,15 @@
 project(PantherCommander)
 cmake_minimum_required( VERSION 2.6 )
 
+SET(CMAKE_AUTOMOC ON)
+SET(CMAKE_INCLUDE_CURRENT_DIR ON)
+SET(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra")
+
 INCLUDE(FindQt4)
 INCLUDE(FindPkgConfig)
 find_package( Qt4 REQUIRED )
 include( ${QT_USE_FILE})
+
 INCLUDE_DIRECTORIES(
 exp
 src
@@ -92,14 +97,14 @@ set( io_SOURCE
 src/io/volumeinfoprovider.cpp
 src/io/volumewatcher.cpp
 src/io/volumewatcher_unix.cpp
-src/io/volumewatcher_win.cpp
+#src/io/volumewatcher_win.cpp
 )
 
 set( io_HEADERS
 src/io/volumeinfoprovider.h
 src/io/volumewatcher_p.h
 src/io/volumewatcher_unix_p.h
-src/io/volumewatcher_win_p.h
+#src/io/volumewatcher_win_p.h
 )
 
 
@@ -192,43 +197,25 @@ src/widgets/pcshortcutedit.h
 src/widgets/tabbar.h
 )
 
-
-
-
-#qt4_wrap_cpp( MOC_SOURCES 
-#	${exp_HEADERS} 
-#	${src_HEADERS}
-#	${dialogs_HEADERS}  
-#	${io_HEADERS}
-#	${models_HEADERS} 
-#	${PantherViewer_HEADERS} 
-#	${Preferences_HEADERS} 
-#	${tools_HEADERS} 
-#	${widgets_HEADER})
-qt4_wrap_cpp( MOC_SOURCES 
-	${exp_SOURCE} 
-	${src_SOURCE} 
-	${models_SOURCE} 
-	${dialogs_SOURCE}  
-	${io_SOURCE}
-	${PantherViewer_SOURCE} 
-	${Preferences_SOURCE} 
-	${tools_SOURCE} 
-	${widgets_SOURCE} 
-)
-
-
 add_executable( PantherCommander 
 	${exp_SOURCE} 
+        ${exp_HEADERS}
 	${src_SOURCE} 
+        ${src_HEADERS}
 	${models_SOURCE} 
+        ${models_HEADERS}
 	${dialogs_SOURCE}  
+        ${dialogs_HEADERS}
 	${io_SOURCE}
+        ${io_HEADERS}
 	${PantherViewer_SOURCE} 
+        ${PantherViewer_HEADERS}
 	${Preferences_SOURCE} 
+        ${Preferences_HEADERS}
 	${tools_SOURCE} 
+        ${tools_HEADERS}
 	${widgets_SOURCE} 
-	${MOC_SOURCES}
+        ${widgets_HEADERS}
  )
 
 
