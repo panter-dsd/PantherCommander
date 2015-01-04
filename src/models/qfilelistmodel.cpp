@@ -39,43 +39,48 @@
 #include "dirsorter.h"
 #include "qfileoperationsthread.h"
 
-static void getInfoList(const QDir& dir, QFileInfoList* infos)
+static void getInfoList (const QDir &dir, QFileInfoList *infos)
 {
-	Q_ASSERT(infos);
+	Q_ASSERT (infos);
 
-	QDirIterator it(dir);
-	while(it.hasNext())
-	{
+	QDirIterator it (dir);
+
+	while (it.hasNext()) {
 		it.next();
 
-		QFileInfo info(it.fileInfo());
-		if(info.fileName() != QLatin1String(".") && !(info.isRoot() && info.fileName() == QLatin1String("..")))
-			infos->append(info);
+		const QFileInfo info (it.fileInfo());
+		const bool isDot = info.fileName() == QLatin1String (".");
+		const bool isDotDot = info.fileName() == QLatin1String ("..");
+		const bool canAddDotDot = isDotDot && !dir.isRoot ();
+
+		if (!isDot && (!isDotDot || canAddDotDot)) {
+			infos->append (info);
+		}
 	}
 }
 
-static void getIcons(QList<QPCFileInfo*>* infos, QFileIconProvider* iconProvider)
+static void getIcons (QList<QPCFileInfo *> *infos, QFileIconProvider *iconProvider)
 {
-	Q_ASSERT(infos);
-	Q_ASSERT(iconProvider);
+	Q_ASSERT (infos);
+	Q_ASSERT (iconProvider);
 
-	for(int i = 0, n = infos->size(); i < n; ++i)
-	{
-		QPCFileInfo* info = (*infos)[i];
-		if(info->icon().isNull())
-		{
-			if(info->fileName() == QLatin1String(".."))
-				info->setIcon(iconProvider->icon(QFileIconProvider::Desktop));
-			else
-				info->setIcon(iconProvider->icon(info->fileInfo()));
+	for (int i = 0, n = infos->size(); i < n; ++i) {
+		QPCFileInfo *info = (*infos) [i];
+
+		if (info->icon().isNull()) {
+			if (info->fileName() == QLatin1String ("..")) {
+				info->setIcon (iconProvider->icon (QFileIconProvider::Desktop));
+			} else {
+				info->setIcon (iconProvider->icon (info->fileInfo()));
+			}
 		}
 	}
 }
 
 
-QFileListModelPrivate::QFileListModelPrivate() : q_ptr(0),
-	sortColumn(0), sortOrder(Qt::AscendingOrder), sort(QDir::DirsFirst | QDir::IgnoreCase | QDir::Name),
-	inUpdate(false), sheduledUpdate(false)
+QFileListModelPrivate::QFileListModelPrivate() : q_ptr (0),
+	sortColumn (0), sortOrder (Qt::AscendingOrder), sort (QDir::DirsFirst | QDir::IgnoreCase | QDir::Name),
+	inUpdate (false), sheduledUpdate (false)
 {
 	iconProvider = new QFileIconProvider();
 
@@ -88,7 +93,7 @@ QFileListModelPrivate::~QFileListModelPrivate()
 {
 	abort();
 
-	qDeleteAll(nodes);
+	qDeleteAll (nodes);
 	nodes.clear();
 
 	delete iconProvider;
@@ -102,38 +107,44 @@ QFileListModelPrivate::~QFileListModelPrivate()
 	q_ptr = 0;
 }
 
-QPCFileInfo* QFileListModelPrivate::node(const QModelIndex& index) const
+QPCFileInfo *QFileListModelPrivate::node (const QModelIndex &index) const
 {
-	if(!index.isValid())
-		return const_cast<QPCFileInfo*>(&root);
-	QPCFileInfo* node = static_cast<QPCFileInfo*>(index.internalPointer());
-	Q_ASSERT(node);
+	if (!index.isValid()) {
+		return const_cast<QPCFileInfo *> (&root);
+	}
+
+	QPCFileInfo *node = static_cast<QPCFileInfo *> (index.internalPointer());
+	Q_ASSERT (node);
 	return node;
 }
 
-QModelIndex QFileListModelPrivate::index(const QPCFileInfo* node) const
+QModelIndex QFileListModelPrivate::index (const QPCFileInfo *node) const
 {
-	QPCFileInfo* parentNode = 0;//(node ? node->parent : 0);
-	if(!parentNode || node == &root)
+	QPCFileInfo *parentNode = 0;//(node ? node->parent : 0);
+
+	if (!parentNode || node == &root) {
 		return QModelIndex();
+	}
 
 	// get the parent's row
-	Q_ASSERT(node);
-	int visualRow = nodes.indexOf(const_cast<QPCFileInfo*>(node));
-	return q_func()->createIndex(visualRow, 0, const_cast<QPCFileInfo*>(node));
+	Q_ASSERT (node);
+	int visualRow = nodes.indexOf (const_cast<QPCFileInfo *> (node));
+	return q_func()->createIndex (visualRow, 0, const_cast<QPCFileInfo *> (node));
 }
 
-QModelIndex QFileListModelPrivate::index(const QString& fileName, int column) const
+QModelIndex QFileListModelPrivate::index (const QString &fileName, int column) const
 {
-	if(fileName == root.fileName())
+	if (fileName == root.fileName()) {
 		return QModelIndex();
+	}
 
 	// get the parent's row
-	for(int row = 0, n = nodes.size(); row < n; ++row)
-	{
-		QPCFileInfo* node = nodes.at(row);
-		if(fileName == node->fileName())
-			return q_func()->createIndex(row, column, node);
+	for (int row = 0, n = nodes.size(); row < n; ++row) {
+		QPCFileInfo *node = nodes.at (row);
+
+		if (fileName == node->fileName()) {
+			return q_func()->createIndex (row, column, node);
+		}
 	}
 
 	return QModelIndex();
@@ -148,10 +159,9 @@ void QFileListModelPrivate::abort()
 
 void QFileListModelPrivate::fetchFileList()
 {
-	Q_Q(QFileListModel);
+	Q_Q (QFileListModel);
 
-	if(inUpdate)
-	{
+	if (inUpdate) {
 		sheduledUpdate = true;
 		return;
 	}
@@ -160,16 +170,16 @@ void QFileListModelPrivate::fetchFileList()
 
 	abort();
 
-	rootDir.setFilter(QDir::AllEntries | QDir::Hidden | QDir::System);
-	rootDir.setSorting(QDir::Unsorted);
+	rootDir.setFilter (QDir::AllEntries | QDir::Hidden | QDir::System);
+	rootDir.setSorting (QDir::Unsorted);
 
 
 	int rowCount = nodes.size();
-	if(rowCount > 0)
-	{
-		q->beginRemoveRows(QModelIndex(), 0, rowCount - 1);
 
-		qDeleteAll(nodes);
+	if (rowCount > 0) {
+		q->beginRemoveRows (QModelIndex(), 0, rowCount - 1);
+
+		qDeleteAll (nodes);
 		nodes.clear();
 
 		q->endRemoveRows();
@@ -178,30 +188,36 @@ void QFileListModelPrivate::fetchFileList()
 
 	//Get file list
 	QFileInfoList infos;
-	future = QtConcurrent::run(getInfoList, rootDir, &infos);
-	while(future.isRunning())
+	future = QtConcurrent::run (getInfoList, rootDir, &infos);
+
+	while (future.isRunning()) {
 		QCoreApplication::processEvents();
+	}
 
 	rowCount = infos.size();
-	if(rowCount > 0)
-	{
+
+	if (rowCount > 0) {
 		//Sort file list
-		QFuture<QFileInfoList> sortFuture = QtConcurrent::run(Dir::sortFileList, infos, sort);
-		while(sortFuture.isRunning())
+		QFuture<QFileInfoList> sortFuture = QtConcurrent::run (Dir::sortFileList, infos, sort);
+
+		while (sortFuture.isRunning()) {
 			QCoreApplication::processEvents();
+		}
+
 		infos = sortFuture.result();
 
 
-		q->beginInsertRows(QModelIndex(), 0, rowCount - 1);
+		q->beginInsertRows (QModelIndex(), 0, rowCount - 1);
 
-		for(int row = 0; row < rowCount; ++row)
-			nodes.append(new QPCFileInfo(infos.at(row)));
+		for (int row = 0; row < rowCount; ++row) {
+			nodes.append (new QPCFileInfo (infos.at (row)));
+		}
 
 		q->endInsertRows();
 
 
-		future = QtConcurrent::run(getIcons, &nodes, iconProvider);
-		futureWatcher.setFuture(future);
+		future = QtConcurrent::run (getIcons, &nodes, iconProvider);
+		futureWatcher.setFuture (future);
 	}
 
 	inUpdate = false;
@@ -209,10 +225,9 @@ void QFileListModelPrivate::fetchFileList()
 
 void QFileListModelPrivate::updateFileList()
 {
-	Q_Q(QFileListModel);
+	Q_Q (QFileListModel);
 
-	if(inUpdate)
-	{
+	if (inUpdate) {
 		sheduledUpdate = true;
 		return;
 	}
@@ -221,80 +236,88 @@ void QFileListModelPrivate::updateFileList()
 
 	abort();
 
-	rootDir.setFilter(QDir::AllEntries | QDir::Hidden | QDir::System);
-	rootDir.setSorting(QDir::Unsorted);
+	rootDir.setFilter (QDir::AllEntries | QDir::Hidden | QDir::System);
+	rootDir.setSorting (QDir::Unsorted);
 
 
 	//Get file list
 	QFileInfoList infos;
-	future = QtConcurrent::run(getInfoList, rootDir, &infos);
-	while(future.isRunning())
+	future = QtConcurrent::run (getInfoList, rootDir, &infos);
+
+	while (future.isRunning()) {
 		QCoreApplication::processEvents();
+	}
 
 
 	int d = nodes.size() - infos.size();
-	if(d < 0)
-	{
+
+	if (d < 0) {
 		// add some rows
 		d = -d;
 		int size = nodes.size();
-		q->beginInsertRows(QModelIndex(), size, size + d - 1);
+		q->beginInsertRows (QModelIndex(), size, size + d - 1);
 
-		for(int row = size, n = size + d; row < n; ++row)
-			nodes.append(new QPCFileInfo(infos.at(row)));
+		for (int row = size, n = size + d; row < n; ++row) {
+			nodes.append (new QPCFileInfo (infos.at (row)));
+		}
 
 		q->endInsertRows();
-	}
-	else if(d > 0)
-	{
+	} else if (d > 0) {
 		// remove extra rows
 		int size = infos.size();
-		q->beginRemoveRows(QModelIndex(), size, size + d - 1);
+		q->beginRemoveRows (QModelIndex(), size, size + d - 1);
 
-		for(int row = size, n = size + d; row < n; ++row)
+		for (int row = size, n = size + d; row < n; ++row) {
 			delete nodes.takeLast();
+		}
 
 		q->endRemoveRows();
 	}
 
 
 	int rowCount = infos.size();
-	if(rowCount > 0)
-	{
+
+	if (rowCount > 0) {
 		emit q->layoutAboutToBeChanged();
 		QModelIndexList oldList = q->persistentIndexList();
 		QList<QPair<QString, int> > oldNodes;
-		for(int i = 0, n = oldList.size(); i < n; ++i)
-		{
-			QPair<QString, int> pair(node(oldList.at(i))->fileName(), oldList.at(i).column());
-			oldNodes.append(pair);
+
+		for (int i = 0, n = oldList.size(); i < n; ++i) {
+			QPair<QString, int> pair (node (oldList.at (i))->fileName(), oldList.at (i).column());
+			oldNodes.append (pair);
 		}
 
 		//Sort file list
-		QFuture<QFileInfoList> sortFuture = QtConcurrent::run(Dir::sortFileList, infos, sort);
-		while(sortFuture.isRunning())
+		QFuture<QFileInfoList> sortFuture = QtConcurrent::run (Dir::sortFileList, infos, sort);
+
+		while (sortFuture.isRunning()) {
 			QCoreApplication::processEvents();
+		}
+
 		infos = sortFuture.result();
 
 
-		qDeleteAll(nodes);
+		qDeleteAll (nodes);
+
 		// update changed rows
-		for(int row = 0; row < rowCount; ++row)
-			nodes[row] = new QPCFileInfo(infos.at(row));
+		for (int row = 0; row < rowCount; ++row) {
+			nodes[row] = new QPCFileInfo (infos.at (row));
+		}
 
 
 		QModelIndexList newList;
-		for(int i = 0, n = oldNodes.size(); i < n; ++i)
-		{
-			QModelIndex idx = index(oldNodes.at(i).first, oldNodes.at(i).second);
-			newList.append(idx);
+
+		for (int i = 0, n = oldNodes.size(); i < n; ++i) {
+			QModelIndex idx = index (oldNodes.at (i).first, oldNodes.at (i).second);
+			newList.append (idx);
 		}
-		q->changePersistentIndexList(oldList, newList);
+
+		q->changePersistentIndexList (oldList, newList);
 		emit q->layoutChanged();
 
 
-		future = QtConcurrent::run(getIcons, &nodes, iconProvider);
-		futureWatcher.setFuture(future);
+		future = QtConcurrent::run (getIcons, &nodes, iconProvider);
+		futureWatcher.setFuture (future);
 	}
 
 	inUpdate = false;
@@ -302,30 +325,32 @@ void QFileListModelPrivate::updateFileList()
 
 void QFileListModelPrivate::_q_directoryChanged()
 {
-	Q_Q(QFileListModel);
+	Q_Q (QFileListModel);
 	sheduledUpdate = true;
-	if(!updateTimer.isActive())
-		updateTimer.start(300, q);
+
+	if (!updateTimer.isActive()) {
+		updateTimer.start (300, q);
+	}
 }
 
 void QFileListModelPrivate::_q_finishedLoadIcons()
 {
-	Q_Q(QFileListModel);
-	emit q->dataChanged(q->index(0, QFileListModel::NameColumn),
-						q->index(nodes.size() - 1, QFileListModel::NameColumn));
+	Q_Q (QFileListModel);
+	emit q->dataChanged (q->index (0, QFileListModel::NameColumn),
+						 q->index (nodes.size() - 1, QFileListModel::NameColumn));
 }
 
 
-QFileListModel::QFileListModel(QObject* parent) : QAbstractItemModel(parent),
-	d_ptr(new QFileListModelPrivate)
+QFileListModel::QFileListModel (QObject *parent) : QAbstractItemModel (parent),
+	d_ptr (new QFileListModelPrivate)
 {
 	d_ptr->q_ptr = this;
 
-	connect(&d_ptr->futureWatcher, SIGNAL(finished()), this, SLOT(_q_finishedLoadIcons()));
+	connect (&d_ptr->futureWatcher, SIGNAL (finished()), this, SLOT (_q_finishedLoadIcons()));
 
 #ifndef QT_NO_FILESYSTEMWATCHER
-	connect(d_ptr->fileSystemWatcher, SIGNAL(directoryChanged(const QString&)),
-			this, SLOT(_q_directoryChanged()));
+	connect (d_ptr->fileSystemWatcher, SIGNAL (directoryChanged (const QString &)),
+			 this, SLOT (_q_directoryChanged()));
 #endif
 }
 
@@ -334,85 +359,101 @@ QFileListModel::~QFileListModel()
 	delete d_ptr;
 }
 
-QModelIndex QFileListModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex QFileListModel::index (int row, int column, const QModelIndex &parent) const
 {
-	Q_D(const QFileListModel);
+	Q_D (const QFileListModel);
 
-	if(row < 0 || column < 0 || row >= rowCount(parent) || column >= columnCount(parent))
+	if (row < 0 || column < 0 || row >= rowCount (parent) || column >= columnCount (parent)) {
 		return QModelIndex();
-	return createIndex(row, column, d->nodes.at(row));
+	}
+
+	return createIndex (row, column, d->nodes.at (row));
 }
 
-QModelIndex QFileListModel::buddy(const QModelIndex& index) const
+QModelIndex QFileListModel::buddy (const QModelIndex &index) const
 {
-	return index.sibling(index.row(), NameColumn);
+	return index.sibling (index.row(), NameColumn);
 }
 
-QModelIndex QFileListModel::parent(const QModelIndex& child) const
+QModelIndex QFileListModel::parent (const QModelIndex &child) const
 {
 //	if(!child.isValid() || (child.row() == 0 && child.column() == 0))
 //		return QModelIndex();
 	return QModelIndex();
 }
 
-bool QFileListModel::hasChildren(const QModelIndex& parent) const
+bool QFileListModel::hasChildren (const QModelIndex &parent) const
 {
-	Q_D(const QFileListModel);
+	Q_D (const QFileListModel);
 
-	if(parent.column() > 0)
+	if (parent.column() > 0) {
 		return false;
+	}
 
-	if(!parent.isValid())
+	if (!parent.isValid()) {
 		return !d->nodes.isEmpty();
+	}
 
-	return d->node(parent)->isDir();
+	return d->node (parent)->isDir();
 }
 
-int QFileListModel::rowCount(const QModelIndex& parent) const
+int QFileListModel::rowCount (const QModelIndex &parent) const
 {
-	Q_D(const QFileListModel);
+	Q_D (const QFileListModel);
 
-	if(parent.column() > 0)
+	if (parent.column() > 0) {
 		return 0;
+	}
 
-	if(!parent.isValid())
+	if (!parent.isValid()) {
 		return d->nodes.size();
+	}
 
 	return 0;
 }
 
-int QFileListModel::columnCount(const QModelIndex& parent) const
+int QFileListModel::columnCount (const QModelIndex &parent) const
 {
 	return (parent.column() > 0) ? 0 : ColumnCount;
 }
 
-Qt::ItemFlags QFileListModel::flags(const QModelIndex& index) const
+Qt::ItemFlags QFileListModel::flags (const QModelIndex &index) const
 {
-	Q_D(const QFileListModel);
-	QPCFileInfo* node = d->node(index);
-	if(!node)
+	Q_D (const QFileListModel);
+	QPCFileInfo *node = d->node (index);
+
+	if (!node) {
 		return Qt::NoItemFlags;
+	}
 
 	Qt::ItemFlags flags = Qt::ItemIsEnabled;
 
-	bool dotDot = node->fileName() == QLatin1String("..");
-	if(!dotDot)
+	bool dotDot = node->fileName() == QLatin1String ("..");
+
+	if (!dotDot) {
 		flags |= Qt::ItemIsSelectable;
+	}
+
 	QFile::Permissions perms = node->permissions();
-	if(!dotDot && (perms & QFile::ReadUser))
+
+	if (!dotDot && (perms & QFile::ReadUser)) {
 		flags |= Qt::ItemIsDragEnabled;
-	if(perms & QFile::WriteUser)
-	{
-		if(node->isDir())
+	}
+
+	if (perms & QFile::WriteUser) {
+		if (node->isDir()) {
 			flags |= Qt::ItemIsDropEnabled;
-		if(!dotDot && index.column() == 0)
+		}
+
+		if (!dotDot && index.column() == 0) {
 			flags |= Qt::ItemIsEditable;
+		}
 	}
 
 	return flags;
 }
 
-QString QFileListModelPrivate::size(qint64 bytes)
+QString QFileListModelPrivate::size (qint64 bytes)
 {
 	// According to the Si standard KB is 1000 bytes, KiB is 1024
 	// but on windows sizes are calculated by dividing by 1024 so we do what they do.
@@ -420,154 +461,221 @@ QString QFileListModelPrivate::size(qint64 bytes)
 	const qint64 mb = 1024 * kb;
 	const qint64 gb = 1024 * mb;
 	const qint64 tb = 1024 * gb;
-	if (bytes >= tb)
-		return QFileListModel::tr("%1 TB").arg(QLocale().toString(qreal(bytes) / tb, 'f', 3));
-	if (bytes >= gb)
-		return QFileListModel::tr("%1 GB").arg(QLocale().toString(qreal(bytes) / gb, 'f', 2));
-	if (bytes >= mb)
-		return QFileListModel::tr("%1 MB").arg(QLocale().toString(qreal(bytes) / mb, 'f', 1));
-	if (bytes >= kb)
-		return QFileListModel::tr("%1 KB").arg(QLocale().toString(bytes / kb));
-	return QFileListModel::tr("%1 bytes").arg(QLocale().toString(bytes));
+
+	if (bytes >= tb) {
+		return QFileListModel::tr ("%1 TB").arg (QLocale().toString (qreal (bytes) / tb, 'f', 3));
+	}
+
+	if (bytes >= gb) {
+		return QFileListModel::tr ("%1 GB").arg (QLocale().toString (qreal (bytes) / gb, 'f', 2));
+	}
+
+	if (bytes >= mb) {
+		return QFileListModel::tr ("%1 MB").arg (QLocale().toString (qreal (bytes) / mb, 'f', 1));
+	}
+
+	if (bytes >= kb) {
+		return QFileListModel::tr ("%1 KB").arg (QLocale().toString (bytes / kb));
+	}
+
+	return QFileListModel::tr ("%1 bytes").arg (QLocale().toString (bytes));
 }
 
-QVariant QFileListModel::data(const QModelIndex& index, int role) const
+QVariant QFileListModel::data (const QModelIndex &index, int role) const
 {
-	Q_D(const QFileListModel);
-	if(!index.isValid() || index.model() != this)
-		return QVariant();
+	Q_D (const QFileListModel);
 
-	QPCFileInfo* node = d->node(index);
-	switch(role)
-	{
+	if (!index.isValid() || index.model() != this) {
+		return QVariant();
+	}
+
+	QPCFileInfo *node = d->node (index);
+
+	switch (role) {
 		case Qt::EditRole:
-			switch(index.column())
-			{
-				case NameColumn: return node->fileName();
-				default: break;
+			switch (index.column()) {
+				case NameColumn:
+					return node->fileName();
+
+				default:
+					break;
 			}
+
 			break;
+
 		case Qt::DisplayRole:
-			switch(index.column())
-			{
-				case NameColumn: return node->name();
-				case TypeColumn: return node->ext();
-				case SizeColumn: return !node->isDir() || node->isSymLink() ? d->size(node->size()) : tr("<folder>");
-				case ModifiedTimeColumn: return node->lastModified().toString("dd.MM.yy hh:mm:ss");
-				case OwnerColumn: return node->fileInfo().owner();
-				case GroupColumn: return node->fileInfo().group();
-				case PermissionsColumn:
-				{
+			switch (index.column()) {
+				case NameColumn:
+					return node->name();
+
+				case TypeColumn:
+					return node->ext();
+
+				case SizeColumn:
+					return !node->isDir() || node->isSymLink() ? d->size (node->size()) : tr ("<folder>");
+
+				case ModifiedTimeColumn:
+					return node->lastModified().toString ("dd.MM.yy hh:mm:ss");
+
+				case OwnerColumn:
+					return node->fileInfo().owner();
+
+				case GroupColumn:
+					return node->fileInfo().group();
+
+				case PermissionsColumn: {
 					QFile::Permissions perms = node->permissions();
 
 					QString ret;
-					ret.append(node->isDir() ? "d" : node->isSymLink() ? "l" : "-");
+					ret.append (node->isDir() ? "d" : node->isSymLink() ? "l" : "-");
 
-					ret.append((perms & QFile::ReadUser) ? "r" : "-");
-					ret.append((perms & QFile::WriteUser) ? "w" : "-");
-					ret.append((perms & QFile::ExeUser) ? "x" : "-");
+					ret.append ( (perms & QFile::ReadUser) ? "r" : "-");
+					ret.append ( (perms & QFile::WriteUser) ? "w" : "-");
+					ret.append ( (perms & QFile::ExeUser) ? "x" : "-");
 
-					ret.append((perms & QFile::ReadGroup) ? "r" : "-");
-					ret.append((perms & QFile::WriteGroup) ? "w" : "-");
-					ret.append((perms & QFile::ExeGroup) ? "x" : "-");
+					ret.append ( (perms & QFile::ReadGroup) ? "r" : "-");
+					ret.append ( (perms & QFile::WriteGroup) ? "w" : "-");
+					ret.append ( (perms & QFile::ExeGroup) ? "x" : "-");
 
-					ret.append((perms & QFile::ReadOther) ? "r" : "-");
-					ret.append((perms & QFile::WriteOther) ? "w" : "-");
-					ret.append((perms & QFile::ExeOther) ? "x" : "-");
+					ret.append ( (perms & QFile::ReadOther) ? "r" : "-");
+					ret.append ( (perms & QFile::WriteOther) ? "w" : "-");
+					ret.append ( (perms & QFile::ExeOther) ? "x" : "-");
 					return ret;
 				}
-					break;
+				break;
+
 				case AttributesColumn:
 #ifdef Q_WS_WIN
-				{
-					qint64 attributes = QFileOperationsThread::winFileAttributes(node->absoluteFilePath());
-					if (attributes != INVALID_FILE_ATTRIBUTES)
 					{
-						QString attr;
-						attr += (attributes & FILE_ATTRIBUTE_READONLY) ? "r" : "-";
-						attr += (attributes & FILE_ATTRIBUTE_ARCHIVE) ? "a" : "-";
-						attr += (attributes & FILE_ATTRIBUTE_HIDDEN) ? "h" : "-";
-						attr += (attributes & FILE_ATTRIBUTE_SYSTEM) ? "s" : "-";
-						attr += (attributes & FILE_ATTRIBUTE_COMPRESSED) ? "c" : "-";
-						attr += (attributes & FILE_ATTRIBUTE_ENCRYPTED) ? "e" : "-";
-						return attr;
+						qint64 attributes = QFileOperationsThread::winFileAttributes (node->absoluteFilePath());
+
+						if (attributes != INVALID_FILE_ATTRIBUTES) {
+							QString attr;
+							attr += (attributes & FILE_ATTRIBUTE_READONLY) ? "r" : "-";
+							attr += (attributes & FILE_ATTRIBUTE_ARCHIVE) ? "a" : "-";
+							attr += (attributes & FILE_ATTRIBUTE_HIDDEN) ? "h" : "-";
+							attr += (attributes & FILE_ATTRIBUTE_SYSTEM) ? "s" : "-";
+							attr += (attributes & FILE_ATTRIBUTE_COMPRESSED) ? "c" : "-";
+							attr += (attributes & FILE_ATTRIBUTE_ENCRYPTED) ? "e" : "-";
+							return attr;
+						}
 					}
-				}
+
 #endif // Q_WS_WIN
 					break;
-				default: break;
+
+				default:
+					break;
 			}
+
 			break;
+
 		case FilePathRole:
 			return node->filePath();
+
 		case FileNameRole:
 			return node->fileName();
+
 		case Qt::DecorationRole:
-			if(index.column() == NameColumn)
-			{
+			if (index.column() == NameColumn) {
 				QIcon icon = node->icon();
-				if(icon.isNull())
-					icon = d->iconProvider->icon(node->isDir() ? QFileIconProvider::Folder : QFileIconProvider::File);
+
+				if (icon.isNull()) {
+					icon = d->iconProvider->icon (node->isDir() ? QFileIconProvider::Folder : QFileIconProvider::File);
+				}
+
 				return icon;
 			}
+
 			break;
+
 		case Qt::TextAlignmentRole:
-			if(index.column() == SizeColumn)
-				return !isDir(index) ? Qt::AlignRight : Qt::AlignHCenter;
-			break;
-		case Qt::ToolTipRole:
-			switch(index.column())
-			{
-				case NameColumn: return node->fileName();
-				case TypeColumn: return node->fileName();
-				case SizeColumn: return node->size();
-				case ModifiedTimeColumn: return node->lastModified().toString("dd.MM.yyyy hh:mm:ss");
-				default: break;
+			if (index.column() == SizeColumn) {
+				return !isDir (index) ? Qt::AlignRight : Qt::AlignHCenter;
 			}
+
 			break;
+
+		case Qt::ToolTipRole:
+			switch (index.column()) {
+				case NameColumn:
+					return node->fileName();
+
+				case TypeColumn:
+					return node->fileName();
+
+				case SizeColumn:
+					return node->size();
+
+				case ModifiedTimeColumn:
+					return node->lastModified().toString ("dd.MM.yyyy hh:mm:ss");
+
+				default:
+					break;
+			}
+
+			break;
+
 		case Qt::ForegroundRole:
-			if(node->lastModified().date().daysTo(QDate::currentDate()) <= 3)
+			if (node->lastModified().date().daysTo (QDate::currentDate()) <= 3) {
 				return Qt::blue;
+			}
+
 			break;
+
 		case FilePermissions:
-			return (int)node->permissions();
+			return (int) node->permissions();
 	}
 
 	return QVariant();
 }
 
-bool QFileListModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool QFileListModel::setData (const QModelIndex &index, const QVariant &value, int role)
 {
-/* if (role != Qt::EditRole)
-		 return false;
+	/* if (role != Qt::EditRole)
+			 return false;
 
-	TreeItem *item = getItem(index);
-	bool result = item->setData(index.column(), value);
+		TreeItem *item = getItem(index);
+		bool result = item->setData(index.column(), value);
 
-	if (result)
-		 emit dataChanged(index, index);
+		if (result)
+			 emit dataChanged(index, index);
 
-	return result;*/
+		return result;*/
 	return false;
 }
 
-QVariant QFileListModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant QFileListModel::headerData (int section, Qt::Orientation orientation, int role) const
 {
-	if(role == Qt::DisplayRole)
-	{
-		if(orientation == Qt::Horizontal)
-		{
-			switch(section)
-			{
-				case NameColumn: return tr("Name");
-				case TypeColumn: return tr("Type");
-				case SizeColumn: return tr("Size");
-				case ModifiedTimeColumn: return tr("Date");
-				case OwnerColumn: return tr("Owner");
-				case GroupColumn: return tr("Group");
-				case PermissionsColumn: return tr("Permissions");
-				case AttributesColumn: return tr("Attr");
-				default: break;
+	if (role == Qt::DisplayRole) {
+		if (orientation == Qt::Horizontal) {
+			switch (section) {
+				case NameColumn:
+					return tr ("Name");
+
+				case TypeColumn:
+					return tr ("Type");
+
+				case SizeColumn:
+					return tr ("Size");
+
+				case ModifiedTimeColumn:
+					return tr ("Date");
+
+				case OwnerColumn:
+					return tr ("Owner");
+
+				case GroupColumn:
+					return tr ("Group");
+
+				case PermissionsColumn:
+					return tr ("Permissions");
+
+				case AttributesColumn:
+					return tr ("Attr");
+
+				default:
+					break;
 			}
 		}
 
@@ -577,38 +685,38 @@ QVariant QFileListModel::headerData(int section, Qt::Orientation orientation, in
 	return QVariant();
 }
 
-bool QFileListModel::isDir(const QModelIndex& index) const
+bool QFileListModel::isDir (const QModelIndex &index) const
 {
-	Q_D(const QFileListModel);
-	QPCFileInfo* node = d->node(index);
+	Q_D (const QFileListModel);
+	QPCFileInfo *node = d->node (index);
 	return node ? node->isDir() : false;
 }
 
-qint64 QFileListModel::size(const QModelIndex& index) const
+qint64 QFileListModel::size (const QModelIndex &index) const
 {
-	Q_D(const QFileListModel);
-	QPCFileInfo* node = d->node(index);
+	Q_D (const QFileListModel);
+	QPCFileInfo *node = d->node (index);
 	return node ? node->size() : 0;
 }
 
-QFile::Permissions QFileListModel::permissions(const QModelIndex& index) const
+QFile::Permissions QFileListModel::permissions (const QModelIndex &index) const
 {
-	Q_D(const QFileListModel);
-	QPCFileInfo* node = d->node(index);
-	return node ? node->permissions() : QFile::Permissions(0);
+	Q_D (const QFileListModel);
+	QPCFileInfo *node = d->node (index);
+	return node ? node->permissions() : QFile::Permissions (0);
 }
 
-QString QFileListModel::filePath(const QModelIndex& index) const
+QString QFileListModel::filePath (const QModelIndex &index) const
 {
-	Q_D(const QFileListModel);
-	QPCFileInfo* node = d->node(index);
+	Q_D (const QFileListModel);
+	QPCFileInfo *node = d->node (index);
 	return node ? node->filePath() : QString();
 }
 
-QString QFileListModel::fileName(const QModelIndex& index) const
+QString QFileListModel::fileName (const QModelIndex &index) const
 {
-	Q_D(const QFileListModel);
-	QPCFileInfo* node = d->node(index);
+	Q_D (const QFileListModel);
+	QPCFileInfo *node = d->node (index);
 	return node ? node->fileName() : QString();
 }
 
@@ -619,147 +727,167 @@ QVariant QFileListModel::myComputer() const
 
 QDir QFileListModel::rootDirectory() const
 {
-	Q_D(const QFileListModel);
+	Q_D (const QFileListModel);
 	return d->rootDir;
 }
 
 QString QFileListModel::rootPath() const
 {
-	Q_D(const QFileListModel);
+	Q_D (const QFileListModel);
 	return d->rootDir.absolutePath();
 }
 
-QModelIndex QFileListModel::setRootPath(const QString& path)
+QModelIndex QFileListModel::setRootPath (const QString &path)
 {
-	Q_D(QFileListModel);
+	Q_D (QFileListModel);
 
-	d->rootDir.setPath(path);
-	d->root.setFileInfo(QFileInfo(path));
+	d->rootDir.setPath (path);
+	d->root.setFileInfo (QFileInfo (path));
 
 	d->fetchFileList();
 
-	emit rootPathChanged(d->rootDir.absolutePath());
+	emit rootPathChanged (d->rootDir.absolutePath());
 
 #ifndef QT_NO_FILESYSTEMWATCHER
-	if(!d->fileSystemWatcher->directories().isEmpty())
-		d->fileSystemWatcher->removePaths(d->fileSystemWatcher->directories());
+
+	if (!d->fileSystemWatcher->directories().isEmpty()) {
+		d->fileSystemWatcher->removePaths (d->fileSystemWatcher->directories());
+	}
+
 #ifdef Q_WS_WIN
-	if(!d->rootDir.absolutePath().startsWith(QLatin1String("//")))
+
+	if (!d->rootDir.absolutePath().startsWith (QLatin1String ("//")))
 #endif
-		d->fileSystemWatcher->addPath(d->rootDir.absolutePath());
+		d->fileSystemWatcher->addPath (d->rootDir.absolutePath());
+
 #endif
 
 	return QModelIndex();
 }
 
-QModelIndex QFileListModel::index(const QString& fileName) const
+QModelIndex QFileListModel::index (const QString &fileName) const
 {
-	Q_D(const QFileListModel);
+	Q_D (const QFileListModel);
 
-	for(int row = 0, n = d->nodes.size(); row < n; ++row)
-	{
-		if(d->nodes.at(row)->fileName() == fileName)
-			return index(row, 0, QModelIndex());
+	for (int row = 0, n = d->nodes.size(); row < n; ++row) {
+		if (d->nodes.at (row)->fileName() == fileName) {
+			return index (row, 0, QModelIndex());
+		}
 	}
+
 	return QModelIndex();
 }
 
 QDir::Filters QFileListModel::filter() const
 {
-	Q_D(const QFileListModel);
+	Q_D (const QFileListModel);
 	return d->rootDir.filter();
 }
 
-void QFileListModel::setFilter(QDir::Filters filters)
+void QFileListModel::setFilter (QDir::Filters filters)
 {
-	Q_D(QFileListModel);
-	d->rootDir.setFilter(filters);
+	Q_D (QFileListModel);
+	d->rootDir.setFilter (filters);
 	d->fetchFileList();
 }
 
-QFileIconProvider* QFileListModel::iconProvider() const
+QFileIconProvider *QFileListModel::iconProvider() const
 {
-	Q_D(const QFileListModel);
+	Q_D (const QFileListModel);
 	return d->iconProvider;
 }
 
-void QFileListModel::setIconProvider(QFileIconProvider* iconProvider)
+void QFileListModel::setIconProvider (QFileIconProvider *iconProvider)
 {
-	Q_D(QFileListModel);
+	Q_D (QFileListModel);
 
-	if(d->iconProvider == iconProvider)
+	if (d->iconProvider == iconProvider) {
 		return;
+	}
 
 	delete d->iconProvider;
 	d->iconProvider = iconProvider;
 }
 
-void QFileListModel::sort(int column, Qt::SortOrder order)
+void QFileListModel::sort (int column, Qt::SortOrder order)
 {
-	Q_D(QFileListModel);
-	if(d->sortColumn == column && d->sortOrder == order)
+	Q_D (QFileListModel);
+
+	if (d->sortColumn == column && d->sortOrder == order) {
 		return;
+	}
 
 	emit layoutAboutToBeChanged();
 	QModelIndexList oldList = persistentIndexList();
 	QList<QPair<QString, int> > oldNodes;
-	for(int i = 0, n = oldList.size(); i < n; ++i)
-	{
-		QPair<QString, int> pair(d->node(oldList.at(i))->fileName(), oldList.at(i).column());
-		oldNodes.append(pair);
+
+	for (int i = 0, n = oldList.size(); i < n; ++i) {
+		QPair<QString, int> pair (d->node (oldList.at (i))->fileName(), oldList.at (i).column());
+		oldNodes.append (pair);
 	}
 
 	d->sortColumn = column;
 	d->sortOrder = order;
 
 	d->sort = QDir::DirsFirst | QDir::IgnoreCase;
-	d->sort |= QDir::SortFlags(0x100 | 0x200 | 0x300);
-	if(d->sortColumn == NameColumn)
+	d->sort |= QDir::SortFlags (0x100 | 0x200 | 0x300);
+
+	if (d->sortColumn == NameColumn) {
 		d->sort |= QDir::Name;
-	else if(d->sortColumn == TypeColumn)
+	} else if (d->sortColumn == TypeColumn) {
 		d->sort |= QDir::Type;
-	else if(d->sortColumn == SizeColumn)
+	} else if (d->sortColumn == SizeColumn) {
 		d->sort |= QDir::Size;
-	else if(d->sortColumn == ModifiedTimeColumn)
+	} else if (d->sortColumn == ModifiedTimeColumn) {
 		d->sort |= QDir::Time;
-	if(d->sortOrder != Qt::AscendingOrder)
+	}
+
+	if (d->sortOrder != Qt::AscendingOrder) {
 		d->sort |= QDir::Reversed;
+	}
 
 	//Sort file list
 	QFileInfoList infos;
-	for(int i = 0, n = d->nodes.size(); i < n; ++i)
-		infos.append(d->nodes.at(i)->fileInfo());
-	QFuture<QFileInfoList> sortFuture = QtConcurrent::run(Dir::sortFileList, infos, d->sort);
-	while(sortFuture.isRunning())
+
+	for (int i = 0, n = d->nodes.size(); i < n; ++i) {
+		infos.append (d->nodes.at (i)->fileInfo());
+	}
+
+	QFuture<QFileInfoList> sortFuture = QtConcurrent::run (Dir::sortFileList, infos, d->sort);
+
+	while (sortFuture.isRunning()) {
 		QCoreApplication::processEvents();
+	}
+
 	infos = sortFuture.result();
-	for(int i = 0, n = infos.size(); i < n; ++i)
-	{
-		int j = d->index(infos.at(i).fileName(), 0).row();
-		d->nodes.swap(i, j);
+
+	for (int i = 0, n = infos.size(); i < n; ++i) {
+		int j = d->index (infos.at (i).fileName(), 0).row();
+		d->nodes.swap (i, j);
 	}
 
 
 	QModelIndexList newList;
-	for(int i = 0, n = oldNodes.size(); i < n; ++i)
-	{
-		QModelIndex idx = d->index(oldNodes.at(i).first, oldNodes.at(i).second);
-		newList.append(idx);
+
+	for (int i = 0, n = oldNodes.size(); i < n; ++i) {
+		QModelIndex idx = d->index (oldNodes.at (i).first, oldNodes.at (i).second);
+		newList.append (idx);
 	}
-	changePersistentIndexList(oldList, newList);
+
+	changePersistentIndexList (oldList, newList);
 	emit layoutChanged();
 }
 
 void QFileListModel::abort()
 {
-	Q_D(QFileListModel);
+	Q_D (QFileListModel);
 	d->updateTimer.stop();
 	d->abort();
 }
 
 void QFileListModel::refresh()
 {
-	Q_D(QFileListModel);
+	Q_D (QFileListModel);
 	d->updateTimer.stop();
 	d->_q_directoryChanged();
 }
@@ -770,7 +898,7 @@ void QFileListModel::refresh()
 */
 QStringList QFileListModel::mimeTypes() const
 {
-	return QStringList("text/uri-list");
+	return QStringList ("text/uri-list");
 }
 
 /*!
@@ -781,29 +909,31 @@ QStringList QFileListModel::mimeTypes() const
 	If the list of indexes is empty, 0 is returned rather than a serialized
 	empty list.
 */
-QMimeData* QFileListModel::mimeData(const QModelIndexList& indexes) const
+QMimeData *QFileListModel::mimeData (const QModelIndexList &indexes) const
 {
-	Q_D(const QFileListModel);
+	Q_D (const QFileListModel);
 
 	QList<QUrl> urls;
 	QList<QModelIndex>::const_iterator it = indexes.constBegin();
-	for(; it != indexes.constEnd(); ++it)
-	{
-		if((*it).column() == 0)
-		{
-			QPCFileInfo* node = d->node(*it);
-			if(node->isLocalFile())
-				urls.append(QUrl::fromLocalFile(node->absoluteFilePath()));
-			else
-				urls.append(QUrl(node->absoluteFilePath()));
+
+	for (; it != indexes.constEnd(); ++it) {
+		if ( (*it).column() == 0) {
+			QPCFileInfo *node = d->node (*it);
+
+			if (node->isLocalFile()) {
+				urls.append (QUrl::fromLocalFile (node->absoluteFilePath()));
+			} else {
+				urls.append (QUrl (node->absoluteFilePath()));
+			}
 		}
 	}
-	if(!urls.isEmpty())
-	{
-		QMimeData* data = new QMimeData();
-		data->setUrls(urls);
+
+	if (!urls.isEmpty()) {
+		QMimeData *data = new QMimeData();
+		data->setUrls (urls);
 		return data;
 	}
+
 	return 0;
 }
 
@@ -814,47 +944,51 @@ QMimeData* QFileListModel::mimeData(const QModelIndexList& indexes) const
 
 	\sa supportedDropActions()
 */
-bool QFileListModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent)
+bool QFileListModel::dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
-	Q_UNUSED(row);
-	Q_UNUSED(column);
+	Q_UNUSED (row);
+	Q_UNUSED (column);
 
-	if(!data->hasFormat("text/uri-list") || data->urls().isEmpty() || isReadOnly())
+	if (!data->hasFormat ("text/uri-list") || data->urls().isEmpty() || isReadOnly()) {
 		return false;
+	}
 
-	if(!(flags(parent) & (Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable)))
+	if (! (flags (parent) & (Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsEditable))) {
 		return false;
+	}
 
 	bool success = true;
 
 	QList<QUrl> urls = data->urls();
 	QList<QUrl>::const_iterator it = urls.constBegin();
 
-	QString destination = filePath(parent) + QDir::separator();
+	QString destination = filePath (parent) + QDir::separator();
 
-	switch(action)
-	{
+	switch (action) {
 		case Qt::CopyAction:
-			for(; it != urls.constEnd(); ++it)
-			{
-				QString path = (*it).scheme() == QLatin1String("file") ? (*it).toLocalFile() : (*it).toString();
-				success = QFile::copy(path, destination + QFileInfo(path).fileName()) && success;
+			for (; it != urls.constEnd(); ++it) {
+				QString path = (*it).scheme() == QLatin1String ("file") ? (*it).toLocalFile() : (*it).toString();
+				success = QFile::copy (path, destination + QFileInfo (path).fileName()) && success;
 			}
+
 			break;
+
 		case Qt::LinkAction:
-			for(; it != urls.constEnd(); ++it)
-			{
-				QString path = (*it).scheme() == QLatin1String("file") ? (*it).toLocalFile() : (*it).toString();
-				success = QFile::link(path, destination + QFileInfo(path).fileName()) && success;
+			for (; it != urls.constEnd(); ++it) {
+				QString path = (*it).scheme() == QLatin1String ("file") ? (*it).toLocalFile() : (*it).toString();
+				success = QFile::link (path, destination + QFileInfo (path).fileName()) && success;
 			}
+
 			break;
+
 		case Qt::MoveAction:
-			for(; it != urls.constEnd(); ++it)
-			{
-				QString path = (*it).scheme() == QLatin1String("file") ? (*it).toLocalFile() : (*it).toString();
-				success = QFile::copy(path, destination + QFileInfo(path).fileName()) && QFile::remove(path) && success;
+			for (; it != urls.constEnd(); ++it) {
+				QString path = (*it).scheme() == QLatin1String ("file") ? (*it).toLocalFile() : (*it).toString();
+				success = QFile::copy (path, destination + QFileInfo (path).fileName()) && QFile::remove (path) && success;
 			}
+
 			break;
+
 		default:
 			return false;
 	}
@@ -870,28 +1004,29 @@ Qt::DropActions QFileListModel::supportedDropActions() const
 	return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
-bool QFileListModel::event(QEvent* event)
+bool QFileListModel::event (QEvent *event)
 {
 	//Q_D(QFileListModel);
-	if(event->type() == QEvent::LanguageChange)
-	{
+	if (event->type() == QEvent::LanguageChange) {
 	}
-	return QAbstractItemModel::event(event);
+
+	return QAbstractItemModel::event (event);
 }
 
-void QFileListModel::timerEvent(QTimerEvent* event)
+void QFileListModel::timerEvent (QTimerEvent *event)
 {
-	Q_D(QFileListModel);
-	if(event->timerId() == d->updateTimer.timerId())
-	{
+	Q_D (QFileListModel);
+
+	if (event->timerId() == d->updateTimer.timerId()) {
 		d->updateTimer.stop();
-		if(d->sheduledUpdate)
-		{
-			d->updateTimer.start(1500, this);
+
+		if (d->sheduledUpdate) {
+			d->updateTimer.start (1500, this);
 			d->updateFileList();
 		}
 	}
-	QAbstractItemModel::timerEvent(event);
+
+	QAbstractItemModel::timerEvent (event);
 }
 
 #include "moc_qfilelistmodel.cpp"
