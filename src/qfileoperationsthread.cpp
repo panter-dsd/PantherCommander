@@ -181,15 +181,9 @@ bool QFileOperationsThread::copyFile(const QString& qsSourceFileName,const QStri
 	qfSecondFile.close();
 //Change file date
 	copyFileTime(source,dest);
-#ifndef Q_CC_MSVC
-	#warning "Need error?"
-#endif
 //Change attributes
 	copyPermisions(source,dest);
-#ifndef Q_CC_MSVC
-	#warning "Need error?"
-#endif
-//
+
 	emit changedPercent(100);
 	return true;
 }
