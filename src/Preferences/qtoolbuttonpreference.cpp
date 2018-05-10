@@ -197,8 +197,8 @@ void QToolButtonPreference::slotChooseIconFile()
 
 QIcon QToolButtonPreference::getIcon(const QString& fileName, int number)
 {
-	QIcon icon;
 #ifdef Q_WS_WIN
+	QIcon icon;
 	HICON smallIcon, lageIcon;
 	if (ExtractIconEx((wchar_t*)fileName.utf16(), number, &lageIcon, &smallIcon, 1) > 0) {
 		ICONINFO info;
@@ -218,8 +218,10 @@ QIcon QToolButtonPreference::getIcon(const QString& fileName, int number)
 		DestroyIcon(smallIcon);
 		DestroyIcon(lageIcon);
 	}
-#endif
 	return icon;
+#else
+	return QIcon(fileName);
+#endif
 }
 
 void QToolButtonPreference::slotGetIconList(const QString& iconFileName)
@@ -232,6 +234,16 @@ void QToolButtonPreference::slotGetIconList(const QString& iconFileName)
 			item = new QListWidgetItem(getIcon(iconFileName, i), QString::number(i), qlwIcons);
 			qlwIcons->addItem(item);
 	}
+	if (qlwIcons->count() == 0) {
+		item = new QListWidgetItem(QFileIconProvider().icon(QFileInfo(iconFileName)), QString::number(0), qlwIcons);
+		qlwIcons->addItem(item);
+	}
+	qlwIcons->setCurrentItem(qlwIcons->item(0));
+#else
+	qlwIcons->clear();
+	QListWidgetItem* item;
+	item = new QListWidgetItem(getIcon(iconFileName, 0), QString::number(0), qlwIcons);
+	qlwIcons->addItem(item);
 	if (qlwIcons->count() == 0) {
 		item = new QListWidgetItem(QFileIconProvider().icon(QFileInfo(iconFileName)), QString::number(0), qlwIcons);
 		qlwIcons->addItem(item);
