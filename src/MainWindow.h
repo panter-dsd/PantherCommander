@@ -41,49 +41,10 @@ class MainWindow : public QMainWindow
 Q_OBJECT
     Q_PROPERTY(QStringList commandHistory
                    READ
-                   commandHistory
+                       commandHistory
                    WRITE
                    setCommandHistory)
 
-private:
-    DriveBar *qdbDriveBarLeft;
-    DriveBar *qdbDriveBarRight;
-    QFilePanel *qflvLeftPanel;
-    QFilePanel *qflvRightPanel;
-    QFilePanel *qfpFocusedFilePanel;
-    QSplitter *qsplitSplitter;
-    QLabel *qlConsolePath;
-    QComboBox *qcbConsoleCommand;
-    QFrame *qfCommandButtons;
-    QPointer<PantherViewer> pvViewer;
-    QStandardItemModel *qsimQeueuModel;
-    QList<QFileOperationsDialog *> qlQueueList;
-    QList<PCToolBar *> qlpcToolBars;
-
-    QPushButton *qpbRunConsole;
-    QPushButton *qpbView;
-    QPushButton *qpbEdit;
-    QPushButton *qpbCopy;
-    QPushButton *qpbMove;
-    QPushButton *qpbMkDir;
-    QPushButton *qpbRemove;
-    QPushButton *qpbExit;
-
-    QAction *actionCpCurFileName2Cmd;
-    QAction *actionCpCurFileNameWhithPath2Cmd;
-    QAction *actionClearCmd;
-
-    QAction *actionRunConsole;
-    QAction *actionView;
-    QAction *actionEdit;
-    QAction *actionCopy;
-    QAction *actionMove;
-    QAction *actionRename;
-    QAction *actionMkDir;
-    QAction *actionRemove;
-    QAction *actionExit;
-    QAction *actionFindFiles;
-    QAction *actionPreferences;
 public:
     explicit MainWindow (QWidget *parent = 0);
 
@@ -180,5 +141,45 @@ private Q_SLOTS:
 #ifdef Q_WS_WIN
     void slotTestingEnableNTFSPermissionLookup(bool enable);
 #endif
+
+private:
+    DriveBar *leftDriveBar_;
+    DriveBar *rightDriveBar_;
+    QFilePanel *leftPanel_;
+    QFilePanel *rightPanel_;
+    QFilePanel *focusedFilePanel_;
+    QSplitter *panelsSplitter_;
+    QLabel *consolePath_;
+    QComboBox *consoleCommandComboBox_;
+    QFrame *commandButtonsFrame_;
+    QPointer<PantherViewer> viewer_;
+    QStandardItemModel *qeueuModel_;
+    QList<QFileOperationsDialog *> queueList_;
+    QList<PCToolBar *> toolBars_;
+
+    QPushButton *runConsoleButton_;
+    QPushButton *viewButton_;
+    QPushButton *editButton_;
+    QPushButton *copyButton_;
+    QPushButton *moveButton_;
+    QPushButton *mkDirButton_;
+    QPushButton *removeButton_;
+    QPushButton *exitButton_;
+
+    QAction *actionCpCurFileName2Cmd_;
+    QAction *actionCpCurFileNameWhithPath2Cmd_;
+    QAction *actionClearCmd_;
+
+    QAction *actionRunConsole_;
+    QAction *actionView_;
+    QAction *actionEdit_;
+    QAction *actionCopy_;
+    QAction *actionMove_;
+    QAction *actionRename_;
+    QAction *actionMkDir_;
+    QAction *actionRemove_;
+    QAction *actionExit_;
+    QAction *actionFindFiles_;
+    QAction *actionPreferences_;
 };
 
