@@ -40,33 +40,33 @@ set( exp_HEADERS
 ################################################################
 
 set( src_SOURCE
-src/appsettings.cpp
-src/fileoperationthread.cpp
+    src/AppSettings.cpp
+    src/FileOperationThread.cpp
 src/main.cpp
-src/mainwindowimpl.cpp
-src/pccommands.cpp
-src/pctoolbar.cpp
-src/qfileoperationsconfirmationdialog.cpp
-src/qfileoperationsdialog.cpp
-src/qfileoperationsthread.cpp
-src/qfilepanel.cpp
-src/qfullview.cpp
-src/qselectdiscdialog.cpp
+    src/MainWindowImpl.cpp
+    src/PCCommands.cpp
+    src/PCToolBar.cpp
+    src/QFileOperationsConfirmationDialog.cpp
+    src/QFileOperationsDialog.cpp
+    src/QFileOperationsThread.cpp
+    src/QFilePanel.cpp
+	src/QFullView.cpp
+	src/QSelectDiscDialog.cpp
 )
 
 set( src_HEADERS
-src/appsettings.h
-src/fileoperationthread.h
-src/fileoperationthread_p.h
-src/mainwindowimpl.h
-src/pccommands.h
-src/pctoolbar.h
-src/qfileoperationsconfirmationdialog.h
-src/qfileoperationsdialog.h
-src/qfileoperationsthread.h
-src/qfilepanel.h
-src/qfullview.h
-src/qselectdiscdialog.h
+    src/AppSettings.h
+    src/FileOperationThread.h
+    src/FileOperationThread_p.h
+    src/MainWindowImpl.h
+    src/PCCommands.h
+    src/PCToolBar.h
+    src/QFileOperationsConfirmationDialog.h
+    src/QFileOperationsDialog.h
+    src/QFileOperationsThread.h
+    src/QFilePanel.h
+	src/QFullView.h
+	src/QSelectDiscDialog.h
 )
 
 ################################################################
@@ -74,15 +74,15 @@ src/qselectdiscdialog.h
 ################################################################
 
 set( dialogs_SOURCE
-src/dialogs/findfilesdialog.cpp
-src/dialogs/pccommandeditdialog.cpp
-src/dialogs/pccopymovedialog.cpp
+	src/dialogs/FindFilesDialog.cpp
+    src/dialogs/PCCommandEditDialog.cpp
+	src/dialogs/PCCopyMoveDialog.cpp
 )
 
 set( dialogs_HEADERS
-src/dialogs/findfilesdialog.h
-src/dialogs/pccommandeditdialog.h
-src/dialogs/pccopymovedialog.h
+	src/dialogs/FindFilesDialog.h
+    src/dialogs/PCCommandEditDialog.h
+	src/dialogs/PCCopyMoveDialog.h
 )
 
 
@@ -91,16 +91,16 @@ src/dialogs/pccopymovedialog.h
 ################################################################
 
 set( io_SOURCE
-src/io/volumeinfoprovider.cpp
-src/io/volumewatcher.cpp
-src/io/volumewatcher_unix.cpp
+    src/io/VolumeInfoProvider.cpp
+    src/io/VolumeWatcher.cpp
+	src/io/VolumeWatcher_unix.cpp
 #src/io/volumewatcher_win.cpp
 )
 
 set( io_HEADERS
-src/io/volumeinfoprovider.h
-src/io/volumewatcher_p.h
-src/io/volumewatcher_unix_p.h
+    src/io/VolumeInfoProvider.h
+    src/io/VolumeWatcher_p.h
+    src/io/VolumeWatcher_unix_p.h
 #src/io/volumewatcher_win_p.h
 )
 
@@ -110,12 +110,12 @@ src/io/volumewatcher_unix_p.h
 ################################################################
 
 set( models_SOURCE
-src/models/qfilelistmodel.cpp
+	src/models/QFileListModel.cpp
 )
 
 set( models_HEADERS
-src/models/qfilelistmodel_p.h
-src/models/qfilelistmodel.h
+    src/models/QFileListModel_p.h
+	src/models/QFileListModel.h
 )
 
 ################################################################
@@ -123,15 +123,15 @@ src/models/qfilelistmodel.h
 ################################################################
 
 set( PantherViewer_SOURCE
-src/PantherViewer/abstractview.cpp
-src/PantherViewer/pantherviewer.cpp
-src/PantherViewer/plainview.cpp
+    src/PantherViewer/AbstractView.cpp
+    src/PantherViewer/PantherViewer.cpp
+	src/PantherViewer/PlainView.cpp
 )
 
 set( PantherViewer_HEADERS
-src/PantherViewer/abstractview.h
-src/PantherViewer/pantherviewer.h
-src/PantherViewer/plainview.h
+    src/PantherViewer/AbstractView.h
+    src/PantherViewer/PantherViewer.h
+	src/PantherViewer/PlainView.h
 )
 
 
@@ -140,23 +140,23 @@ src/PantherViewer/plainview.h
 ################################################################
 
 set( Preferences_SOURCE
-src/Preferences/pccommandsdialog.cpp
-src/Preferences/pccommandspreference.cpp
-src/Preferences/qabstractpreferencespage.cpp
-src/Preferences/qinterfacepreference.cpp
-src/Preferences/qpreferenceglobal.cpp
-src/Preferences/qpreferencesdialog.cpp
-src/Preferences/qtoolbuttonpreference.cpp
+    src/Preferences/PCCommandsDialog.cpp
+    src/Preferences/PCCommandsPreference.cpp
+    src/Preferences/QAbstractPreferencesPage.cpp
+    src/Preferences/QInterfacePreference.cpp
+	src/Preferences/QPreferenceGlobal.cpp
+    src/Preferences/QPreferencesDialog.cpp
+    src/Preferences/QToolButtonPreference.cpp
 )
 
 set( Preferences_HEADERS
-src/Preferences/pccommandsdialog.h
-src/Preferences/pccommandspreference.h
-src/Preferences/qabstractpreferencespage.h
-src/Preferences/qinterfacepreference.h
-src/Preferences/qpreferenceglobal.h
-src/Preferences/qpreferencesdialog.h
-src/Preferences/qtoolbuttonpreference.h
+    src/Preferences/PCCommandsDialog.h
+    src/Preferences/PCCommandsPreference.h
+    src/Preferences/QAbstractPreferencesPage.h
+    src/Preferences/QInterfacePreference.h
+	src/Preferences/QPreferenceGlobal.h
+    src/Preferences/QPreferencesDialog.h
+    src/Preferences/QToolButtonPreference.h
 )
 
 
@@ -165,11 +165,11 @@ src/Preferences/qtoolbuttonpreference.h
 ################################################################
 
 set( tools_SOURCE
-src/tools/dirsorter.cpp
+    src/tools/DirSorter.cpp
 )
 
 set( tools_HEADERS
-src/tools/dirsorter.h
+    src/tools/DirSorter.h
 )
 
 
@@ -178,20 +178,20 @@ src/tools/dirsorter.h
 ################################################################
 
 set( widgets_SOURCE
-src/widgets/drivebar.cpp
-src/widgets/filewidget.cpp
-src/widgets/flowlayout.cpp
-src/widgets/pcshortcutedit.cpp
-src/widgets/tabbar.cpp
+    src/widgets/DriveBar.cpp
+    src/widgets/FileWidget.cpp
+	src/widgets/FlowLayout.cpp
+    src/widgets/PCShortcutEdit.cpp
+    src/widgets/TabBar.cpp
 )
 
 set( widgets_HEADERS
-src/widgets/drivebar.h
-src/widgets/filewidget.h
-src/widgets/filewidget_p.h
-src/widgets/flowlayout.h
-src/widgets/pcshortcutedit.h
-src/widgets/tabbar.h
+    src/widgets/DriveBar.h
+    src/widgets/FileWidget.h
+    src/widgets/FileWidget_p.h
+	src/widgets/FlowLayout.h
+    src/widgets/PCShortcutEdit.h
+    src/widgets/TabBar.h
 )
 
 add_executable( PantherCommander

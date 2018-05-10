@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QApplication>
 
-#include "mainwindowimpl.h"
+#include "MainWindowImpl.h"
 
 #define ApplicationVersion "0.0.0.6"
 
