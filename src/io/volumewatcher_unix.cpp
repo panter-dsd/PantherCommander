@@ -27,6 +27,7 @@
 #include "volumewatcher_unix_p.h"
 
 #include <QtCore/QEvent>
+#include <QtCore/QDebug>
 #include <QtCore/QFile>
 #ifndef QT_NO_THREAD
 #  include <QtCore/QMutex>
@@ -108,16 +109,15 @@ QStringList UnixVolumeWatcherEngine::volumes()
 	//###TODO: make thread-safe
 	QStringList ret;
 	QFile file("/etc/mtab");
-	if(file.open(QIODevice::ReadOnly | QIODevice::Text))
-	{
-		QTextStream stream(&file);
-		while(!stream.atEnd())
-		{
-			QStringList params = stream.readLine().split(QLatin1Char(' '));
-			if(params.size() > 1)
-				ret.append(params.at(1));
-		}
-		file.close();
+	file.open (QIODevice::ReadOnly);
+	for (const QByteArray &line : file.readAll ().split ('\n')) {
+			const auto params = line.split(' ');
+			if(params.size() > 1) {
+				const QString driveName = params.at(1).trimmed ();
+				if (!ret.contains (driveName)) {
+					ret.append (driveName);
+				}
+			}
 	}
 	return ret;
 }
