@@ -1,5 +1,4 @@
-#ifndef ABSTRACTVIEW_H
-#define ABSTRACTVIEW_H
+#pragma once
 
 #include <QWidget>
 
@@ -28,4 +27,3 @@ public:
     }
 };
 
-#endif // ABSTRACTVIEW_H

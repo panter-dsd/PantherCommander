@@ -1,5 +1,4 @@
-#ifndef QFILEOPERATIONSCONFIRMATIONDIALOG_H
-#define QFILEOPERATIONSCONFIRMATIONDIALOG_H
+#pragma once
 
 //
 class QVBoxLayout;
@@ -51,4 +50,3 @@ private Q_SLOTS:
     void slotButtonClick ();
 };
 
-#endif // QFILEOPERATIONSCONFIRMATIONDIALOG_H

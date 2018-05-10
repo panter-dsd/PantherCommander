@@ -1,5 +1,4 @@
-#ifndef VOLUMEWATCHER_WIN_P_H
-#define VOLUMEWATCHER_WIN_P_H
+#pragma once
 
 #include "VolumeWatcher_p.h"
 
@@ -18,5 +17,3 @@ public:
 
     bool getDiskFreeSpace (const QString &volume, qint64 *total, qint64 *free, qint64 *available) const;
 };
-
-#endif // VOLUMEWATCHER_WIN_P_H

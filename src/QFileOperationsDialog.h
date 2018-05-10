@@ -1,5 +1,4 @@
-#ifndef QFILEOPERATIONSDIALOG_H
-#define QFILEOPERATIONSDIALOG_H
+#pragma once
 
 //
 class QLabel;
@@ -124,4 +123,3 @@ Q_SIGNALS:
     void jobAdding (SJob &job);
 };
 
-#endif // QFILEOPERATIONSDIALOG_H

@@ -1,5 +1,4 @@
-#ifndef QFILELISTMODEL_P_H
-#define QFILELISTMODEL_P_H
+#pragma once
 
 #include "QFileListModel.h"
 
@@ -275,4 +274,3 @@ public:
     QBasicTimer updateTimer;
 };
 
-#endif // QFILELISTMODEL_P_H

@@ -1,5 +1,4 @@
-#ifndef QSELECTDISCDIALOG_H
-#define QSELECTDISCDIALOG_H
+#pragma once
 
 class QListWidget;
 
@@ -28,4 +27,3 @@ private Q_SLOTS:
     void selectDisc (QListWidgetItem *item);
 };
 
-#endif // QSELECTDISCDIALOG_H

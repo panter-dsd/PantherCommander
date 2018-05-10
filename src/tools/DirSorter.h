@@ -1,5 +1,4 @@
-#ifndef DIRSORTER_H
-#define DIRSORTER_H
+#pragma once
 
 #include <QtCore/QDir>
 #include <QtCore/QList>
@@ -13,4 +12,3 @@ struct Dir
     static QFileInfoList sortFileList (QFileInfoList &infos, QDir::SortFlags sort);
 };
 
-#endif // DIRSORTER_H

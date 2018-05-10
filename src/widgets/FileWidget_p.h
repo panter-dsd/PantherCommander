@@ -1,5 +1,4 @@
-#ifndef FILEWIDGET_P_H
-#define FILEWIDGET_P_H
+#pragma once
 
 #include "FileWidget.h"
 
@@ -215,4 +214,3 @@ inline QString FileWidgetPrivate::rootPath () const
     return model->rootPath ();
 }
 
-#endif // FILEWIDGET_P_H

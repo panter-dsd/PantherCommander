@@ -1,5 +1,4 @@
-#ifndef FLOWLAYOUT_H
-#define FLOWLAYOUT_H
+#pragma once
 
 #include <QLayout>
 #include <QRect>
@@ -49,4 +48,3 @@ private:
     int m_vSpace;
 };
 
-#endif

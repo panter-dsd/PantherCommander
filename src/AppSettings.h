@@ -1,6 +1,4 @@
-
-#ifndef APPSETTINGS_H
-#define APPSETTINGS_H
+#pragma once
 
 #include <QtCore/QSettings>
 
@@ -28,4 +26,3 @@ private:
     static AppSettings *pInstance;
 };
 
-#endif // APPSETTINGS_H

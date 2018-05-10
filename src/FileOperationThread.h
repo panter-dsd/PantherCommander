@@ -1,5 +1,4 @@
-#ifndef FILEOPERATIONTHREAD_H
-#define FILEOPERATIONTHREAD_H
+#pragma once
 
 #include <QThread>
 
@@ -37,4 +36,3 @@ private:
     FileOperationThreadPrivate *const d_ptr;
 };
 
-#endif // FILEOPERATIONTHREAD_H

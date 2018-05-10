@@ -1,5 +1,4 @@
-#ifndef QPREFERENCEGLOBAL_H
-#define QPREFERENCEGLOBAL_H
+#pragma once
 //
 #include "QAbstractPreferencesPage.h"
 
@@ -42,4 +41,3 @@ private:
     void setConnects ();
 };
 
-#endif // QPREFERENCEGLOBAL_H

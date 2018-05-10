@@ -1,5 +1,4 @@
-#ifndef PCSHORTCUTEDIT_H
-#define PCSHORTCUTEDIT_H
+#pragma once
 
 #include <QtWidgets/QLineEdit>
 
@@ -34,4 +33,3 @@ private Q_SLOTS:
     void textChange (const QString &text);
 };
 
-#endif // PCSHORTCUTEDIT_H

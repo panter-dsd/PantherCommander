@@ -1,5 +1,4 @@
-#ifndef QINTERFACEPREFERENCE_H
-#define QINTERFACEPREFERENCE_H
+#pragma once
 //
 #include "QAbstractPreferencesPage.h"
 
@@ -60,4 +59,3 @@ private:
     void setConnects ();
 };
 
-#endif // QINTERFACEPREFERENCE_H

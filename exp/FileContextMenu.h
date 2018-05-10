@@ -1,5 +1,4 @@
-#ifndef FILECONTEXTEMNU_H
-#define FILECONTEXTEMNU_H
+#pragma once
 
 #include <QtCore/QStringList>
 
@@ -51,4 +50,3 @@ public:
     qint64 itemUserData;
 };
 
-#endif // FILECONTEXTEMNU_H

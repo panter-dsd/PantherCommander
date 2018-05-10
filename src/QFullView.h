@@ -1,5 +1,4 @@
-#ifndef QFULLVIEW_H
-#define QFULLVIEW_H
+#pragma once
 
 #include <QtWidgets/QTreeView>
 
@@ -48,4 +47,3 @@ private:
     QPersistentModelIndex pressedIndex;
 };
 
-#endif // QFULLVIEW_H

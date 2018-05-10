@@ -1,5 +1,4 @@
-#ifndef VOLUMEWATCHER_P_H
-#define VOLUMEWATCHER_P_H
+#pragma once
 
 #include <QtCore/QAtomicInt>
 #include <QtCore/QFileInfo>
@@ -50,4 +49,3 @@ Q_SIGNALS:
     void volumeRemoved (const QString &volume);
 };
 
-#endif // VOLUMEWATCHER_P_H

@@ -1,5 +1,4 @@
-#ifndef DRIVEBAR_H
-#define DRIVEBAR_H
+#pragma once
 
 class QAction;
 
@@ -48,4 +47,3 @@ private Q_SLOTS:
     void volumeRemove (const QString &);
 };
 
-#endif // DRIVEBAR_H

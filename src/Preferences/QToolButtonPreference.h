@@ -1,5 +1,4 @@
-#ifndef QTOOLBUTTONPREFERENCE_H
-#define QTOOLBUTTONPREFERENCE_H
+#pragma once
 
 class QLabel;
 
@@ -84,4 +83,3 @@ private Q_SLOTS:
     void slotGetIconList (const QString &iconFileName);
 };
 
-#endif // QTOOLBUTTONPREFERENCE_H

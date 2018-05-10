@@ -1,5 +1,4 @@
-#ifndef PCCOPYMOVEDIALOG_H
-#define PCCOPYMOVEDIALOG_H
+#pragma once
 
 #include <QDialog>
 
@@ -53,4 +52,3 @@ private:
     void updateText ();
 };
 
-#endif // PCCOPYMOVEDIALOG_H

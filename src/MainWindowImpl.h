@@ -1,5 +1,4 @@
-#ifndef MAINWINDOWIMPL_H
-#define MAINWINDOWIMPL_H
+#pragma once
 
 #include <QMainWindow>
 #include <QMap>
@@ -183,4 +182,3 @@ private Q_SLOTS:
 #endif
 };
 
-#endif // MAINWINDOWIMPL_H

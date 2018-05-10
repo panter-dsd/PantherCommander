@@ -1,5 +1,4 @@
-#ifndef TABBAR_H
-#define TABBAR_H
+#pragma once
 
 #include <QtWidgets/QTabBar>
 
@@ -54,4 +53,3 @@ private:
     bool m_showTabBarWhenOneTab;
 };
 
-#endif // TABBAR_H

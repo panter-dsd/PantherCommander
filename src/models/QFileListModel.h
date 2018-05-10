@@ -1,5 +1,4 @@
-#ifndef QFILELISTMODEL_H
-#define QFILELISTMODEL_H
+#pragma once
 
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QDir>
@@ -132,4 +131,3 @@ private:
     Q_PRIVATE_SLOT(d_func (), void _q_finishedLoadIcons ())
 };
 
-#endif // QFILELISTMODEL_H

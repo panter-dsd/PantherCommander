@@ -1,5 +1,4 @@
-#ifndef QPREFERENCESDIALOG_H
-#define QPREFERENCESDIALOG_H
+#pragma once
 
 class QListWidget;
 
@@ -55,4 +54,3 @@ private Q_SLOTS:
     void slotSetDefaults ();
 };
 
-#endif

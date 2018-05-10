@@ -1,5 +1,4 @@
-#ifndef PANTHERVIEWER_H
-#define PANTHERVIEWER_H
+#pragma once
 
 //
 class QTabWidget;
@@ -65,4 +64,3 @@ private Q_SLOTS:
     void slotCloseCurrentTab ();
 };
 
-#endif // PANTHERVIEWER_H

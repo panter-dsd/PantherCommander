@@ -1,5 +1,4 @@
-#ifndef PCCOMMANDSDIALOG_H
-#define PCCOMMANDSDIALOG_H
+#pragma once
 
 class PCCommandsPreference;
 
@@ -33,4 +32,3 @@ private Q_SLOTS:
     void saveAndAccept ();
 };
 
-#endif // PCCOMMANDSDIALOG_H

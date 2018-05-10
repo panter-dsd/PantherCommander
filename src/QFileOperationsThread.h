@@ -1,5 +1,4 @@
-#ifndef QFILEOPERATIONSTHREAD_H
-#define QFILEOPERATIONSTHREAD_H
+#pragma once
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
@@ -173,4 +172,3 @@ public Q_SLOTS:
     }
 };
 
-#endif // QFILEOPERATIONSTHREAD_H

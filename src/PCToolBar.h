@@ -1,5 +1,4 @@
-#ifndef PCTOOLBAR_H
-#define PCTOOLBAR_H
+#pragma once
 
 #include <QtWidgets/QToolBar>
 #include "QToolButtonPreference.h"
@@ -63,4 +62,3 @@ Q_SIGNALS:
     void toolbarContextMenu (const QPoint &pos);
 };
 
-#endif // PCTOOLBAR_H

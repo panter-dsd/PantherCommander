@@ -1,5 +1,4 @@
-#ifndef FILEOPERATIONS_H
-#define FILEOPERATIONS_H
+#pragma once
 
 #include <QtCore/QStringList>
 
@@ -125,4 +124,3 @@ public:
     }
 };
 
-#endif // FILEOPERATIONS_H

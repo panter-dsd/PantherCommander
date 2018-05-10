@@ -1,5 +1,4 @@
-#ifndef PCCOMMANDS_H
-#define PCCOMMANDS_H
+#pragma once
 
 class QAction;
 
@@ -36,4 +35,3 @@ private:
     void loadShortcuts (QAction *action);
 };
 
-#endif // PCCOMMANDS_H

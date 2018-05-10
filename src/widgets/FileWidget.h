@@ -1,5 +1,4 @@
-#ifndef FILEWIDGET_H
-#define FILEWIDGET_H
+#pragma once
 
 #include <QtCore/QDir>
 #include <QtCore/QString>
@@ -129,4 +128,3 @@ inline void FileWidget::selectFile (const QString &fileName)
     selectFile (fileName, true);
 }
 
-#endif // FILEWIDGET_H

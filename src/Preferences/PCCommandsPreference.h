@@ -1,5 +1,4 @@
-#ifndef PCCOMMANDSPREFERENCE_H
-#define PCCOMMANDSPREFERENCE_H
+#pragma once
 
 class QListWidget;
 
@@ -84,4 +83,3 @@ Q_SIGNALS:
     void itemActivated ();
 };
 
-#endif // PCCommandsPreference_H

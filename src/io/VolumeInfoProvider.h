@@ -1,5 +1,4 @@
-#ifndef VOLUMEINFOPROVIDER_H
-#define VOLUMEINFOPROVIDER_H
+#pragma once
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
@@ -34,4 +33,3 @@ protected:
     VolumeWatcher *watcher;
 };
 
-#endif // VOLUMEINFOPROVIDER_H

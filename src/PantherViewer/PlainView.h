@@ -1,5 +1,4 @@
-#ifndef PLAINVIEW_H
-#define PLAINVIEW_H
+#pragma once
 
 //
 class QFile;
@@ -76,4 +75,3 @@ private Q_SLOTS:
     void slotScroll ();
 };
 
-#endif // PLAINVIEW_H

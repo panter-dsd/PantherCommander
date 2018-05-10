@@ -1,5 +1,4 @@
-#ifndef FINDFILESDIALOG_H
-#define FINDFILESDIALOG_H
+#pragma once
 
 #include <QtCore/QList>
 
@@ -54,4 +53,3 @@ private:
     QTabWidget *tabber;
 };
 
-#endif // FINDFILESDIALOG_H

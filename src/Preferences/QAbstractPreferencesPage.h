@@ -1,5 +1,4 @@
-#ifndef QABSTRACTPREFERENCESPAGE_H
-#define QABSTRACTPREFERENCESPAGE_H
+#pragma once
 
 #include <QtCore/QSettings>
 
@@ -31,4 +30,3 @@ Q_SIGNALS:
     void modified ();
 };
 
-#endif // QABSTRACTPREFERENCESPAGE_H

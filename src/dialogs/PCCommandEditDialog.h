@@ -1,5 +1,4 @@
-#ifndef PCCOMMANDEDITDIALOG_H
-#define PCCOMMANDEDITDIALOG_H
+#pragma once
 
 class QLabel;
 
@@ -71,4 +70,3 @@ private Q_SLOTS:
     void removeShortcut ();
 };
 
-#endif // PCCOMMANDEDITDIALOG_H

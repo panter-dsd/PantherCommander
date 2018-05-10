@@ -1,5 +1,4 @@
-#ifndef QFILEPANEL_H
-#define QFILEPANEL_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -87,4 +86,3 @@ private:
     static QString size (qint64 bytes);
 };
 
-#endif // QFILEPANEL_H

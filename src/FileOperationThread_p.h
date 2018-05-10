@@ -1,5 +1,4 @@
-#ifndef FILEOPERATIONTHREAD_P_H
-#define FILEOPERATIONTHREAD_P_H
+#pragma once
 
 #include "FileOperationThread.h"
 #include "FileOperations.h"
@@ -34,4 +33,3 @@ private:
     mutable QMutex mutex;
 };
 
-#endif // FILEOPERATIONTHREAD_P_H
