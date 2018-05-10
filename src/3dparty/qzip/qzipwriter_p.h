@@ -46,20 +46,24 @@
 #include <QtCore/QString>
 
 class QZipWriterPrivate;
+
 class QZipWriter
 {
 public:
-    QZipWriter(const QString &fileName, QIODevice::OpenMode mode = (QIODevice::WriteOnly | QIODevice::Truncate));
+    QZipWriter (const QString &fileName, QIODevice::OpenMode mode = (QIODevice::WriteOnly | QIODevice::Truncate));
 
-    explicit QZipWriter(QIODevice *device);
-    ~QZipWriter();
+    explicit QZipWriter (QIODevice *device);
 
-    QIODevice* device() const;
+    ~QZipWriter ();
 
-    bool isWritable() const;
-    bool exists() const;
+    QIODevice *device () const;
 
-    enum Status {
+    bool isWritable () const;
+
+    bool exists () const;
+
+    enum Status
+    {
         NoError,
         FileWriteError,
         FileOpenError,
@@ -67,29 +71,33 @@ public:
         FileError
     };
 
-    Status status() const;
+    Status status () const;
 
-    enum CompressionPolicy {
+    enum CompressionPolicy
+    {
         AlwaysCompress,
         NeverCompress,
         AutoCompress
     };
 
-    void setCompressionPolicy(CompressionPolicy policy);
-    CompressionPolicy compressionPolicy() const;
+    void setCompressionPolicy (CompressionPolicy policy);
 
-    void setCreationPermissions(QFile::Permissions permissions);
-    QFile::Permissions creationPermissions() const;
+    CompressionPolicy compressionPolicy () const;
 
-    void addFile(const QString &fileName, const QByteArray &data);
+    void setCreationPermissions (QFile::Permissions permissions);
 
-    void addFile(const QString &fileName, QIODevice *device);
+    QFile::Permissions creationPermissions () const;
 
-    void addDirectory(const QString &dirName);
+    void addFile (const QString &fileName, const QByteArray &data);
 
-    void addSymLink(const QString &fileName, const QString &destination);
+    void addFile (const QString &fileName, QIODevice *device);
 
-    void close();
+    void addDirectory (const QString &dirName);
+
+    void addSymLink (const QString &fileName, const QString &destination);
+
+    void close ();
+
 private:
     QZipWriterPrivate *d;
     Q_DISABLE_COPY(QZipWriter)

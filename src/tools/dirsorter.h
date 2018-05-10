@@ -29,11 +29,12 @@
 #include <QtCore/QList>
 
 class QFileInfo;
+
 typedef QList<QFileInfo> QFileInfoList;
 
 struct Dir
 {
-	static QFileInfoList sortFileList(QFileInfoList& infos, QDir::SortFlags sort);
+    static QFileInfoList sortFileList (QFileInfoList &infos, QDir::SortFlags sort);
 };
 
 #endif // DIRSORTER_H

@@ -34,24 +34,28 @@ class QMutex;
 
 class FileOperationThreadPrivate
 {
-	Q_DECLARE_PUBLIC(FileOperationThread)
+    Q_DECLARE_PUBLIC(FileOperationThread)
 
 public:
-	FileOperationThreadPrivate();
-	~FileOperationThreadPrivate();
+    FileOperationThreadPrivate ();
 
-	void nextOperation();
-	void copy(FileOperation* operation);
-	void copyDir(const QString& source, const QString& dest);
-	void copyFile(const QString& source, const QString& dest);
+    ~FileOperationThreadPrivate ();
 
-	FileOperationThread *q_ptr;
+    void nextOperation ();
 
-	QList<FileOperation> operationList;
-	int currentID;
+    void copy (FileOperation *operation);
+
+    void copyDir (const QString &source, const QString &dest);
+
+    void copyFile (const QString &source, const QString &dest);
+
+    FileOperationThread *q_ptr;
+
+    QList<FileOperation> operationList;
+    int currentID;
 
 private:
-	mutable QMutex mutex;
+    mutable QMutex mutex;
 };
 
 #endif // FILEOPERATIONTHREAD_P_H

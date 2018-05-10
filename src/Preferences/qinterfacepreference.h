@@ -26,51 +26,62 @@
 #define QINTERFACEPREFERENCE_H
 //
 #include "qabstractpreferencespage.h"
+
 //
 class QCheckBox;
+
 class QGroupBox;
+
 //
 class QInterfacePreference : public QAbstractPreferencesPage
 {
-	Q_OBJECT
+Q_OBJECT
 
 private:
-	QGroupBox							*qgbGlobal;
-	QCheckBox							*qchbShowDriveBar;
-	QCheckBox							*qchbShowTwoDriveBar;
-	QCheckBox							*qchbShowDriveButton;
-	QCheckBox							*qchbShowDriveComboBox;
-	QCheckBox							*qchbShowTabs;
-	QCheckBox							*qchbShowHeader;
-	QCheckBox							*qchbShowDirInformation;
-	QCheckBox							*qchbShowCommandLine;
-	QCheckBox							*qchbShowFunctionButtons;
+    QGroupBox *qgbGlobal;
+    QCheckBox *qchbShowDriveBar;
+    QCheckBox *qchbShowTwoDriveBar;
+    QCheckBox *qchbShowDriveButton;
+    QCheckBox *qchbShowDriveComboBox;
+    QCheckBox *qchbShowTabs;
+    QCheckBox *qchbShowHeader;
+    QCheckBox *qchbShowDirInformation;
+    QCheckBox *qchbShowCommandLine;
+    QCheckBox *qchbShowFunctionButtons;
 
-	QGroupBox							*qgbCurrentPathEditor;
-	QCheckBox							*qchbShowHistory;
-	QCheckBox							*qchbShowGotoRoot;
-	QCheckBox							*qchbShowGotoUp;
-	QCheckBox							*qchbShowGotoHome;
+    QGroupBox *qgbCurrentPathEditor;
+    QCheckBox *qchbShowHistory;
+    QCheckBox *qchbShowGotoRoot;
+    QCheckBox *qchbShowGotoUp;
+    QCheckBox *qchbShowGotoHome;
 
-	QGroupBox							*qgbFlatInterface;
-	QCheckBox							*qchbFlatToolBar;
-	QCheckBox							*qchbFlatDriveBar;
-	QCheckBox							*qchbFlatDriveButtons;
-	QCheckBox							*qchbFlatFunctionButtons;
+    QGroupBox *qgbFlatInterface;
+    QCheckBox *qchbFlatToolBar;
+    QCheckBox *qchbFlatDriveBar;
+    QCheckBox *qchbFlatDriveButtons;
+    QCheckBox *qchbFlatFunctionButtons;
 public:
-	QInterfacePreference(QWidget *parent = 0);
-	~QInterfacePreference();
+    QInterfacePreference (QWidget *parent = 0);
 
-	void saveSettings();
-	void loadSettings();
-	void setDefaults();
+    ~QInterfacePreference ();
 
-	static QString preferenceGroup() { return tr("Interface"); }
+    void saveSettings ();
+
+    void loadSettings ();
+
+    void setDefaults ();
+
+    static QString preferenceGroup ()
+    {
+        return tr ("Interface");
+    }
 
 private:
-	void createControls();
-	void setLayouts();
-	void setConnects();
+    void createControls ();
+
+    void setLayouts ();
+
+    void setConnects ();
 };
 
 #endif // QINTERFACEPREFERENCE_H

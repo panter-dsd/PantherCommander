@@ -26,42 +26,57 @@
 #define QPREFERENCESDIALOG_H
 
 class QListWidget;
+
 class QStackedWidget;
+
 class QDialogButtonBox;
+
 class QPushButton;
 
 #include <QDialog>
 
 class QPreferencesDialog : public QDialog
 {
-	Q_OBJECT
+Q_OBJECT
 
 private:
-	QListWidget *qlwPreferencesList;
-	QStackedWidget *qswPreferencesWidgets;
-	QDialogButtonBox *qdbbButtons;
-	QPushButton *qpbSetDefaults;
+    QListWidget *qlwPreferencesList;
+    QStackedWidget *qswPreferencesWidgets;
+    QDialogButtonBox *qdbbButtons;
+    QPushButton *qpbSetDefaults;
 
 private:
-	void createControls();
-	void setLayouts();
-	void setConnects();
-	void setMaximumSizePreferencesList();
-	void loadSettings();
-	void saveSattings();
+    void createControls ();
+
+    void setLayouts ();
+
+    void setConnects ();
+
+    void setMaximumSizePreferencesList ();
+
+    void loadSettings ();
+
+    void saveSattings ();
 
 public:
-	QPreferencesDialog(QWidget * parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
-	~QPreferencesDialog();
+    QPreferencesDialog (QWidget *parent = 0,
+                        Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
+
+    ~QPreferencesDialog ();
 
 private Q_SLOTS:
-	void slotSavePreferences();
-	void slotSavePreferencesAndExit()
-	{
-		slotSavePreferences();
-		close();
-	}
-	void slotSetApplyEnabled();
-	void slotSetDefaults();
+
+    void slotSavePreferences ();
+
+    void slotSavePreferencesAndExit ()
+    {
+        slotSavePreferences ();
+        close ();
+    }
+
+    void slotSetApplyEnabled ();
+
+    void slotSetDefaults ();
 };
+
 #endif

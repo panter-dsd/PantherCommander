@@ -31,45 +31,45 @@
 
 #include "volumeinfoprovider.h"
 
-QSelectDiscDialog::QSelectDiscDialog(QWidget* parent)
-		:QDialog(parent)
+QSelectDiscDialog::QSelectDiscDialog (QWidget *parent)
+    : QDialog (parent)
 {
-	discList = new QListWidget(this);
+    discList = new QListWidget (this);
 
-	QListWidgetItem *item;
-	foreach(const QFileInfo& fi, VolumeInfoProvider().volumes()) {
-		item = new QListWidgetItem(QDir::toNativeSeparators(fi.absoluteFilePath()), discList);
-		item->setData(Qt::EditRole, fi.absoluteFilePath());
-		discList->addItem(item);
-	}
+    QListWidgetItem *item;
+        foreach(const QFileInfo &fi, VolumeInfoProvider ().volumes ()) {
+            item = new QListWidgetItem (QDir::toNativeSeparators (fi.absoluteFilePath ()), discList);
+            item->setData (Qt::EditRole, fi.absoluteFilePath ());
+            discList->addItem (item);
+        }
 
-	discList->setCurrentRow(0);
+    discList->setCurrentRow (0);
 
-	connect(discList, SIGNAL(itemActivated(QListWidgetItem*)),
-			this, SLOT(selectDisc(QListWidgetItem*)));
-	connect(discList, SIGNAL(itemClicked(QListWidgetItem*)),
-			this, SLOT(selectDisc(QListWidgetItem*)));
+    connect (discList, SIGNAL(itemActivated (QListWidgetItem * )),
+             this, SLOT(selectDisc (QListWidgetItem * )));
+    connect (discList, SIGNAL(itemClicked (QListWidgetItem * )),
+             this, SLOT(selectDisc (QListWidgetItem * )));
 
-	QVBoxLayout *layout = new QVBoxLayout();
-	layout->setContentsMargins(0, 0, 0, 0);
-	layout->addWidget(discList);
-	setLayout(layout);
+    QVBoxLayout *layout = new QVBoxLayout ();
+    layout->setContentsMargins (0, 0, 0, 0);
+    layout->addWidget (discList);
+    setLayout (layout);
 
-	discList->setFocus();
+    discList->setFocus ();
 }
 
-void QSelectDiscDialog::selectDisc(QListWidgetItem *item)
+void QSelectDiscDialog::selectDisc (QListWidgetItem *item)
 {
-	emit setectedDisc(item->text());
-	accept();
+    emit setectedDisc (item->text ());
+    accept ();
 }
 
-void QSelectDiscDialog::setPath(const QString& path)
+void QSelectDiscDialog::setPath (const QString &path)
 {
-	for (int i = 0; i < discList->count(); i++) {
-		if (path.startsWith(discList->item(i)->data(Qt::EditRole).toString())) {
-			discList->setCurrentItem(discList->item(i));
-			break;
-		}
-	}
+    for (int i = 0; i < discList->count (); i++) {
+        if (path.startsWith (discList->item (i)->data (Qt::EditRole).toString ())) {
+            discList->setCurrentItem (discList->item (i));
+            break;
+        }
+    }
 }

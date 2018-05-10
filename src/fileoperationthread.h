@@ -28,31 +28,37 @@
 #include <QThread>
 
 class FileOperation;
+
 class FileOperationThreadPrivate;
+
 class FileOperation;
 
 class FileOperationThread : public QThread
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
-	explicit FileOperationThread(QObject* parent = 0);
-	virtual ~FileOperationThread();
+    explicit FileOperationThread (QObject *parent = 0);
 
-	int addOperation(const FileOperation& operation);
-	bool removeOperation(int ID);
-	bool insertOperation(int ID, const FileOperation& operation);
-	FileOperation operation(int ID) const;
+    virtual ~FileOperationThread ();
 
+    int addOperation (const FileOperation &operation);
+
+    bool removeOperation (int ID);
+
+    bool insertOperation (int ID, const FileOperation &operation);
+
+    FileOperation operation (int ID) const;
 
 protected:
-	void run();
+    void run ();
 
 private:
-	Q_DISABLE_COPY(FileOperationThread)
-	Q_DECLARE_PRIVATE(FileOperationThread)
+    Q_DISABLE_COPY(FileOperationThread)
 
-	FileOperationThreadPrivate* const d_ptr;
+    Q_DECLARE_PRIVATE(FileOperationThread)
+
+    FileOperationThreadPrivate *const d_ptr;
 };
 
 #endif // FILEOPERATIONTHREAD_H

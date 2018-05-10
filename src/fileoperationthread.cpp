@@ -23,124 +23,129 @@
 *******************************************************************/
 
 #include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
 #include <QtCore/QFileInfo>
 
 #include "fileoperationthread.h"
 #include "fileoperationthread_p.h"
 
-FileOperationThreadPrivate::FileOperationThreadPrivate() : q_ptr(0), currentID(0)
+FileOperationThreadPrivate::FileOperationThreadPrivate ()
+    : q_ptr (0)
+    , currentID (0)
 {
 
 }
 
-FileOperationThreadPrivate::~FileOperationThreadPrivate()
+FileOperationThreadPrivate::~FileOperationThreadPrivate ()
 {
-	q_ptr = 0;
+    q_ptr = 0;
 }
 
-void FileOperationThreadPrivate::nextOperation()
+void FileOperationThreadPrivate::nextOperation ()
 {
-	if (currentID >= operationList.size())
-		return;
+    if (currentID >= operationList.size ()) {
+        return;
+    }
 
-	FileOperation fo = operationList.at(++currentID);
+    FileOperation fo = operationList.at (++currentID);
 
-	switch(fo.type()) {
-		case FileOperation::Copy: {
-				copy(&fo);
-				break;
-			}
-	}
+    switch (fo.type ()) {
+        case FileOperation::Copy: {
+            copy (&fo);
+            break;
+        }
+    }
 }
 
-void FileOperationThreadPrivate::copy(FileOperation* operation)
+void FileOperationThreadPrivate::copy (FileOperation *operation)
 {
-	CopyFileOperation* cfo = static_cast<CopyFileOperation*> (operation);
+    CopyFileOperation *cfo = static_cast<CopyFileOperation *> (operation);
 
-	foreach(const QString& source, cfo->getSources()) {
-		if (QFileInfo(source).isDir())
-			copyDir(source, cfo->getDest());
-		else
-			copyFile(source, cfo->getDest());
-	}
+        foreach(const QString &source, cfo->getSources ()) {
+            if (QFileInfo (source).isDir ()) {
+                copyDir (source, cfo->getDest ());
+            } else {
+                copyFile (source, cfo->getDest ());
+            }
+        }
 }
 
-void FileOperationThreadPrivate::copyDir(const QString& source, const QString& dest)
-{
-
-}
-
-void FileOperationThreadPrivate::copyFile(const QString& source, const QString& dest)
+void FileOperationThreadPrivate::copyDir (const QString &source, const QString &dest)
 {
 
 }
 
-FileOperationThread::FileOperationThread(QObject* parent)
-		:QThread(parent), d_ptr(new FileOperationThreadPrivate)
+void FileOperationThreadPrivate::copyFile (const QString &source, const QString &dest)
+{
+
+}
+
+FileOperationThread::FileOperationThread (QObject *parent)
+    : QThread (parent)
+    , d_ptr (new FileOperationThreadPrivate)
 {
 }
 
-FileOperationThread::~FileOperationThread()
+FileOperationThread::~FileOperationThread ()
 {
-	delete d_ptr;
+    delete d_ptr;
 }
 
-int FileOperationThread::addOperation(const FileOperation& operation)
+int FileOperationThread::addOperation (const FileOperation &operation)
 {
-	Q_D(FileOperationThread);
+    Q_D(FileOperationThread);
 
-	QMutexLocker l(&d->mutex);
-	d->operationList.append(operation);
-	return d->operationList.size() - 1;
+    QMutexLocker l (&d->mutex);
+    d->operationList.append (operation);
+    return d->operationList.size () - 1;
 }
 
-bool FileOperationThread::removeOperation(int ID)
+bool FileOperationThread::removeOperation (int ID)
 {
-	Q_D(FileOperationThread);
+    Q_D(FileOperationThread);
 
-	if (d->currentID < ID && ID > 0 && ID < d->operationList.size()) {
-		d->operationList.removeAt(ID);
-		return true;
-	}
+    if (d->currentID < ID && ID > 0 && ID < d->operationList.size ()) {
+        d->operationList.removeAt (ID);
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
-bool FileOperationThread::insertOperation(int ID, const FileOperation& operation)
+bool FileOperationThread::insertOperation (int ID, const FileOperation &operation)
 {
-	Q_D(FileOperationThread);
+    Q_D(FileOperationThread);
 
-	if (d->currentID < ID && ID > 0 && ID <= d->operationList.size()) {
-		d->operationList.insert(ID, operation);
-		return true;
-	}
+    if (d->currentID < ID && ID > 0 && ID <= d->operationList.size ()) {
+        d->operationList.insert (ID, operation);
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
-FileOperation FileOperationThread::operation(int ID) const
+FileOperation FileOperationThread::operation (int ID) const
 {
-	Q_D(const FileOperationThread);
+    Q_D(const FileOperationThread);
 
-	if (ID > 0 && ID < d->operationList.size()) {
-		d->operationList.at(ID);
-	}
+    if (ID > 0 && ID < d->operationList.size ()) {
+        d->operationList.at (ID);
+    }
 
-	return FileOperation(FileOperation::None, 0);
+    return FileOperation (FileOperation::None, 0);
 }
 
-void FileOperationThread::run()
+void FileOperationThread::run ()
 {
-	Q_D(FileOperationThread);
+    Q_D(FileOperationThread);
 
-	bool stop = false;
+    bool stop = false;
 
-	while (!stop) {
-		d->mutex.lock();
-		if (d->currentID == d->operationList.size())
-			stop = true;
-		d->mutex.unlock();
-	}
-	deleteLater();
+    while (!stop) {
+        d->mutex.lock ();
+        if (d->currentID == d->operationList.size ()) {
+            stop = true;
+        }
+        d->mutex.unlock ();
+    }
+    deleteLater ();
 }

@@ -29,48 +29,50 @@
 #include <QtWidgets/QHeaderView>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-#include <QtWidgets/QStyle>
 
-QFullView::QFullView(QWidget* parent) : QTreeView(parent)
+QFullView::QFullView (QWidget *parent)
+    : QTreeView (parent)
 {
 //	isRightMouseButtonPressed=false;
 //	isMouseSelect=false;
 }
 
-QFullView::~QFullView()
+QFullView::~QFullView ()
 {
 }
 
-void QFullView::drawRow(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void QFullView::drawRow (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	QTreeView::drawRow(painter, option, index);
+    QTreeView::drawRow (painter, option, index);
 
-	if(index.row() == currentIndex().row() && hasFocus())
-	{
-		QRect rect(visualRect(index));
-		rect.adjust(0, 0, -1, -1);
-		painter->setPen(Qt::green);
-		painter->drawRect(rect);
-	}
+    if (index.row () == currentIndex ().row () && hasFocus ()) {
+        QRect rect (visualRect (index));
+        rect.adjust (0, 0, -1, -1);
+        painter->setPen (Qt::green);
+        painter->drawRect (rect);
+    }
 }
 
-QRect QFullView::visualRect(const QModelIndex& index) const
+QRect QFullView::visualRect (const QModelIndex &index) const
 {
-	if(index.row() < 0 || index.column() < 0 || index.model() != model())
-		return QRect();
+    if (index.row () < 0 || index.column () < 0 || index.model () != model ()) {
+        return QRect ();
+    }
 
-	QModelIndex left = index.sibling(index.row(), header()->logicalIndex(0));
-	QModelIndex right = index.sibling(index.row(), header()->logicalIndex(index.model()->columnCount(index.parent()) - 1));
-	return QRect(QTreeView::visualRect(left).topLeft(), QTreeView::visualRect(right).bottomRight());
+    QModelIndex left = index.sibling (index.row (), header ()->logicalIndex (0));
+    QModelIndex right = index.sibling (index.row (),
+                                       header ()->logicalIndex (index.model ()->columnCount (index.parent ()) - 1));
+    return QRect (QTreeView::visualRect (left).topLeft (), QTreeView::visualRect (right).bottomRight ());
 }
 
 #ifndef QT_NO_DRAGANDDROP
+
 /*!
 	Starts a drag by calling drag->exec() using the given \a supportedActions.
 */
-void QFullView::startDrag(Qt::DropActions supportedActions)
+void QFullView::startDrag (Qt::DropActions supportedActions)
 {
-	QModelIndexList indexes = selectedIndexes();
+    QModelIndexList indexes = selectedIndexes ();
 /*	if(indexes.isEmpty())
 	{
 		//QModelIndex tl = model()->index(currentIndex().row(), 0, currentIndex().parent());
@@ -79,26 +81,28 @@ void QFullView::startDrag(Qt::DropActions supportedActions)
 		selectionModel()->select(selection, QItemSelectionModel::Select);
 		indexes = selectedIndexes();
 	}*/
-	for(int i = indexes.size() - 1 ; i >= 0; --i)
-	{
-		if(!(model()->flags(indexes.at(i)) & Qt::ItemIsDragEnabled))
-			indexes.removeAt(i);
-	}
-	QMimeData* data = model()->mimeData(indexes);
-	if(data)
-	{
-		QDrag* drag = new QDrag(this);
-		drag->setMimeData(data);
-		//drag->setPixmap(pixmap);
-		//drag->setHotSpot(d->pressedPosition - rect.topLeft());
-		Qt::DropAction defaultDropAction = Qt::IgnoreAction;
-		if((supportedActions & Qt::CopyAction) && dragDropMode() != QAbstractItemView::InternalMove)
-			defaultDropAction = Qt::CopyAction;
-		if(drag->exec(supportedActions, defaultDropAction) == Qt::MoveAction)
-			;//clearSelection();
-	}
+    for (int i = indexes.size () - 1; i >= 0; --i) {
+        if (!(model ()->flags (indexes.at (i)) & Qt::ItemIsDragEnabled)) {
+            indexes.removeAt (i);
+        }
+    }
+    QMimeData *data = model ()->mimeData (indexes);
+    if (data) {
+        QDrag *drag = new QDrag (this);
+        drag->setMimeData (data);
+        //drag->setPixmap(pixmap);
+        //drag->setHotSpot(d->pressedPosition - rect.topLeft());
+        Qt::DropAction defaultDropAction = Qt::IgnoreAction;
+        if ((supportedActions & Qt::CopyAction) && dragDropMode () != QAbstractItemView::InternalMove) {
+            defaultDropAction = Qt::CopyAction;
+        }
+        if (drag->exec (supportedActions, defaultDropAction) == Qt::MoveAction) {
+        }//clearSelection();
+    }
 }
+
 #endif // QT_NO_DRAGANDDROP
+
 /*
 void QFullView::mousePressEvent ( QMouseEvent * event)
 {
@@ -186,118 +190,120 @@ void QFullView::focusOutEvent (QFocusEvent* event)
 	}
 }*/
 
-QItemSelectionModel::SelectionFlags QFullView::selectionBehaviorFlags() const
+QItemSelectionModel::SelectionFlags QFullView::selectionBehaviorFlags () const
 {
-	if(selectionBehavior() == QAbstractItemView::SelectRows)
-		return QItemSelectionModel::Rows;
-	if(selectionBehavior() == QAbstractItemView::SelectColumns)
-		return QItemSelectionModel::Columns;
-	return QItemSelectionModel::NoUpdate;
+    if (selectionBehavior () == QAbstractItemView::SelectRows) {
+        return QItemSelectionModel::Rows;
+    }
+    if (selectionBehavior () == QAbstractItemView::SelectColumns) {
+        return QItemSelectionModel::Columns;
+    }
+    return QItemSelectionModel::NoUpdate;
 }
 
-QItemSelectionModel::SelectionFlags QFullView::selectionCommand(const QModelIndex& index, const QEvent* event) const
+QItemSelectionModel::SelectionFlags QFullView::selectionCommand (const QModelIndex &index, const QEvent *event) const
 {
-	if(selectionMode() != ExtendedSelection)
-		return QItemSelectionModel::NoUpdate;
+    if (selectionMode () != ExtendedSelection) {
+        return QItemSelectionModel::NoUpdate;
+    }
 
-	Qt::KeyboardModifiers modifiers = QApplication::keyboardModifiers();
-	if(event)
-	{
-		switch(event->type())
-		{
-			case QEvent::MouseMove:
-			{
-				// Toggle on MouseMove
-				modifiers = static_cast<const QMouseEvent*>(event)->modifiers();
-				if(modifiers & Qt::ControlModifier)
-					return QItemSelectionModel::ToggleCurrent | selectionBehaviorFlags();
-			}
-				break;
-			case QEvent::MouseButtonPress:
-			{
-				modifiers = static_cast<const QMouseEvent*>(event)->modifiers();
-				const Qt::MouseButton button = static_cast<const QMouseEvent*>(event)->button();
-				const bool rightButtonPressed = (button & Qt::RightButton);
-				const bool shiftKeyPressed = (modifiers & Qt::ShiftModifier);
-				const bool controlKeyPressed = (modifiers & Qt::ControlModifier);
-				const bool indexIsSelected = selectionModel()->isSelected(index);
-				if((shiftKeyPressed || controlKeyPressed) && rightButtonPressed)
-					return QItemSelectionModel::NoUpdate;
-				if(!shiftKeyPressed && !controlKeyPressed && indexIsSelected)
-					return QItemSelectionModel::NoUpdate;
-				if(!index.isValid() && !rightButtonPressed && !shiftKeyPressed && !controlKeyPressed)
-					return QItemSelectionModel::Clear;
-				if(!index.isValid())
-					return QItemSelectionModel::NoUpdate;
-			}
-				break;
-			case QEvent::MouseButtonRelease:
-			{
-				// Clear on MouseButtonRelease if MouseButtonPress on selected item or empty area
-				modifiers = static_cast<const QMouseEvent*>(event)->modifiers();
-				const Qt::MouseButton button = static_cast<const QMouseEvent*>(event)->button();
-				const bool rightButtonPressed = (button & Qt::RightButton);
-				const bool shiftKeyPressed = (modifiers & Qt::ShiftModifier);
-				const bool controlKeyPressed = (modifiers & Qt::ControlModifier);
-				if(((index == pressedIndex && selectionModel()->isSelected(index)) || !index.isValid())
-					&& state() != QAbstractItemView::DragSelectingState
-					&& !shiftKeyPressed && !controlKeyPressed && !rightButtonPressed)
-				{
-					return QItemSelectionModel::Clear | selectionBehaviorFlags();
-				}
-				return QItemSelectionModel::NoUpdate;
-			}
-			case QEvent::KeyPress:
-			{
-				// NoUpdate on Key movement and Ctrl
-				modifiers = static_cast<const QKeyEvent*>(event)->modifiers();
-				switch(static_cast<const QKeyEvent*>(event)->key())
-				{
-					case Qt::Key_Backtab:
-						modifiers = modifiers & ~Qt::ShiftModifier; // special case for backtab
-					case Qt::Key_Down:
-					case Qt::Key_Up:
-					case Qt::Key_Left:
-					case Qt::Key_Right:
-					case Qt::Key_Home:
-					case Qt::Key_End:
-					case Qt::Key_PageUp:
-					case Qt::Key_PageDown:
-					case Qt::Key_Tab:
+    Qt::KeyboardModifiers modifiers = QApplication::keyboardModifiers ();
+    if (event) {
+        switch (event->type ()) {
+            case QEvent::MouseMove: {
+                // Toggle on MouseMove
+                modifiers = static_cast<const QMouseEvent *>(event)->modifiers ();
+                if (modifiers & Qt::ControlModifier) {
+                    return QItemSelectionModel::ToggleCurrent | selectionBehaviorFlags ();
+                }
+            }
+                break;
+            case QEvent::MouseButtonPress: {
+                modifiers = static_cast<const QMouseEvent *>(event)->modifiers ();
+                const Qt::MouseButton button = static_cast<const QMouseEvent *>(event)->button ();
+                const bool rightButtonPressed = (button & Qt::RightButton);
+                const bool shiftKeyPressed = (modifiers & Qt::ShiftModifier);
+                const bool controlKeyPressed = (modifiers & Qt::ControlModifier);
+                const bool indexIsSelected = selectionModel ()->isSelected (index);
+                if ((shiftKeyPressed || controlKeyPressed) && rightButtonPressed) {
+                    return QItemSelectionModel::NoUpdate;
+                }
+                if (!shiftKeyPressed && !controlKeyPressed && indexIsSelected) {
+                    return QItemSelectionModel::NoUpdate;
+                }
+                if (!index.isValid () && !rightButtonPressed && !shiftKeyPressed && !controlKeyPressed) {
+                    return QItemSelectionModel::Clear;
+                }
+                if (!index.isValid ()) {
+                    return QItemSelectionModel::NoUpdate;
+                }
+            }
+                break;
+            case QEvent::MouseButtonRelease: {
+                // Clear on MouseButtonRelease if MouseButtonPress on selected item or empty area
+                modifiers = static_cast<const QMouseEvent *>(event)->modifiers ();
+                const Qt::MouseButton button = static_cast<const QMouseEvent *>(event)->button ();
+                const bool rightButtonPressed = (button & Qt::RightButton);
+                const bool shiftKeyPressed = (modifiers & Qt::ShiftModifier);
+                const bool controlKeyPressed = (modifiers & Qt::ControlModifier);
+                if (((index == pressedIndex && selectionModel ()->isSelected (index)) || !index.isValid ())
+                    && state () != QAbstractItemView::DragSelectingState
+                    && !shiftKeyPressed && !controlKeyPressed && !rightButtonPressed) {
+                    return QItemSelectionModel::Clear | selectionBehaviorFlags ();
+                }
+                return QItemSelectionModel::NoUpdate;
+            }
+            case QEvent::KeyPress: {
+                // NoUpdate on Key movement and Ctrl
+                modifiers = static_cast<const QKeyEvent *>(event)->modifiers ();
+                switch (static_cast<const QKeyEvent *>(event)->key ()) {
+                    case Qt::Key_Backtab:
+                        modifiers = modifiers & ~Qt::ShiftModifier; // special case for backtab
+                    case Qt::Key_Down:
+                    case Qt::Key_Up:
+                    case Qt::Key_Left:
+                    case Qt::Key_Right:
+                    case Qt::Key_Home:
+                    case Qt::Key_End:
+                    case Qt::Key_PageUp:
+                    case Qt::Key_PageDown:
+                    case Qt::Key_Tab:
 #ifdef QT_KEYPAD_NAVIGATION
-						return QItemSelectionModel::NoUpdate;
+                        return QItemSelectionModel::NoUpdate;
 #else
-						if(modifiers & Qt::ShiftModifier)
-							return QItemSelectionModel::Toggle | selectionBehaviorFlags();
-						return QItemSelectionModel::NoUpdate;
+                        if (modifiers & Qt::ShiftModifier) {
+                            return QItemSelectionModel::Toggle | selectionBehaviorFlags ();
+                        }
+                        return QItemSelectionModel::NoUpdate;
 #endif
-					case Qt::Key_Insert:
-					case Qt::Key_Select:
-					case Qt::Key_Space:
-						return QItemSelectionModel::Toggle | selectionBehaviorFlags();
-					default:
-						break;
-				}
-			}
-			default:
-				break;
-		}
-	}
+                    case Qt::Key_Insert:
+                    case Qt::Key_Select:
+                    case Qt::Key_Space:
+                        return QItemSelectionModel::Toggle | selectionBehaviorFlags ();
+                    default:
+                        break;
+                }
+            }
+            default:
+                break;
+        }
+    }
 
-	if(modifiers & Qt::ShiftModifier)
-		return QItemSelectionModel::SelectCurrent | selectionBehaviorFlags();
-	if(modifiers & Qt::ControlModifier)
-		return QItemSelectionModel::Toggle | selectionBehaviorFlags();
-	if(state() == QAbstractItemView::DragSelectingState)
-	{
-		//when drag-selecting we need to clear any previous selection and select the current one
-		return QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent | selectionBehaviorFlags();
-	}
+    if (modifiers & Qt::ShiftModifier) {
+        return QItemSelectionModel::SelectCurrent | selectionBehaviorFlags ();
+    }
+    if (modifiers & Qt::ControlModifier) {
+        return QItemSelectionModel::Toggle | selectionBehaviorFlags ();
+    }
+    if (state () == QAbstractItemView::DragSelectingState) {
+        //when drag-selecting we need to clear any previous selection and select the current one
+        return QItemSelectionModel::Clear | QItemSelectionModel::SelectCurrent | selectionBehaviorFlags ();
+    }
 
-	return QItemSelectionModel::Clear;
+    return QItemSelectionModel::Clear;
 }
 
-void QFullView::keyPressEvent(QKeyEvent* event)
+void QFullView::keyPressEvent (QKeyEvent *event)
 {
 /*	QModelIndex index = currentIndex();
 	switch(event->key())
@@ -338,12 +344,12 @@ void QFullView::keyPressEvent(QKeyEvent* event)
 			break;
 	}
 */
-	QTreeView::keyPressEvent(event);
+    QTreeView::keyPressEvent (event);
 }
 
-void QFullView::mousePressEvent(QMouseEvent* event)
+void QFullView::mousePressEvent (QMouseEvent *event)
 {
-	QTreeView::mousePressEvent(event);
+    QTreeView::mousePressEvent (event);
 
-	pressedIndex = indexAt(event->pos());
+    pressedIndex = indexAt (event->pos ());
 }

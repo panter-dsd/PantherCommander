@@ -13,357 +13,370 @@
 /*
 	Makes a list of filters from space-separated text.
 */
-static QStringList make_filter_list(const QString& filter)
+static QStringList make_filter_list (const QString &filter)
 {
-	QString f(filter);
-	if(f.isEmpty())
-		return QStringList();
+    QString f (filter);
+    if (f.isEmpty ()) {
+        return QStringList ();
+    }
 
-	QString sep(QLatin1Char(' '));
-	if(f.indexOf(sep, 0) == -1 && f.indexOf(QLatin1Char('\n'), 0) != -1)
-		sep = QLatin1Char('\n');
+    QString sep (QLatin1Char (' '));
+    if (f.indexOf (sep, 0) == -1 && f.indexOf (QLatin1Char ('\n'), 0) != -1) {
+        sep = QLatin1Char ('\n');
+    }
 
-	return f.split(sep, QString::SkipEmptyParts);
+    return f.split (sep, QString::SkipEmptyParts);
 }
-
 
 typedef QList<QPointer<QTranslator> > TranslatorList;
 
 struct TranslationsData
 {
-	TranslationsData()
-	{
-		if(!QCoreApplication::instance())
-			qCritical("TranslationManager: an instance of QCoreApplication is required for proper functionality.");
+    TranslationsData ()
+    {
+        if (!QCoreApplication::instance ())
+            qCritical ("TranslationManager: an instance of QCoreApplication is required for proper functionality.");
 
-		dirty = true;
-		initSearchPaths();
-		initNameFilters();
-	}
-	~TranslationsData()
-	{
-		qDeleteAll(translators.begin(), translators.end());
-		translators.clear();
-	}
+        dirty = true;
+        initSearchPaths ();
+        initNameFilters ();
+    }
 
-	void initSearchPaths()
-	{
-		QStringList defaultPaths;
+    ~TranslationsData ()
+    {
+        qDeleteAll (translators.begin (), translators.end ());
+        translators.clear ();
+    }
 
-		if(QCoreApplication::instance())
-		{
-			// Application's default translations path
-			QString appPathTranslations = QCoreApplication::applicationDirPath();
+    void initSearchPaths ()
+    {
+        QStringList defaultPaths;
+
+        if (QCoreApplication::instance ()) {
+            // Application's default translations path
+            QString appPathTranslations = QCoreApplication::applicationDirPath ();
 #ifndef Q_OS_WIN
-			appPathTranslations.append(QLatin1String("/../share/")).append(qAppName());
+            appPathTranslations.append (QLatin1String ("/../share/")).append (qAppName ());
 #endif
-			appPathTranslations.append(QDir::separator()).append(QLatin1String("translations"));
-			defaultPaths.append(appPathTranslations);
-		}
+            appPathTranslations.append (QDir::separator ()).append (QLatin1String ("translations"));
+            defaultPaths.append (appPathTranslations);
+        }
 
-		// Qt's translations path
-		defaultPaths.append(QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+        // Qt's translations path
+        defaultPaths.append (QLibraryInfo::location (QLibraryInfo::TranslationsPath));
 
-		foreach(const QString& path, defaultPaths)
-		{
-			QDir dir(path);
-			if(dir.exists() && dir.isReadable())
-			{
-				// Make sure we convert from backslashes to slashes.
-				searchPaths.append(dir.canonicalPath());
-			}
-		}
-	}
+            foreach(const QString &path, defaultPaths) {
+                QDir dir (path);
+                if (dir.exists () && dir.isReadable ()) {
+                    // Make sure we convert from backslashes to slashes.
+                    searchPaths.append (dir.canonicalPath ());
+                }
+            }
+    }
 
-	void initNameFilters()
-	{
-		const QString suffix("_*.qm");
-		if(QCoreApplication::instance())
-			nameFilters.append(qAppName() + suffix);
-		nameFilters.append(QLatin1String("qt") + suffix);
-	}
+    void initNameFilters ()
+    {
+        const QString suffix ("_*.qm");
+        if (QCoreApplication::instance ()) {
+            nameFilters.append (qAppName () + suffix);
+        }
+        nameFilters.append (QLatin1String ("qt") + suffix);
+    }
 
-	void refreshLanguages()
-	{
-		if(!dirty)
-			return;
+    void refreshLanguages ()
+    {
+        if (!dirty) {
+            return;
+        }
 
-		dirty = false;
-		languages.clear();
+        dirty = false;
+        languages.clear ();
 
-		QString prefix;
-		QString suffix;
-		const QString pattern(nameFilters.first());
-		int indexOfStar = pattern.indexOf(QLatin1Char('*'));
-		if(indexOfStar >= 0)
-		{
-			prefix = pattern.left(indexOfStar);
-			suffix = pattern.right(pattern.size() - indexOfStar - 1);
-		}
-		const QRegExp regexp(pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
-		const QStringList nameFilter(pattern);
-		foreach(const QString& path, searchPaths)
-		{
-			QDir dir(path);
-			if(!dir.exists() || !dir.isReadable())
-				continue;
+        QString prefix;
+        QString suffix;
+        const QString pattern (nameFilters.first ());
+        int indexOfStar = pattern.indexOf (QLatin1Char ('*'));
+        if (indexOfStar >= 0) {
+            prefix = pattern.left (indexOfStar);
+            suffix = pattern.right (pattern.size () - indexOfStar - 1);
+        }
+        const QRegExp regexp (pattern, Qt::CaseInsensitive, QRegExp::Wildcard);
+        const QStringList nameFilter (pattern);
+            foreach(const QString &path, searchPaths) {
+                QDir dir (path);
+                if (!dir.exists () || !dir.isReadable ()) {
+                    continue;
+                }
 
-			QFileInfo fileInfo;
-			const QStringList fileNameList = dir.entryList(nameFilter);
-			foreach(const QString& fname, fileNameList)
-			{
-				fileInfo.setFile(fname);
-				if(fileInfo.isReadable())
-					continue;
+                QFileInfo fileInfo;
+                const QStringList fileNameList = dir.entryList (nameFilter);
+                    foreach(const QString &fname, fileNameList) {
+                        fileInfo.setFile (fname);
+                        if (fileInfo.isReadable ()) {
+                            continue;
+                        }
 
-				QString language = fileInfo.fileName();
-				if(!regexp.exactMatch(language))
-					continue;
+                        QString language = fileInfo.fileName ();
+                        if (!regexp.exactMatch (language)) {
+                            continue;
+                        }
 
-				if(!suffix.isEmpty())
-					language = language.left(language.size() - suffix.size());
-				if(!prefix.isEmpty())
-					language = language.right(language.size() - prefix.size());
-				if(!language.isEmpty())
-				{
-					QLocale locale(language);
-					if(locale != QLocale::c())
-						language = locale.name(); // let's shift 'ru' to 'ru_RU' to enable QTranslation::load()'s fallback
-					else
-						language = QLatin1String("untranslated");
-					if(!languages.contains(language))
-						languages.append(language);
-				}
-			}
-		}
-	}
+                        if (!suffix.isEmpty ()) {
+                            language = language.left (language.size () - suffix.size ());
+                        }
+                        if (!prefix.isEmpty ()) {
+                            language = language.right (language.size () - prefix.size ());
+                        }
+                        if (!language.isEmpty ()) {
+                            QLocale locale (language);
+                            if (locale != QLocale::c ()) {
+                                language = locale.name (); // let's shift 'ru' to 'ru_RU' to enable QTranslation::load()'s fallback
+                            } else {
+                                language = QLatin1String ("untranslated");
+                            }
+                            if (!languages.contains (language)) {
+                                languages.append (language);
+                            }
+                        }
+                    }
+            }
+    }
 
-	void refreshTranslations()
-	{
-		qDeleteAll(translators.begin(), translators.end());
-		translators.clear();
+    void refreshTranslations ()
+    {
+        qDeleteAll (translators.begin (), translators.end ());
+        translators.clear ();
 
-		if(currentLanguage.isEmpty())
-			return;
+        if (currentLanguage.isEmpty ()) {
+            return;
+        }
 
-		QList<QString> keys;
-		for(int i = nameFilters.size() - 1; i >= 0; --i)
-		{
-			QString translationFileName = nameFilters[i];
-			translationFileName.replace(QLatin1Char('*'), currentLanguage);
+        QList<QString> keys;
+        for (int i = nameFilters.size () - 1; i >= 0; --i) {
+            QString translationFileName = nameFilters[i];
+            translationFileName.replace (QLatin1Char ('*'), currentLanguage);
 
-			foreach(const QString& path, searchPaths)
-			{
-				const QString key = QString(nameFilters[i]).append(QLatin1Char('?')).append(path);
-				if(keys.contains(key))
-					continue;
+                foreach(const QString &path, searchPaths) {
+                    const QString key = QString (nameFilters[i]).append (QLatin1Char ('?')).append (path);
+                    if (keys.contains (key)) {
+                        continue;
+                    }
 
-				QTranslator* translator = new QTranslator(QCoreApplication::instance());
-				if(translator->load(translationFileName, path))
-				{
-					keys.append(key);
-					translators.append(translator);
+                    QTranslator *translator = new QTranslator (QCoreApplication::instance ());
+                    if (translator->load (translationFileName, path)) {
+                        keys.append (key);
+                        translators.append (translator);
 
-					// A LanguageChange event is sent to all objects in the application
-					// They need to catch it and re-translate themselves
-					QCoreApplication::installTranslator(translator);
-					break;
-				}
-				delete translator;
-			}
-		}
-	}
+                        // A LanguageChange event is sent to all objects in the application
+                        // They need to catch it and re-translate themselves
+                        QCoreApplication::installTranslator (translator);
+                        break;
+                    }
+                    delete translator;
+                }
+        }
+    }
 
-	void refreshAll()
-	{
-		dirty = true;
-		refreshLanguages();
-		refreshTranslations();
-	}
+    void refreshAll ()
+    {
+        dirty = true;
+        refreshLanguages ();
+        refreshTranslations ();
+    }
 
-	QStringList searchPaths;
-	QStringList nameFilters;
-	TranslatorList translators;
+    QStringList searchPaths;
+    QStringList nameFilters;
+    TranslatorList translators;
 
-	QStringList languages;
-	QString currentLanguage;
-	QString untranslatedLanguage;
+    QStringList languages;
+    QString currentLanguage;
+    QString untranslatedLanguage;
 
-	bool dirty;
+    bool dirty;
 };
 
 Q_GLOBAL_STATIC(TranslationsData, trdata)
 
 Q_GLOBAL_STATIC_WITH_ARGS(QMutex, translationMutex, (QMutex::Recursive))
 
-
-QString TranslationManager::currentLanguage()
+QString TranslationManager::currentLanguage ()
 {
-	QMutexLocker lock(translationMutex());
-	const TranslationsData* d = trdata();
+    QMutexLocker lock (translationMutex ());
+    const TranslationsData *d = trdata ();
 
-	if(!d->currentLanguage.isEmpty())
-		return d->currentLanguage;
+    if (!d->currentLanguage.isEmpty ()) {
+        return d->currentLanguage;
+    }
 
-	if(!d->untranslatedLanguage.isEmpty())
-		return d->untranslatedLanguage;
+    if (!d->untranslatedLanguage.isEmpty ()) {
+        return d->untranslatedLanguage;
+    }
 
-	const QString sysLanguage = QLocale::system().name();
-	if(isLanguageAvailable(sysLanguage))
-		return sysLanguage;
+    const QString sysLanguage = QLocale::system ().name ();
+    if (isLanguageAvailable (sysLanguage)) {
+        return sysLanguage;
+    }
 
-	return QString();
+    return QString ();
 }
 
-void TranslationManager::setCurrentLanguage(const QString& language)
+void TranslationManager::setCurrentLanguage (const QString &language)
 {
-	QMutexLocker lock(translationMutex());
-	TranslationsData* d = trdata();
+    QMutexLocker lock (translationMutex ());
+    TranslationsData *d = trdata ();
 
-	if(!isLanguageAvailable(language) || d->currentLanguage == language)
-		return;
+    if (!isLanguageAvailable (language) || d->currentLanguage == language) {
+        return;
+    }
 
-	d->currentLanguage = language;
-	d->refreshTranslations();
+    d->currentLanguage = language;
+    d->refreshTranslations ();
 }
 
-QString TranslationManager::untranslatedLanguage()
+QString TranslationManager::untranslatedLanguage ()
 {
-	QMutexLocker lock(translationMutex());
+    QMutexLocker lock (translationMutex ());
 
-	return trdata()->untranslatedLanguage;
+    return trdata ()->untranslatedLanguage;
 }
 
-void TranslationManager::setUntranslatedLanguage(const QString& language)
+void TranslationManager::setUntranslatedLanguage (const QString &language)
 {
-	QMutexLocker lock(translationMutex());
-	TranslationsData* d = trdata();
+    QMutexLocker lock (translationMutex ());
+    TranslationsData *d = trdata ();
 
-	if(d->untranslatedLanguage == language)
-		return;
+    if (d->untranslatedLanguage == language) {
+        return;
+    }
 
-	d->untranslatedLanguage.clear();
-	QLocale locale(language);
-	if(locale != QLocale::c())
-		d->untranslatedLanguage = locale.name();
+    d->untranslatedLanguage.clear ();
+    QLocale locale (language);
+    if (locale != QLocale::c ()) {
+        d->untranslatedLanguage = locale.name ();
+    }
 }
 
-QStringList TranslationManager::languages()
+QStringList TranslationManager::languages ()
 {
-	QMutexLocker lock(translationMutex());
-	TranslationsData* d = trdata();
+    QMutexLocker lock (translationMutex ());
+    TranslationsData *d = trdata ();
 
-	d->refreshLanguages();
-	QStringList languages(d->languages);
-	if(!d->untranslatedLanguage.isEmpty())
-		languages.prepend(d->untranslatedLanguage);
+    d->refreshLanguages ();
+    QStringList languages (d->languages);
+    if (!d->untranslatedLanguage.isEmpty ()) {
+        languages.prepend (d->untranslatedLanguage);
+    }
 
-	return languages;
+    return languages;
 }
 
-bool TranslationManager::isLanguageAvailable(const QString& language)
+bool TranslationManager::isLanguageAvailable (const QString &language)
 {
-	return language.isEmpty() || languages().contains(language);
+    return language.isEmpty () || languages ().contains (language);
 }
 
-QStringList TranslationManager::translationPaths()
+QStringList TranslationManager::translationPaths ()
 {
-	QMutexLocker lock(translationMutex());
+    QMutexLocker lock (translationMutex ());
 
-	return trdata()->searchPaths;
+    return trdata ()->searchPaths;
 }
 
-void TranslationManager::setTranslationPaths(const QStringList& paths)
+void TranslationManager::setTranslationPaths (const QStringList &paths)
 {
-	QMutexLocker lock(translationMutex());
-	TranslationsData* d = trdata();
+    QMutexLocker lock (translationMutex ());
+    TranslationsData *d = trdata ();
 
-	if(d->searchPaths == paths)
-		return;
+    if (d->searchPaths == paths) {
+        return;
+    }
 
-	d->searchPaths = paths;
-	d->refreshAll();
+    d->searchPaths = paths;
+    d->refreshAll ();
 }
 
-void TranslationManager::addTranslationPath(const QString& path)
+void TranslationManager::addTranslationPath (const QString &path)
 {
-	QString canonicalPath = QDir(path).canonicalPath();
-	if(canonicalPath.isEmpty())
-		return;
+    QString canonicalPath = QDir (path).canonicalPath ();
+    if (canonicalPath.isEmpty ()) {
+        return;
+    }
 
-	QMutexLocker lock(translationMutex());
-	TranslationsData* d = trdata();
+    QMutexLocker lock (translationMutex ());
+    TranslationsData *d = trdata ();
 
-	d->searchPaths.append(canonicalPath);
-	d->refreshAll();
+    d->searchPaths.append (canonicalPath);
+    d->refreshAll ();
 }
 
-void TranslationManager::removeTranslationPath(const QString& path)
+void TranslationManager::removeTranslationPath (const QString &path)
 {
-	QString canonicalPath = QDir(path).canonicalPath();
-	if(canonicalPath.isEmpty())
-		return;
+    QString canonicalPath = QDir (path).canonicalPath ();
+    if (canonicalPath.isEmpty ()) {
+        return;
+    }
 
-	QMutexLocker lock(translationMutex());
-	TranslationsData* d = trdata();
+    QMutexLocker lock (translationMutex ());
+    TranslationsData *d = trdata ();
 
-	int i = d->searchPaths.lastIndexOf(canonicalPath);
-	if(i >= 0)
-	{
-		d->searchPaths.removeAt(i);
-		d->refreshAll();
-	}
+    int i = d->searchPaths.lastIndexOf (canonicalPath);
+    if (i >= 0) {
+        d->searchPaths.removeAt (i);
+        d->refreshAll ();
+    }
 }
 
-QStringList TranslationManager::nameFilters()
+QStringList TranslationManager::nameFilters ()
 {
-	QMutexLocker lock(translationMutex());
+    QMutexLocker lock (translationMutex ());
 
-	return trdata()->nameFilters;
+    return trdata ()->nameFilters;
 }
 
-void TranslationManager::setNameFilter(const QString& filter)
+void TranslationManager::setNameFilter (const QString &filter)
 {
-	setNameFilters(make_filter_list(filter));
+    setNameFilters (make_filter_list (filter));
 }
 
-void TranslationManager::setNameFilters(const QStringList& filters)
+void TranslationManager::setNameFilters (const QStringList &filters)
 {
-	QMutexLocker lock(translationMutex());
-	TranslationsData* d = trdata();
+    QMutexLocker lock (translationMutex ());
+    TranslationsData *d = trdata ();
 
-	if(d->nameFilters == filters)
-		return;
+    if (d->nameFilters == filters) {
+        return;
+    }
 
-	d->nameFilters = filters;
-	d->refreshAll();
+    d->nameFilters = filters;
+    d->refreshAll ();
 }
 
-void TranslationManager::addNameFilter(const QString& filter)
+void TranslationManager::addNameFilter (const QString &filter)
 {
-	if(filter.isEmpty())
-		return;
+    if (filter.isEmpty ()) {
+        return;
+    }
 
-	QMutexLocker lock(translationMutex());
-	TranslationsData* d = trdata();
+    QMutexLocker lock (translationMutex ());
+    TranslationsData *d = trdata ();
 
-	d->nameFilters.prepend(filter);
-	d->refreshAll();
+    d->nameFilters.prepend (filter);
+    d->refreshAll ();
 }
 
-void TranslationManager::removeNameFilter(const QString& filter)
+void TranslationManager::removeNameFilter (const QString &filter)
 {
-	if(filter.isEmpty())
-		return;
+    if (filter.isEmpty ()) {
+        return;
+    }
 
-	QMutexLocker lock(translationMutex());
-	TranslationsData* d = trdata();
+    QMutexLocker lock (translationMutex ());
+    TranslationsData *d = trdata ();
 
-	int i = d->nameFilters.indexOf(filter);
-	if(i >= 0)
-	{
-		d->nameFilters.removeAt(i);
-		d->refreshAll();
-	}
+    int i = d->nameFilters.indexOf (filter);
+    if (i >= 0) {
+        d->nameFilters.removeAt (i);
+        d->refreshAll ();
+    }
 }
 

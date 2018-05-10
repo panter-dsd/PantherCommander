@@ -24,41 +24,43 @@
 
 #include "volumewatcher_p.h"
 
-VolumeWatcherEngine::VolumeWatcherEngine() : QObject(), ref(0)
+VolumeWatcherEngine::VolumeWatcherEngine ()
+    : QObject ()
+    , ref (0)
 {
 }
 
-VolumeWatcherEngine::~VolumeWatcherEngine()
+VolumeWatcherEngine::~VolumeWatcherEngine ()
 {
-	if(ref > 0)
-		qWarning("~VolumeWatcherEngine: instance still in use (%d references)", int(ref));
+    if (ref > 0)
+        qWarning ("~VolumeWatcherEngine: instance still in use (%d references)", int (ref));
 }
 
-
-VolumeWatcher::VolumeWatcher(QObject* parent) : QObject(parent)
-{
-}
-
-VolumeWatcher::~VolumeWatcher()
+VolumeWatcher::VolumeWatcher (QObject *parent)
+    : QObject (parent)
 {
 }
 
-QFileInfoList VolumeWatcher::volumes() const
+VolumeWatcher::~VolumeWatcher ()
 {
-	return QFileInfoList();
 }
 
-QString VolumeWatcher::volumeLabel(const QString& volume) const
+QFileInfoList VolumeWatcher::volumes () const
 {
-	Q_UNUSED(volume)
-	return QString();
+    return QFileInfoList ();
 }
 
-bool VolumeWatcher::getDiskFreeSpace(const QString& volume, qint64* total, qint64* free, qint64* available) const
+QString VolumeWatcher::volumeLabel (const QString &volume) const
 {
-	Q_UNUSED(volume)
-	Q_UNUSED(total)
-	Q_UNUSED(free)
-	Q_UNUSED(available)
-	return false;
+    Q_UNUSED(volume)
+    return QString ();
+}
+
+bool VolumeWatcher::getDiskFreeSpace (const QString &volume, qint64 *total, qint64 *free, qint64 *available) const
+{
+    Q_UNUSED(volume)
+    Q_UNUSED(total)
+    Q_UNUSED(free)
+    Q_UNUSED(available)
+    return false;
 }

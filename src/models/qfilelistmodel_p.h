@@ -41,75 +41,108 @@
 class QPCFileInfo
 {
 public:
-	enum Type { Dir, File, System };
+    enum Type
+    {
+        Dir, File, System
+    };
 
-	QPCFileInfo() : m_permissions(0)
-	{}
-	QPCFileInfo(const QFileInfo& fileInfo) : m_fileInfo(fileInfo), m_permissions(0)
-	{}
+    QPCFileInfo ()
+        : m_permissions (0)
+    {
+    }
 
-	bool operator==(const QPCFileInfo& fileInfo) const
-	{ return m_fileInfo == fileInfo.m_fileInfo && m_permissions == fileInfo.m_permissions; }
+    QPCFileInfo (const QFileInfo &fileInfo)
+        : m_fileInfo (fileInfo)
+        , m_permissions (0)
+    {
+    }
 
-	inline QFileInfo fileInfo() const
-	{ return m_fileInfo; }
-	inline void setFileInfo(const QFileInfo& fileInfo)
-	{ m_fileInfo = fileInfo; }
+    bool operator== (const QPCFileInfo &fileInfo) const
+    {
+        return m_fileInfo == fileInfo.m_fileInfo && m_permissions == fileInfo.m_permissions;
+    }
 
-	bool isCaseSensitive() const
-	{
+    inline QFileInfo fileInfo () const
+    {
+        return m_fileInfo;
+    }
+
+    inline void setFileInfo (const QFileInfo &fileInfo)
+    {
+        m_fileInfo = fileInfo;
+    }
+
+    bool isCaseSensitive () const
+    {
 #if false
 #if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
-		QAbstractFileEngine* fe = QAbstractFileEngine::create(m_fileInfo.absoluteFilePath());
-		bool cs = fe->caseSensitive();
-		delete fe;
-		return cs;
+        QAbstractFileEngine* fe = QAbstractFileEngine::create(m_fileInfo.absoluteFilePath());
+        bool cs = fe->caseSensitive();
+        delete fe;
+        return cs;
 #else
-		QAbstractFileEngine* fe = m_fileInfo.fileEngine();
-		if(fe)
-			return fe->caseSensitive();
+        QAbstractFileEngine* fe = m_fileInfo.fileEngine();
+        if(fe)
+            return fe->caseSensitive();
 #ifdef Q_WS_WIN
-		return false;
+        return false;
 #else
-		return true;
+        return true;
 #endif
 #endif
 #endif
-	}
-	bool isLocalFile() const
-	{
+    }
+
+    bool isLocalFile () const
+    {
 #if false
 #if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
-		QAbstractFileEngine* fe = QAbstractFileEngine::create(m_fileInfo.absoluteFilePath());
-		bool localDisc = (fe->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
-		delete fe;
-		return localDisc;
+        QAbstractFileEngine* fe = QAbstractFileEngine::create(m_fileInfo.absoluteFilePath());
+        bool localDisc = (fe->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
+        delete fe;
+        return localDisc;
 #else
-		QAbstractFileEngine* fe = m_fileInfo.fileEngine();
-		if(fe)
-			return (fe->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
-		return false;
+        QAbstractFileEngine* fe = m_fileInfo.fileEngine();
+        if(fe)
+            return (fe->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
+        return false;
 #endif
 #endif
-	}
+    }
 
-	inline bool isDir() const
-	{ return m_fileInfo.isDir(); }
-	inline bool isFile() const
-	{ return m_fileInfo.isFile(); }
-	inline bool isSymLink() const
-	{ return m_fileInfo.isSymLink(); }
+    inline bool isDir () const
+    {
+        return m_fileInfo.isDir ();
+    }
 
-	inline bool isHidden() const
-	{ return m_fileInfo.isHidden(); }
-	inline bool isSystem() const
-	{ return type() == System; }
-	Type type() const
-	{
-		if(m_fileInfo.isDir())
-			return QPCFileInfo::Dir;
-		if(m_fileInfo.isFile())
-			return QPCFileInfo::File;
+    inline bool isFile () const
+    {
+        return m_fileInfo.isFile ();
+    }
+
+    inline bool isSymLink () const
+    {
+        return m_fileInfo.isSymLink ();
+    }
+
+    inline bool isHidden () const
+    {
+        return m_fileInfo.isHidden ();
+    }
+
+    inline bool isSystem () const
+    {
+        return type () == System;
+    }
+
+    Type type () const
+    {
+        if (m_fileInfo.isDir ()) {
+            return QPCFileInfo::Dir;
+        }
+        if (m_fileInfo.isFile ()) {
+            return QPCFileInfo::File;
+        }
 /*#ifdef Q_WS_WIN
 		//TODO: implement
 #else
@@ -117,116 +150,153 @@ public:
 		if(m_fileInfo.exists() && !m_fileInfo.isSymLink())
 			return QPCFileInfo::System;
 #endif*/
-		return QPCFileInfo::System;
-	}
+        return QPCFileInfo::System;
+    }
 
-	inline QString fileName() const
-	{ return m_fileInfo.fileName(); }
-	inline QString filePath() const
-	{ return m_fileInfo.filePath(); }
-	inline QString absoluteFilePath() const
-	{ return m_fileInfo.absoluteFilePath(); }
+    inline QString fileName () const
+    {
+        return m_fileInfo.fileName ();
+    }
 
-	QString name() const
-	{
-		QString fname(m_fileInfo.fileName());
-		if(!fname.isEmpty() && !m_fileInfo.isDir())
-		{
-			int pos = fname.lastIndexOf(QLatin1Char('.'));
-			if(pos > 0 && pos < fname.size() - 1)
-				return fname.left(pos);
-		}
-		return fname;
-	}
-	QString ext() const
-	{
-		QString fname(m_fileInfo.fileName());
-		if(!fname.isEmpty() && !m_fileInfo.isDir())
-		{
-			int pos = fname.lastIndexOf(QLatin1Char('.'));
-			if(pos > 0 && pos < fname.size() - 1)
-				return fname.mid(pos + 1);
-		}
-		return QString();
-	}
+    inline QString filePath () const
+    {
+        return m_fileInfo.filePath ();
+    }
 
-	inline QDateTime created() const
-	{ return m_fileInfo.created(); }
-	inline QDateTime lastModified() const
-	{ return m_fileInfo.lastModified(); }
-	inline QDateTime lastRead() const
-	{ return m_fileInfo.lastRead(); }
+    inline QString absoluteFilePath () const
+    {
+        return m_fileInfo.absoluteFilePath ();
+    }
 
-	qint64 size() const
-	{ return m_fileInfo.isDir() && !m_fileInfo.isSymLink() ? 0 : m_fileInfo.size(); }
+    QString name () const
+    {
+        QString fname (m_fileInfo.fileName ());
+        if (!fname.isEmpty () && !m_fileInfo.isDir ()) {
+            int pos = fname.lastIndexOf (QLatin1Char ('.'));
+            if (pos > 0 && pos < fname.size () - 1) {
+                return fname.left (pos);
+            }
+        }
+        return fname;
+    }
 
-	inline QFile::Permissions permissions() const
-	{ return m_permissions ? m_permissions : m_fileInfo.permissions(); }
-	inline void setPermissions(QFile::Permissions permissions)
-	{ m_permissions = permissions; }
+    QString ext () const
+    {
+        QString fname (m_fileInfo.fileName ());
+        if (!fname.isEmpty () && !m_fileInfo.isDir ()) {
+            int pos = fname.lastIndexOf (QLatin1Char ('.'));
+            if (pos > 0 && pos < fname.size () - 1) {
+                return fname.mid (pos + 1);
+            }
+        }
+        return QString ();
+    }
 
-	inline QIcon icon() const
-	{ return m_icon; }
-	inline void setIcon(const QIcon& icon)
-	{ m_icon = icon; }
+    inline QDateTime created () const
+    {
+        return m_fileInfo.created ();
+    }
+
+    inline QDateTime lastModified () const
+    {
+        return m_fileInfo.lastModified ();
+    }
+
+    inline QDateTime lastRead () const
+    {
+        return m_fileInfo.lastRead ();
+    }
+
+    qint64 size () const
+    {
+        return m_fileInfo.isDir () && !m_fileInfo.isSymLink () ? 0 : m_fileInfo.size ();
+    }
+
+    inline QFile::Permissions permissions () const
+    {
+        return m_permissions ? m_permissions : m_fileInfo.permissions ();
+    }
+
+    inline void setPermissions (QFile::Permissions permissions)
+    {
+        m_permissions = permissions;
+    }
+
+    inline QIcon icon () const
+    {
+        return m_icon;
+    }
+
+    inline void setIcon (const QIcon &icon)
+    {
+        m_icon = icon;
+    }
 
 private:
-	QFileInfo m_fileInfo;
-	QFile::Permissions m_permissions;
-	QIcon m_icon;
+    QFileInfo m_fileInfo;
+    QFile::Permissions m_permissions;
+    QIcon m_icon;
 };
-
 
 class QFileListModelPrivate
 {
-	Q_DECLARE_PUBLIC(QFileListModel)
+    Q_DECLARE_PUBLIC(QFileListModel)
 
 public:
-	QFileListModelPrivate();
-	~QFileListModelPrivate();
+    QFileListModelPrivate ();
 
-	QPCFileInfo* node(const QModelIndex& index) const;
-	QModelIndex index(const QPCFileInfo* node) const;
-	QModelIndex index(const QString& fileName, int column) const;
+    ~QFileListModelPrivate ();
 
-	void abort();
-	void fetchFileList();
-	void updateFileList();
+    QPCFileInfo *node (const QModelIndex &index) const;
 
-	void _q_directoryChanged();
-	void _q_finishedLoadIcons();
+    QModelIndex index (const QPCFileInfo *node) const;
 
-	inline bool indexValid(const QModelIndex& index) const
-	{
-		Q_Q(const QFileListModel);
-		return (index.isValid() && index.model() == q
-				&& index.row() < q->rowCount(index.parent())
-				&& index.column() < q->columnCount(index.parent()));
-	}
-	static QString size(qint64 bytes);
+    QModelIndex index (const QString &fileName, int column) const;
 
-	QFileListModel* q_ptr;
+    void abort ();
 
-	QDir rootDir;
-	QPCFileInfo root;
-	QList<QPCFileInfo*> nodes;
+    void fetchFileList ();
 
-	int sortColumn;
-	Qt::SortOrder sortOrder;
-	QDir::SortFlags sort;
+    void updateFileList ();
 
-	QFuture<void> future;
-	QFutureWatcher<void> futureWatcher;
+    void _q_directoryChanged ();
 
-	QFileIconProvider* iconProvider;
+    void _q_finishedLoadIcons ();
+
+    inline bool indexValid (const QModelIndex &index) const
+    {
+        Q_Q(const QFileListModel);
+        return (index.isValid () && index.model () == q
+                && index.row () < q->rowCount (index.parent ())
+                && index.column () < q->columnCount (index.parent ()));
+    }
+
+    static QString size (qint64 bytes);
+
+    QFileListModel *q_ptr;
+
+    QDir rootDir;
+    QPCFileInfo root;
+    QList<QPCFileInfo *> nodes;
+
+    int sortColumn;
+    Qt::SortOrder sortOrder;
+    QDir::SortFlags sort;
+
+    QFuture<void> future;
+    QFutureWatcher<void> futureWatcher;
+
+    QFileIconProvider *iconProvider;
 
 #ifndef QT_NO_FILESYSTEMWATCHER
-	QFileSystemWatcher* fileSystemWatcher;
+    QFileSystemWatcher *fileSystemWatcher;
 #endif
 
-	ushort inUpdate : 1;
-	ushort sheduledUpdate : 1;
-	QBasicTimer updateTimer;
+    ushort inUpdate
+        : 1;
+    ushort sheduledUpdate
+        : 1;
+    QBasicTimer updateTimer;
 };
 
 #endif // QFILELISTMODEL_P_H

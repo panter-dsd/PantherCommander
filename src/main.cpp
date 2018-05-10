@@ -23,7 +23,6 @@
 *******************************************************************/
 
 #include <QtCore/QSettings>
-#include <QtCore/QTextCodec>
 
 #include <QtWidgets/QApplication>
 
@@ -31,21 +30,21 @@
 
 #define ApplicationVersion "0.0.0.6"
 
-int main(int argc, char **argv)
+int main (int argc, char **argv)
 {
-	QApplication app(argc, argv);
-	app.setOrganizationDomain("panter.org");
-	app.setOrganizationName("PanteR");
-	app.setApplicationName("Panther Commander");
-	app.setApplicationVersion(ApplicationVersion);
+    QApplication app (argc, argv);
+    app.setOrganizationDomain ("panter.org");
+    app.setOrganizationName ("PanteR");
+    app.setApplicationName ("Panther Commander");
+    app.setApplicationVersion (ApplicationVersion);
 
-	app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+    app.connect (&app, SIGNAL(lastWindowClosed ()), &app, SLOT(quit ()));
 
-	QSettings::setDefaultFormat(QSettings::IniFormat);
+    QSettings::setDefaultFormat (QSettings::IniFormat);
 
-	MainWindowImpl win;
-	win.setWindowTitle(app.applicationName()+" "+app.applicationVersion());
-	win.show();
+    MainWindowImpl win;
+    win.setWindowTitle (app.applicationName () + " " + app.applicationVersion ());
+    win.show ();
 
-	return app.exec();
+    return app.exec ();
 }

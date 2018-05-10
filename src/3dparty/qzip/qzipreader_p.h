@@ -47,29 +47,41 @@
 #include <QtCore/QString>
 
 class QZipReaderPrivate;
+
 class QZipReader
 {
 public:
-    QZipReader(const QString &fileName, QIODevice::OpenMode mode = QIODevice::ReadOnly);
-    explicit QZipReader(QIODevice *device);
-    virtual ~QZipReader();
+    QZipReader (const QString &fileName, QIODevice::OpenMode mode = QIODevice::ReadOnly);
 
-    QIODevice* device() const;
+    explicit QZipReader (QIODevice *device);
 
-    bool isReadable() const;
-    bool exists() const;
+    virtual ~QZipReader ();
+
+    QIODevice *device () const;
+
+    bool isReadable () const;
+
+    bool exists () const;
 
     struct FileInfo
     {
-        FileInfo();
-        FileInfo(const FileInfo &other);
-        ~FileInfo();
-        FileInfo &operator=(const FileInfo &other);
-        bool isValid() const;
+        FileInfo ();
+
+        FileInfo (const FileInfo &other);
+
+        ~FileInfo ();
+
+        FileInfo &operator= (const FileInfo &other);
+
+        bool isValid () const;
+
         QString filePath;
-        uint isDir : 1;
-        uint isFile : 1;
-        uint isSymLink : 1;
+        uint isDir
+            : 1;
+        uint isFile
+            : 1;
+        uint isSymLink
+            : 1;
         QFile::Permissions permissions;
         uint crc32;
         qint64 size;
@@ -77,14 +89,18 @@ public:
         void *d;
     };
 
-    QList<FileInfo> fileInfoList() const;
-    int count() const;
+    QList<FileInfo> fileInfoList () const;
 
-    FileInfo entryInfoAt(int index) const;
-    QByteArray fileData(const QString &fileName) const;
-    bool extractAll(const QString &destinationDir) const;
+    int count () const;
 
-    enum Status {
+    FileInfo entryInfoAt (int index) const;
+
+    QByteArray fileData (const QString &fileName) const;
+
+    bool extractAll (const QString &destinationDir) const;
+
+    enum Status
+    {
         NoError,
         FileReadError,
         FileOpenError,
@@ -92,9 +108,9 @@ public:
         FileError
     };
 
-    Status status() const;
+    Status status () const;
 
-    void close();
+    void close ();
 
 private:
     QZipReaderPrivate *d;

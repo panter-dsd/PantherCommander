@@ -28,8 +28,8 @@
 namespace Konsole
 {
 
-/** 
- * A class to parse and extract information about shell commands. 
+/**
+ * A class to parse and extract information about shell commands.
  *
  * ShellCommand can be used to:
  *
@@ -38,7 +38,7 @@ namespace Konsole
  *          into its component parts (eg. the command "/bin/sh" and the arguments
  *          "-c","/path/to/my/script")
  *      </li>
- *      <li>Take a command and a list of arguments and combine them to 
+ *      <li>Take a command and a list of arguments and combine them to
  *          form a complete command line.
  *      </li>
  *      <li>Determine whether the binary specified by a command exists in the
@@ -47,46 +47,49 @@ namespace Konsole
  *      <li>Determine whether a command-line specifies the execution of
  *          another command as the root user using su/sudo etc.
  *      </li>
- * </ul> 
+ * </ul>
  */
-class ShellCommand
-{
-public:
-    /**
-     * Constructs a ShellCommand from a command line.
-     *
-     * @param fullCommand The command line to parse.  
-     */
-    ShellCommand(const QString& fullCommand);
-    /**
-     * Constructs a ShellCommand with the specified @p command and @p arguments.
-     */
-    ShellCommand(const QString& command , const QStringList& arguments);
+    class ShellCommand
+    {
+    public:
+        /**
+         * Constructs a ShellCommand from a command line.
+         *
+         * @param fullCommand The command line to parse.
+         */
+        ShellCommand (const QString &fullCommand);
 
-    /** Returns the command. */
-    QString command() const;
-    /** Returns the arguments. */
-    QStringList arguments() const;
+        /**
+         * Constructs a ShellCommand with the specified @p command and @p arguments.
+         */
+        ShellCommand (const QString &command, const QStringList &arguments);
 
-    /** 
-     * Returns the full command line. 
-     */
-    QString fullCommand() const;
+        /** Returns the command. */
+        QString command () const;
 
-    /** Returns true if this is a root command. */
-    bool isRootCommand() const;
-    /** Returns true if the program specified by @p command() exists. */
-    bool isAvailable() const;
+        /** Returns the arguments. */
+        QStringList arguments () const;
 
-    /** Expands environment variables in @p text .*/
-    static QString expand(const QString& text);
+        /**
+         * Returns the full command line.
+         */
+        QString fullCommand () const;
 
-    /** Expands environment variables in each string in @p list. */
-    static QStringList expand(const QStringList& items);
+        /** Returns true if this is a root command. */
+        bool isRootCommand () const;
 
-private:
-    QStringList _arguments;    
-};
+        /** Returns true if the program specified by @p command() exists. */
+        bool isAvailable () const;
+
+        /** Expands environment variables in @p text .*/
+        static QString expand (const QString &text);
+
+        /** Expands environment variables in each string in @p list. */
+        static QStringList expand (const QStringList &items);
+
+    private:
+        QStringList _arguments;
+    };
 
 }
 

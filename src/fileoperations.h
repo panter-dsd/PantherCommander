@@ -6,102 +6,123 @@
 class FileOperation
 {
 public:
-	enum OperationType {
-		None = 0,
-		Copy,
-		Move,
-		Remove,
-		User = 1000,
-		MaxUser = 65535};
+    enum OperationType
+    {
+        None = 0,
+        Copy,
+        Move,
+        Remove,
+        User = 1000,
+        MaxUser = 65535
+    };
 
-	enum OperationFlag {
-		Interactive = 0x01,
-		Force = 0x02,
-		MakeLinks = 0x04,
-		FollowLinks = 0x08
-	};
+    enum OperationFlag
+    {
+        Interactive = 0x01,
+        Force = 0x02,
+        MakeLinks = 0x04,
+        FollowLinks = 0x08
+    };
 
-	Q_DECLARE_FLAGS(OperationFlags, OperationFlag);
+    Q_DECLARE_FLAGS(OperationFlags, OperationFlag);
 
-	FileOperation(OperationType type, OperationFlags flags)
-			: operationType(type), operationFlags(flags), canceled(false), complited(false)
-	{}
+    FileOperation (OperationType type, OperationFlags flags)
+        : operationType (type)
+        , operationFlags (flags)
+        , canceled (false)
+        , complited (false)
+    {
+    }
 
-	virtual ~FileOperation()
-	{}
+    virtual ~FileOperation ()
+    {
+    }
 
-	inline OperationType type() const
-	{return operationType;}
+    inline OperationType type () const
+    {
+        return operationType;
+    }
 
-	const QStringList& getSources() const
-	{return qslSources;}
+    const QStringList &getSources () const
+    {
+        return qslSources;
+    }
 
-	void setSources(const QStringList& sources)
-	{qslSources = sources;}
+    void setSources (const QStringList &sources)
+    {
+        qslSources = sources;
+    }
 
-	const QString& getDest() const
-	{return qsDest;}
+    const QString &getDest () const
+    {
+        return qsDest;
+    }
 
-	void setDest(const QString& dest)
-	{qsDest = dest;}
+    void setDest (const QString &dest)
+    {
+        qsDest = dest;
+    }
 
 protected:
-	OperationType operationType;
+    OperationType operationType;
 
-	QStringList qslSources;
-	QString qsDest;
+    QStringList qslSources;
+    QString qsDest;
 
-	ushort operationFlags;
+    ushort operationFlags;
 
-	bool canceled;
-	bool complited;
+    bool canceled;
+    bool complited;
 };
 
-class CopyFileOperation: public FileOperation
+class CopyFileOperation : public FileOperation
 {
 public:
-	CopyFileOperation(const QStringList& from, const QString& to, OperationFlags flags)
-			:FileOperation(Copy, flags)
-	{
-		qslSources = from;
-		qsDest = to;
-		operationType = Copy;
-		operationFlags = flags;
-	}
+    CopyFileOperation (const QStringList &from, const QString &to, OperationFlags flags)
+        : FileOperation (Copy, flags)
+    {
+        qslSources = from;
+        qsDest = to;
+        operationType = Copy;
+        operationFlags = flags;
+    }
 
-	virtual ~CopyFileOperation()
-	{}
+    virtual ~CopyFileOperation ()
+    {
+    }
 };
 
-class MoveFileOperation: public FileOperation
+class MoveFileOperation : public FileOperation
 {
 public:
-	MoveFileOperation(const QStringList& from, const QString& to, OperationFlags flags)
-			:FileOperation(Move, flags)
-	{
-		qslSources = from;
-		qsDest = to;
-		operationType = Move;
-		operationFlags = flags;
-	}
+    MoveFileOperation (const QStringList &from, const QString &to, OperationFlags flags)
+        : FileOperation (Move, flags)
+    {
+        qslSources = from;
+        qsDest = to;
+        operationType = Move;
+        operationFlags = flags;
+    }
 
-	virtual ~MoveFileOperation()
-	{}
+    virtual ~MoveFileOperation ()
+    {
+    }
 };
 
-class RemoveFileOperation: public FileOperation
+class RemoveFileOperation : public FileOperation
 {
 public:
-	RemoveFileOperation(const QStringList& files, OperationFlags flags)
-			:FileOperation(Remove, flags)
-	{
-		qslSources = files;
-		operationType = Remove;
-		operationFlags = flags;
-	}
+    RemoveFileOperation (const QStringList &files, OperationFlags flags)
+        : FileOperation (Remove, flags)
+    {
+        qslSources = files;
+        operationType = Remove;
+        operationFlags = flags;
+    }
 
-	virtual ~RemoveFileOperation()
-	{}
+    virtual ~RemoveFileOperation ()
+    {
+    }
 };
 
 #endif // FILEOPERATIONS_H

@@ -29,24 +29,26 @@
 
 class AppSettings : public QSettings
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
-	static AppSettings* instance();
-	virtual ~AppSettings();
+    static AppSettings *instance ();
 
-	void settingsChange();
+    virtual ~AppSettings ();
 
-	bool useNativeDialogs();
+    void settingsChange ();
+
+    bool useNativeDialogs ();
 
 protected:
-	explicit AppSettings(QObject* parent = 0);
+    explicit AppSettings (QObject *parent = 0);
 
 Q_SIGNALS:
-	void settingsChanged();
+
+    void settingsChanged ();
 
 private:
-	static AppSettings* pInstance;
+    static AppSettings *pInstance;
 };
 
 #endif // APPSETTINGS_H

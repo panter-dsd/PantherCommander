@@ -29,39 +29,53 @@
 
 class TabBar : public QTabBar
 {
-	Q_OBJECT
-	Q_PROPERTY(bool showTabBarWhenOneTab READ showTabBarWhenOneTab WRITE setShowTabBarWhenOneTab)
+Q_OBJECT
+    Q_PROPERTY(bool showTabBarWhenOneTab
+                   READ
+                   showTabBarWhenOneTab
+                   WRITE
+                   setShowTabBarWhenOneTab)
 
 public:
-	explicit TabBar(QWidget* parent = 0);
-	virtual ~TabBar();
+    explicit TabBar (QWidget *parent = 0);
 
-	bool showTabBarWhenOneTab() const;
-	void setShowTabBarWhenOneTab(bool enabled);
+    virtual ~TabBar ();
+
+    bool showTabBarWhenOneTab () const;
+
+    void setShowTabBarWhenOneTab (bool enabled);
 
 protected:
-	void mouseDoubleClickEvent(QMouseEvent* event);
-	void mouseReleaseEvent(QMouseEvent* event);
+    void mouseDoubleClickEvent (QMouseEvent *event);
 
-	QSize tabSizeHint(int index) const;
+    void mouseReleaseEvent (QMouseEvent *event);
 
-	void tabInserted(int position);
-	void tabRemoved(int position);
+    QSize tabSizeHint (int index) const;
+
+    void tabInserted (int position);
+
+    void tabRemoved (int position);
 
 Q_SIGNALS:
-	void newTab();
-	void cloneTab(int index);
+
+    void newTab ();
+
+    void cloneTab (int index);
 
 private Q_SLOTS:
-	void cloneTab();
-	void closeTab(int index = -1);
-	void closeOtherTabs();
-	void contextMenuRequested(const QPoint& pos);
+
+    void cloneTab ();
+
+    void closeTab (int index = -1);
+
+    void closeOtherTabs ();
+
+    void contextMenuRequested (const QPoint &pos);
 
 private:
-	void updateVisibility();
+    void updateVisibility ();
 
-	bool m_showTabBarWhenOneTab;
+    bool m_showTabBarWhenOneTab;
 };
 
 #endif // TABBAR_H

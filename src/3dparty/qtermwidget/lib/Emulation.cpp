@@ -62,131 +62,131 @@ using namespace Konsole;
 /*!
 */
 
-Emulation::Emulation() :
-  _currentScreen(0),
-  _codec(0),
-  _decoder(0),
-  _keyTranslator(0),
-  _usesMouse(false)
+Emulation::Emulation ()
+    :
+    _currentScreen (0)
+    , _codec (0)
+    , _decoder (0)
+    , _keyTranslator (0)
+    , _usesMouse (false)
 {
 
-  // create screens with a default size
-  _screen[0] = new Screen(40,80);
-  _screen[1] = new Screen(40,80);
-  _currentScreen = _screen[0];
+    // create screens with a default size
+    _screen[0] = new Screen (40, 80);
+    _screen[1] = new Screen (40, 80);
+    _currentScreen = _screen[0];
 
-  QObject::connect(&_bulkTimer1, SIGNAL(timeout()), this, SLOT(showBulk()) );
-  QObject::connect(&_bulkTimer2, SIGNAL(timeout()), this, SLOT(showBulk()) );
+    QObject::connect (&_bulkTimer1, SIGNAL(timeout ()), this, SLOT(showBulk ()));
+    QObject::connect (&_bulkTimer2, SIGNAL(timeout ()), this, SLOT(showBulk ()));
 
-  // listen for mouse status changes
-  connect( this , SIGNAL(programUsesMouseChanged(bool)) ,
-           SLOT(usesMouseChanged(bool)) );
+    // listen for mouse status changes
+    connect (this, SIGNAL(programUsesMouseChanged (bool)),
+             SLOT(usesMouseChanged (bool)));
 }
 
-bool Emulation::programUsesMouse() const
+bool Emulation::programUsesMouse () const
 {
     return _usesMouse;
 }
 
-void Emulation::usesMouseChanged(bool usesMouse)
+void Emulation::usesMouseChanged (bool usesMouse)
 {
     _usesMouse = usesMouse;
 }
 
-ScreenWindow* Emulation::createWindow()
+ScreenWindow *Emulation::createWindow ()
 {
-    ScreenWindow* window = new ScreenWindow();
-    window->setScreen(_currentScreen);
+    ScreenWindow *window = new ScreenWindow ();
+    window->setScreen (_currentScreen);
     _windows << window;
 
-    connect(window , SIGNAL(selectionChanged()),
-            this , SLOT(bufferedUpdate()));
+    connect (window, SIGNAL(selectionChanged ()),
+             this, SLOT(bufferedUpdate ()));
 
-    connect(this , SIGNAL(outputChanged()),
-            window , SLOT(notifyOutputChanged()) );
+    connect (this, SIGNAL(outputChanged ()),
+             window, SLOT(notifyOutputChanged ()));
     return window;
 }
 
 /*!
 */
 
-Emulation::~Emulation()
+Emulation::~Emulation ()
 {
-  QListIterator<ScreenWindow*> windowIter(_windows);
+    QListIterator<ScreenWindow *> windowIter (_windows);
 
-  while (windowIter.hasNext())
-  {
-    delete windowIter.next();
-  }
+    while (windowIter.hasNext ()) {
+        delete windowIter.next ();
+    }
 
-  delete _screen[0];
-  delete _screen[1];
-  delete _decoder;
+    delete _screen[0];
+    delete _screen[1];
+    delete _decoder;
 }
 
 /*! change between primary and alternate _screen
 */
 
-void Emulation::setScreen(int n)
+void Emulation::setScreen (int n)
 {
-  Screen *old = _currentScreen;
-  _currentScreen = _screen[n&1];
-  if (_currentScreen != old)
-  {
-     old->setBusySelecting(false);
+    Screen *old = _currentScreen;
+    _currentScreen = _screen[n & 1];
+    if (_currentScreen != old) {
+        old->setBusySelecting (false);
 
-     // tell all windows onto this emulation to switch to the newly active _screen
-     QListIterator<ScreenWindow*> windowIter(_windows);
-     while ( windowIter.hasNext() )
-     {
-         windowIter.next()->setScreen(_currentScreen);
-     }
-  }
+        // tell all windows onto this emulation to switch to the newly active _screen
+        QListIterator<ScreenWindow *> windowIter (_windows);
+        while (windowIter.hasNext ()) {
+            windowIter.next ()->setScreen (_currentScreen);
+        }
+    }
 }
 
-void Emulation::clearHistory()
+void Emulation::clearHistory ()
 {
-    _screen[0]->setScroll( _screen[0]->getScroll() , false );
-}
-void Emulation::setHistory(const HistoryType& t)
-{
-  _screen[0]->setScroll(t);
-
-  showBulk();
+    _screen[0]->setScroll (_screen[0]->getScroll (), false);
 }
 
-const HistoryType& Emulation::history()
+void Emulation::setHistory (const HistoryType &t)
 {
-  return _screen[0]->getScroll();
+    _screen[0]->setScroll (t);
+
+    showBulk ();
 }
 
-void Emulation::setCodec(const QTextCodec * qtc)
+const HistoryType &Emulation::history ()
 {
-  Q_ASSERT( qtc );
-
-  _codec = qtc;
-  delete _decoder;
-  _decoder = _codec->makeDecoder();
-
-  emit useUtf8Request(utf8());
+    return _screen[0]->getScroll ();
 }
 
-void Emulation::setCodec(EmulationCodec codec)
+void Emulation::setCodec (const QTextCodec *qtc)
 {
-    if ( codec == Utf8Codec )
-        setCodec( QTextCodec::codecForName("utf8") );
-    else if ( codec == LocaleCodec )
-        setCodec( QTextCodec::codecForLocale() );
+    Q_ASSERT(qtc);
+
+    _codec = qtc;
+    delete _decoder;
+    _decoder = _codec->makeDecoder ();
+
+    emit useUtf8Request (utf8 ());
 }
 
-void Emulation::setKeyBindings(const QString& name)
+void Emulation::setCodec (EmulationCodec codec)
 {
-  _keyTranslator = KeyboardTranslatorManager::instance()->findTranslator(name);
+    if (codec == Utf8Codec) {
+        setCodec (QTextCodec::codecForName ("utf8"));
+    } else if (codec == LocaleCodec) {
+        setCodec (QTextCodec::codecForLocale ());
+    }
 }
 
-QString Emulation::keyBindings()
+void Emulation::setKeyBindings (const QString &name)
 {
-  return _keyTranslator->name();
+    _keyTranslator = KeyboardTranslatorManager::instance ()->findTranslator (name);
+}
+
+QString Emulation::keyBindings ()
+{
+    return _keyTranslator->name ();
 }
 
 
@@ -202,21 +202,31 @@ QString Emulation::keyBindings()
 /*!
 */
 
-void Emulation::receiveChar(int c)
+void Emulation::receiveChar (int c)
 // process application unicode input to terminal
 // this is a trivial scanner
 {
-  c &= 0xff;
-  switch (c)
-  {
-    case '\b'      : _currentScreen->BackSpace();                 break;
-    case '\t'      : _currentScreen->Tabulate();                  break;
-    case '\n'      : _currentScreen->NewLine();                   break;
-    case '\r'      : _currentScreen->Return();                    break;
-    case 0x07      : emit stateSet(NOTIFYBELL);
-                     break;
-    default        : _currentScreen->ShowCharacter(c);            break;
-  };
+    c &= 0xff;
+    switch (c) {
+        case '\b'      :
+            _currentScreen->BackSpace ();
+            break;
+        case '\t'      :
+            _currentScreen->Tabulate ();
+            break;
+        case '\n'      :
+            _currentScreen->NewLine ();
+            break;
+        case '\r'      :
+            _currentScreen->Return ();
+            break;
+        case 0x07      :
+            emit stateSet (NOTIFYBELL);
+            break;
+        default        :
+            _currentScreen->ShowCharacter (c);
+            break;
+    };
 }
 
 /* ------------------------------------------------------------------------- */
@@ -228,26 +238,25 @@ void Emulation::receiveChar(int c)
 /*!
 */
 
-void Emulation::sendKeyEvent( QKeyEvent* ev )
+void Emulation::sendKeyEvent (QKeyEvent *ev)
 {
-  emit stateSet(NOTIFYNORMAL);
+    emit stateSet (NOTIFYNORMAL);
 
-  if (!ev->text().isEmpty())
-  { // A block of text
-    // Note that the text is proper unicode.
-    // We should do a conversion here, but since this
-    // routine will never be used, we simply emit plain ascii.
-    //emit sendBlock(ev->text().toAscii(),ev->text().length());
-    emit sendData(ev->text().toUtf8(),ev->text().length());
-  }
+    if (!ev->text ().isEmpty ()) { // A block of text
+        // Note that the text is proper unicode.
+        // We should do a conversion here, but since this
+        // routine will never be used, we simply emit plain ascii.
+        //emit sendBlock(ev->text().toAscii(),ev->text().length());
+        emit sendData (ev->text ().toUtf8 (), ev->text ().length ());
+    }
 }
 
-void Emulation::sendString(const char*,int)
+void Emulation::sendString (const char *, int)
 {
     // default implementation does nothing
 }
 
-void Emulation::sendMouseEvent(int /*buttons*/, int /*column*/, int /*row*/, int /*eventType*/)
+void Emulation::sendMouseEvent (int /*buttons*/, int /*column*/, int /*row*/, int /*eventType*/)
 {
     // default implementation does nothing
 }
@@ -259,31 +268,30 @@ void Emulation::sendMouseEvent(int /*buttons*/, int /*column*/, int /*row*/, int
 TODO: Character composition from the old code.  See #96536
 */
 
-void Emulation::receiveData(const char* text, int length)
+void Emulation::receiveData (const char *text, int length)
 {
-	emit stateSet(NOTIFYACTIVITY);
+    emit stateSet (NOTIFYACTIVITY);
 
-	bufferedUpdate();
+    bufferedUpdate ();
 
-    QString unicodeText = _decoder->toUnicode(text,length);
+    QString unicodeText = _decoder->toUnicode (text, length);
 
-	//send characters to terminal emulator
-	for (int i=0;i<unicodeText.length();i++)
-	{
-		receiveChar(unicodeText[i].unicode());
-	}
+    //send characters to terminal emulator
+    for (int i = 0; i < unicodeText.length (); i++) {
+        receiveChar (unicodeText[i].unicode ());
+    }
 
-	//look for z-modem indicator
-	//-- someone who understands more about z-modems that I do may be able to move
-	//this check into the above for loop?
-	for (int i=0;i<length;i++)
-	{
-		if (text[i] == '\030')
-    		{
-      			if ((length-i-1 > 3) && (strncmp(text+i+1, "B00", 3) == 0))
-      				emit zmodemDetected();
-    		}
-	}
+    //look for z-modem indicator
+    //-- someone who understands more about z-modems that I do may be able to move
+    //this check into the above for loop?
+    for (int i = 0; i < length; i++) {
+        if (text[i] == '\030') {
+            if ((length - i - 1 > 3) && (strncmp (text + i + 1, "B00", 3) == 0))
+                emit {
+                zmodemDetected ();
+            }
+        }
+    }
 }
 
 //OLDER VERSION
@@ -376,17 +384,17 @@ void Emulation::clearSelection() {
 
 #endif
 
-void Emulation::writeToStream( TerminalCharacterDecoder* _decoder ,
-                               int startLine ,
+void Emulation::writeToStream (TerminalCharacterDecoder *_decoder,
+                               int startLine,
                                int endLine)
 {
-  _currentScreen->writeToStream(_decoder,startLine,endLine);
+    _currentScreen->writeToStream (_decoder, startLine, endLine);
 }
 
-int Emulation::lineCount()
+int Emulation::lineCount ()
 {
     // sum number of lines currently on _screen plus number of lines in history
-    return _currentScreen->getLines() + _currentScreen->getHistLines();
+    return _currentScreen->getLines () + _currentScreen->getHistLines ();
 }
 
 // Refreshing -------------------------------------------------------------- --
@@ -396,94 +404,91 @@ int Emulation::lineCount()
 
 /*!
 */
-void Emulation::showBulk()
+void Emulation::showBulk ()
 {
-    _bulkTimer1.stop();
-    _bulkTimer2.stop();
+    _bulkTimer1.stop ();
+    _bulkTimer2.stop ();
 
-    emit outputChanged();
+    emit outputChanged ();
 
-    _currentScreen->resetScrolledLines();
-    _currentScreen->resetDroppedLines();
+    _currentScreen->resetScrolledLines ();
+    _currentScreen->resetDroppedLines ();
 }
 
-void Emulation::bufferedUpdate()
+void Emulation::bufferedUpdate ()
 {
-   _bulkTimer1.setSingleShot(true);
-   _bulkTimer1.start(BULK_TIMEOUT1);
-   if (!_bulkTimer2.isActive())
-   {
-      _bulkTimer2.setSingleShot(true);
-      _bulkTimer2.start(BULK_TIMEOUT2);
-   }
+    _bulkTimer1.setSingleShot (true);
+    _bulkTimer1.start (BULK_TIMEOUT1);
+    if (!_bulkTimer2.isActive ()) {
+        _bulkTimer2.setSingleShot (true);
+        _bulkTimer2.start (BULK_TIMEOUT2);
+    }
 }
 
-char Emulation::getErase() const
+char Emulation::getErase () const
 {
-  return '\b';
+    return '\b';
 }
 
-void Emulation::setImageSize(int lines, int columns)
+void Emulation::setImageSize (int lines, int columns)
 {
-  //kDebug() << "Resizing image to: " << lines << "by" << columns << QTime::currentTime().msec();
-  Q_ASSERT( lines > 0 );
-  Q_ASSERT( columns > 0 );
+    //kDebug() << "Resizing image to: " << lines << "by" << columns << QTime::currentTime().msec();
+    Q_ASSERT(lines > 0);
+    Q_ASSERT(columns > 0);
 
-  _screen[0]->resizeImage(lines,columns);
-  _screen[1]->resizeImage(lines,columns);
+    _screen[0]->resizeImage (lines, columns);
+    _screen[1]->resizeImage (lines, columns);
 
-  emit imageSizeChanged(lines,columns);
+    emit imageSizeChanged (lines, columns);
 
-  bufferedUpdate();
+    bufferedUpdate ();
 }
 
-QSize Emulation::imageSize()
+QSize Emulation::imageSize ()
 {
-  return QSize(_currentScreen->getColumns(), _currentScreen->getLines());
+    return QSize (_currentScreen->getColumns (), _currentScreen->getLines ());
 }
 
-ushort ExtendedCharTable::extendedCharHash(ushort* unicodePoints , ushort length) const
+ushort ExtendedCharTable::extendedCharHash (ushort *unicodePoints, ushort length) const
 {
     ushort hash = 0;
-    for ( ushort i = 0 ; i < length ; i++ )
-    {
-        hash = 31*hash + unicodePoints[i];
+    for (ushort i = 0; i < length; i++) {
+        hash = 31 * hash + unicodePoints[i];
     }
     return hash;
 }
-bool ExtendedCharTable::extendedCharMatch(ushort hash , ushort* unicodePoints , ushort length) const
+
+bool ExtendedCharTable::extendedCharMatch (ushort hash, ushort *unicodePoints, ushort length) const
 {
-    ushort* entry = extendedCharTable[hash];
+    ushort *entry = extendedCharTable[hash];
 
     // compare given length with stored sequence length ( given as the first ushort in the
     // stored buffer )
-    if ( entry == 0 || entry[0] != length )
-       return false;
+    if (entry == 0 || entry[0] != length) {
+        return false;
+    }
     // if the lengths match, each character must be checked.  the stored buffer starts at
     // entry[1]
-    for ( int i = 0 ; i < length ; i++ )
-    {
-        if ( entry[i+1] != unicodePoints[i] )
-           return false;
+    for (int i = 0; i < length; i++) {
+        if (entry[i + 1] != unicodePoints[i]) {
+            return false;
+        }
     }
     return true;
 }
-ushort ExtendedCharTable::createExtendedChar(ushort* unicodePoints , ushort length)
+
+ushort ExtendedCharTable::createExtendedChar (ushort *unicodePoints, ushort length)
 {
     // look for this sequence of points in the table
-    ushort hash = extendedCharHash(unicodePoints,length);
+    ushort hash = extendedCharHash (unicodePoints, length);
 
     // check existing entry for match
-    while ( extendedCharTable.contains(hash) )
-    {
-        if ( extendedCharMatch(hash,unicodePoints,length) )
-        {
+    while (extendedCharTable.contains (hash)) {
+        if (extendedCharMatch (hash, unicodePoints, length)) {
             // this sequence already has an entry in the table,
             // return its hash
             return hash;
-        }
-        else
-        {
+        } else {
             // if hash is already used by another, different sequence of unicode character
             // points then try next hash
             hash++;
@@ -491,47 +496,45 @@ ushort ExtendedCharTable::createExtendedChar(ushort* unicodePoints , ushort leng
     }
 
 
-     // add the new sequence to the table and
-     // return that index
-    ushort* buffer = new ushort[length+1];
+    // add the new sequence to the table and
+    // return that index
+    ushort *buffer = new ushort[length + 1];
     buffer[0] = length;
-    for ( int i = 0 ; i < length ; i++ )
-       buffer[i+1] = unicodePoints[i];
+    for (int i = 0; i < length; i++) {
+        buffer[i + 1] = unicodePoints[i];
+    }
 
-    extendedCharTable.insert(hash,buffer);
+    extendedCharTable.insert (hash, buffer);
 
     return hash;
 }
 
-ushort* ExtendedCharTable::lookupExtendedChar(ushort hash , ushort& length) const
+ushort *ExtendedCharTable::lookupExtendedChar (ushort hash, ushort &length) const
 {
     // lookup index in table and if found, set the length
     // argument and return a pointer to the character sequence
 
-    ushort* buffer = extendedCharTable[hash];
-    if ( buffer )
-    {
+    ushort *buffer = extendedCharTable[hash];
+    if (buffer) {
         length = buffer[0];
-        return buffer+1;
-    }
-    else
-    {
+        return buffer + 1;
+    } else {
         length = 0;
         return 0;
     }
 }
 
-ExtendedCharTable::ExtendedCharTable()
+ExtendedCharTable::ExtendedCharTable ()
 {
 }
-ExtendedCharTable::~ExtendedCharTable()
+
+ExtendedCharTable::~ExtendedCharTable ()
 {
     // free all allocated character buffers
-    QHashIterator<ushort,ushort*> iter(extendedCharTable);
-    while ( iter.hasNext() )
-    {
-        iter.next();
-        delete[] iter.value();
+    QHashIterator<ushort, ushort *> iter (extendedCharTable);
+    while (iter.hasNext ()) {
+        iter.next ();
+        delete[] iter.value ();
     }
 }
 

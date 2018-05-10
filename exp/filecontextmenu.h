@@ -7,41 +7,48 @@
 #include <QtWidgets/QMenu>
 
 class FileContextMenuPrivate;
+
 class FileContextMenu : public QMenu
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
-	explicit FileContextMenu(QWidget* parent = 0);
-	explicit FileContextMenu(const QString& title, QWidget* parent = 0);
-	virtual ~FileContextMenu();
+    explicit FileContextMenu (QWidget *parent = 0);
 
-	void setPath(const QString& path);
-	void setPaths(const QStringList& paths);
+    explicit FileContextMenu (const QString &title, QWidget *parent = 0);
 
-	QAction* executeNativeMenu(const QPoint& pos);
+    virtual ~FileContextMenu ();
+
+    void setPath (const QString &path);
+
+    void setPaths (const QStringList &paths);
+
+    QAction *executeNativeMenu (const QPoint &pos);
 
 protected:
-	void moveEvent(QMoveEvent* event);
+    void moveEvent (QMoveEvent *event);
 
 private:
-	friend class FileContextMenuPrivate;
-	FileContextMenuPrivate* const d;
-	Q_PRIVATE_SLOT(d, void _q_nativeActionTriggered())
-};
+    friend class FileContextMenuPrivate;
 
+    FileContextMenuPrivate *const d;
+    Q_PRIVATE_SLOT(d, void _q_nativeActionTriggered ())
+};
 
 class FileContextMenuAction : public QAction
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
-	explicit FileContextMenuAction(QObject* parent = 0) : QAction(parent),
-		itemData(0), itemUserData(0)
-	{}
+    explicit FileContextMenuAction (QObject *parent = 0)
+        : QAction (parent)
+        , itemData (0)
+        , itemUserData (0)
+    {
+    }
 
-	int itemData;
-	qint64 itemUserData;
+    int itemData;
+    qint64 itemUserData;
 };
 
 #endif // FILECONTEXTEMNU_H

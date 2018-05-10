@@ -44,157 +44,199 @@ class AddressLineEdit : public QLineEdit
 //	Q_OBJECT
 
 public:
-	explicit AddressLineEdit(QWidget* parent = 0) : QLineEdit(parent)
-	{
-		setFocusPolicy(Qt::ClickFocus);
-		setCursor(Qt::ArrowCursor);
-	}
-	virtual ~AddressLineEdit()
-	{}
+    explicit AddressLineEdit (QWidget *parent = 0)
+        : QLineEdit (parent)
+    {
+        setFocusPolicy (Qt::ClickFocus);
+        setCursor (Qt::ArrowCursor);
+    }
+
+    virtual ~AddressLineEdit ()
+    {
+    }
 
 protected:
-	void focusInEvent(QFocusEvent* event)
-	{
-		setCursor(Qt::IBeamCursor);
-		QLineEdit::focusInEvent(event);
-	}
-	void focusOutEvent(QFocusEvent* event)
-	{
+    void focusInEvent (QFocusEvent *event)
+    {
+        setCursor (Qt::IBeamCursor);
+        QLineEdit::focusInEvent (event);
+    }
+
+    void focusOutEvent (QFocusEvent *event)
+    {
 //		setCursor(Qt::PointingHandCursor);
-		setCursor(Qt::ArrowCursor);
-		QLineEdit::focusOutEvent(event);
-	}
-	void mousePressEvent(QMouseEvent* event)
-	{
-		if(!hasFocus())
-		{
-			setText("123");
-			event->ignore();
-		}
+        setCursor (Qt::ArrowCursor);
+        QLineEdit::focusOutEvent (event);
+    }
 
-		QLineEdit::mousePressEvent(event);
-	}
-	void paintEvent(QPaintEvent* event)
-	{
-		QLineEdit::paintEvent(event);
-	}
+    void mousePressEvent (QMouseEvent *event)
+    {
+        if (!hasFocus ()) {
+            setText ("123");
+            event->ignore ();
+        }
+
+        QLineEdit::mousePressEvent (event);
+    }
+
+    void paintEvent (QPaintEvent *event)
+    {
+        QLineEdit::paintEvent (event);
+    }
 };
-
 
 class FileWidgetPrivate
 {
-	Q_DECLARE_PUBLIC(FileWidget)
+    Q_DECLARE_PUBLIC(FileWidget)
 
 public:
-	struct SDirInformation
-	{
-		SDirInformation()
-		{ clear(); }
+    struct SDirInformation
+    {
+        SDirInformation ()
+        {
+            clear ();
+        }
 
-		void clear()
-		{
-			dirsCount = 0;
-			filesCount = 0;
-			filesSize = 0;
-			dirsSelectedCount = 0;
-			filesSelectedCount = 0;
-			filesSelectedSize = 0;
-		}
+        void clear ()
+        {
+            dirsCount = 0;
+            filesCount = 0;
+            filesSize = 0;
+            dirsSelectedCount = 0;
+            filesSelectedCount = 0;
+            filesSelectedSize = 0;
+        }
 
-		int dirsCount;
-		int dirsSelectedCount;
-		int filesCount;
-		int filesSelectedCount;
-		qint64 filesSize;
-		qint64 filesSelectedSize;
-	};
+        int dirsCount;
+        int dirsSelectedCount;
+        int filesCount;
+        int filesSelectedCount;
+        qint64 filesSize;
+        qint64 filesSelectedSize;
+    };
 
-	FileWidgetPrivate() : q_ptr(0),
-		model(0),
+    FileWidgetPrivate ()
+        : q_ptr (0)
+        , model (0)
+        ,
 #ifndef QT_NO_PROXYMODEL
-		proxyModel(0),
+        proxyModel (0)
+        ,
 #endif
-		treeView(0),
+        treeView (0)
+        , pathLineEdit (0)
+        , infoLabel (0)
+        , navigateBackwardAction (0)
+        , navigateForwardAction (0)
+        , navigateToParentAction (0)
+        , navigateToHomeAction (0)
+        , navigateToRootAction (0)
+        , navigateHistoryAction (0)
+        , newFolderAction (0)
+        , renameAction (0)
+        , deleteAction (0)
+        , historyLocation (-1)
+    {
+    }
 
-		pathLineEdit(0),
-		infoLabel(0),
+    ~FileWidgetPrivate ()
+    {
+    }
 
-		navigateBackwardAction(0), navigateForwardAction(0),
-		navigateToParentAction(0), navigateToHomeAction(0), navigateToRootAction(0),
-		navigateHistoryAction(0),
+    void init (const QString &directory);
 
-		newFolderAction(0),
-		renameAction(0),
-		deleteAction(0),
+    void createWidgets ();
 
-		historyLocation(-1)
-	{}
-	~FileWidgetPrivate()
-	{}
+    void createActions ();
 
-	void init(const QString& directory);
-	void createWidgets();
-	void createActions();
-	void retranslateStrings();
-	QString workingDirectory(const QString& path) const;
+    void retranslateStrings ();
 
-	inline QModelIndex mapFromSource(const QModelIndex& sourceIndex) const;
-	inline QModelIndex mapToSource(const QModelIndex& index) const;
-	inline QString rootPath() const;
-	inline QModelIndex rootIndex() const;
-	inline void setRootIndex(const QModelIndex& sourceIndex) const;
-	inline QModelIndex setCurrentIndex(const QModelIndex& sourceIndex) const;
-	inline QModelIndex select(const QModelIndex& sourceIndex) const;
+    QString workingDirectory (const QString &path) const;
 
-	QString size(qint64 bytes) const;
-	void updateDirInfo();
+    inline QModelIndex mapFromSource (const QModelIndex &sourceIndex) const;
 
-	void _q_rowsInserted(const QModelIndex& parent, int start, int end);
-	void _q_rowsAboutToBeRemoved(const QModelIndex& parent, int start, int end);
-	void _q_selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-	void _q_showHeader(QAction* action);
-	void _q_showContextMenu(const QPoint& position);
-	void _q_addressChanged();
-	void _q_activate(const QModelIndex& index);
-	void _q_pathChanged(const QString& newPath);
-	void _q_navigateBackward();
-	void _q_navigateForward();
-	void _q_navigateToParent();
-	void _q_navigateToHome();
-	void _q_navigateToRoot();
+    inline QModelIndex mapToSource (const QModelIndex &index) const;
 
-	FileWidget* q_ptr;
+    inline QString rootPath () const;
 
-	QFileListModel* model;
-	QAbstractProxyModel* proxyModel;
-	QTreeView* treeView;
+    inline QModelIndex rootIndex () const;
 
-	QLineEdit* pathLineEdit;
-	QLabel* infoLabel;
+    inline void setRootIndex (const QModelIndex &sourceIndex) const;
 
-	QAction* navigateBackwardAction;
-	QAction* navigateForwardAction;
-	QAction* navigateToParentAction;
-	QAction* navigateToHomeAction;
-	QAction* navigateToRootAction;
-	QAction* navigateHistoryAction;
-	QAction* refreshListAction;
-	QAction* newFolderAction;
-	QAction* renameAction;
-	QAction* deleteAction;
+    inline QModelIndex setCurrentIndex (const QModelIndex &sourceIndex) const;
 
-	QString lastVisitedDir;
-	QStringList history;
-	int historyLocation;
+    inline QModelIndex select (const QModelIndex &sourceIndex) const;
 
-	SDirInformation dirInfo;
+    QString size (qint64 bytes) const;
+
+    void updateDirInfo ();
+
+    void _q_rowsInserted (const QModelIndex &parent, int start, int end);
+
+    void _q_rowsAboutToBeRemoved (const QModelIndex &parent, int start, int end);
+
+    void _q_selectionChanged (const QItemSelection &selected, const QItemSelection &deselected);
+
+    void _q_showHeader (QAction *action);
+
+    void _q_showContextMenu (const QPoint &position);
+
+    void _q_addressChanged ();
+
+    void _q_activate (const QModelIndex &index);
+
+    void _q_pathChanged (const QString &newPath);
+
+    void _q_navigateBackward ();
+
+    void _q_navigateForward ();
+
+    void _q_navigateToParent ();
+
+    void _q_navigateToHome ();
+
+    void _q_navigateToRoot ();
+
+    FileWidget *q_ptr;
+
+    QFileListModel *model;
+    QAbstractProxyModel *proxyModel;
+    QTreeView *treeView;
+
+    QLineEdit *pathLineEdit;
+    QLabel *infoLabel;
+
+    QAction *navigateBackwardAction;
+    QAction *navigateForwardAction;
+    QAction *navigateToParentAction;
+    QAction *navigateToHomeAction;
+    QAction *navigateToRootAction;
+    QAction *navigateHistoryAction;
+    QAction *refreshListAction;
+    QAction *newFolderAction;
+    QAction *renameAction;
+    QAction *deleteAction;
+
+    QString lastVisitedDir;
+    QStringList history;
+    int historyLocation;
+
+    SDirInformation dirInfo;
 };
 
-inline QModelIndex FileWidgetPrivate::mapFromSource(const QModelIndex& sourceIndex) const
-{ return proxyModel ? proxyModel->mapFromSource(sourceIndex) : sourceIndex; }
-inline QModelIndex FileWidgetPrivate::mapToSource(const QModelIndex &index) const
-{ return proxyModel ? proxyModel->mapToSource(index) : index; }
-inline QString FileWidgetPrivate::rootPath() const
-{ return model->rootPath(); }
+inline QModelIndex FileWidgetPrivate::mapFromSource (const QModelIndex &sourceIndex) const
+{
+    return proxyModel ? proxyModel->mapFromSource (sourceIndex) : sourceIndex;
+}
+
+inline QModelIndex FileWidgetPrivate::mapToSource (const QModelIndex &index) const
+{
+    return proxyModel ? proxyModel->mapToSource (index) : index;
+}
+
+inline QString FileWidgetPrivate::rootPath () const
+{
+    return model->rootPath ();
+}
 
 #endif // FILEWIDGET_P_H
