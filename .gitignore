@@ -7,3 +7,5 @@ object_script.*.*
 *~
 CMakeLists.txt.user
 todo.txt
+.idea
+cmake-build-*
