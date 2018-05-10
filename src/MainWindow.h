@@ -36,7 +36,7 @@ class SToolBarButton;
 
 #include "QFileOperationsThread.h"
 
-class MainWindowImpl : public QMainWindow
+class MainWindow : public QMainWindow
 {
 Q_OBJECT
     Q_PROPERTY(QStringList commandHistory
@@ -85,9 +85,9 @@ private:
     QAction *actionFindFiles;
     QAction *actionPreferences;
 public:
-    explicit MainWindowImpl (QWidget *parent = 0);
+    explicit MainWindow (QWidget *parent = 0);
 
-    virtual ~MainWindowImpl ();
+    virtual ~MainWindow ();
 
     QStringList commandHistory () const;
 

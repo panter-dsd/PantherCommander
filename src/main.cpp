@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QApplication>
 
-#include "MainWindowImpl.h"
+#include "MainWindow.h"
 
 #define ApplicationVersion "0.0.0.6"
 
@@ -18,7 +18,7 @@ int main (int argc, char **argv)
 
     QSettings::setDefaultFormat (QSettings::IniFormat);
 
-    MainWindowImpl win;
+    MainWindow win;
     win.setWindowTitle (app.applicationName () + " " + app.applicationVersion ());
     win.show ();
 

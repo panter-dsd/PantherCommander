@@ -23,6 +23,6 @@ Q_SIGNALS:
     void settingsChanged ();
 
 private:
-    static AppSettings *pInstance;
+    static AppSettings *instance_;
 };
 

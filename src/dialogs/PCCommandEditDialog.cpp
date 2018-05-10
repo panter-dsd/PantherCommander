@@ -63,111 +63,111 @@ void PCShortcutWidget::clear ()
 PCCommandEditDialog::PCCommandEditDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f)
 {
-    qgbMainBox = new QGroupBox (this);
+    mainBox_ = new QGroupBox (this);
 
-    qlObjectName = new QLabel (tr ("Command name"), this);
+    objectNameLabel_ = new QLabel (tr ("Command name"), this);
 
-    qleObjectName = new QLineEdit (this);
-    qleObjectName->setEnabled (false);
+    objectNameEdit_ = new QLineEdit (this);
+    objectNameEdit_->setEnabled (false);
 
-    qlText = new QLabel (tr ("Command text"), this);
+    textLabel_ = new QLabel (tr ("Command text"), this);
 
-    qleText = new QLineEdit (this);
+    textEdit_ = new QLineEdit (this);
 
-    qlToolTip = new QLabel (tr ("Command tooltip"), this);
+    toolTipLabel_ = new QLabel (tr ("Command tooltip"), this);
 
-    qleToolTip = new QLineEdit (this);
+    toolTipEdit_ = new QLineEdit (this);
 
-    qgbShortcutBox = new QGroupBox (tr ("Shortcuts"), this);
+    shortcutBox_ = new QGroupBox (tr ("Shortcuts"), this);
 
-    qpbAddShortcut = new QPushButton (tr ("Add shortcut"), this);
-    connect (qpbAddShortcut, SIGNAL(clicked ()),
+    addShortcutButton_ = new QPushButton (tr ("Add shortcut"), this);
+    connect (addShortcutButton_, SIGNAL(clicked ()),
              this, SLOT(addShortcut ()));
 
-    qpbRemoveShortcut = new QPushButton (tr ("Remove shortcut"), this);
-    connect (qpbRemoveShortcut, SIGNAL(clicked ()),
+    removeShortcutButton_ = new QPushButton (tr ("Remove shortcut"), this);
+    connect (removeShortcutButton_, SIGNAL(clicked ()),
              this, SLOT(removeShortcut ()));
 
-    qdbbButtons = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+    buttons_ = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                         Qt::Horizontal, this
     );
 
-    connect (qdbbButtons, SIGNAL(accepted ()), this, SLOT(accept ()));
-    connect (qdbbButtons, SIGNAL(rejected ()), this, SLOT(reject ()));
+    connect (buttons_, SIGNAL(accepted ()), this, SLOT(accept ()));
+    connect (buttons_, SIGNAL(rejected ()), this, SLOT(reject ()));
 
-    qhblButtonsLayout = new QHBoxLayout ();
-    qhblButtonsLayout->addWidget (qpbAddShortcut);
-    qhblButtonsLayout->addWidget (qpbRemoveShortcut);
+    buttonsLayout_ = new QHBoxLayout ();
+    buttonsLayout_->addWidget (addShortcutButton_);
+    buttonsLayout_->addWidget (removeShortcutButton_);
 
-    m_shortcutsLayout = new QVBoxLayout;
-    m_shortcutsLayout->addLayout (qhblButtonsLayout);
-    qgbShortcutBox->setLayout (m_shortcutsLayout);
+    shortcutsLayout_ = new QVBoxLayout;
+    shortcutsLayout_->addLayout (buttonsLayout_);
+    shortcutBox_->setLayout (shortcutsLayout_);
 
     QVBoxLayout *qglFirstLayout = new QVBoxLayout ();
-    qglFirstLayout->addWidget (qlObjectName);
-    qglFirstLayout->addWidget (qleObjectName);
-    qglFirstLayout->addWidget (qlText);
-    qglFirstLayout->addWidget (qleText);
-    qglFirstLayout->addWidget (qlToolTip);
-    qglFirstLayout->addWidget (qleToolTip);
-    qgbMainBox->setLayout (qglFirstLayout);
+    qglFirstLayout->addWidget (objectNameLabel_);
+    qglFirstLayout->addWidget (objectNameEdit_);
+    qglFirstLayout->addWidget (textLabel_);
+    qglFirstLayout->addWidget (textEdit_);
+    qglFirstLayout->addWidget (toolTipLabel_);
+    qglFirstLayout->addWidget (toolTipEdit_);
+    mainBox_->setLayout (qglFirstLayout);
 
     QVBoxLayout *qvblMainLayout = new QVBoxLayout ();
     qvblMainLayout->setSizeConstraint (QLayout::SetFixedSize);
-    qvblMainLayout->addWidget (qgbMainBox);
-    qvblMainLayout->addWidget (qgbShortcutBox);
-    qvblMainLayout->addWidget (qdbbButtons);
+    qvblMainLayout->addWidget (mainBox_);
+    qvblMainLayout->addWidget (shortcutBox_);
+    qvblMainLayout->addWidget (buttons_);
     setLayout (qvblMainLayout);
 }
 
 void PCCommandEditDialog::setCommandObjectName (const QString &objectName)
 {
-    qleObjectName->setText (objectName);
+    objectNameEdit_->setText (objectName);
 }
 
 void PCCommandEditDialog::setCommandText (const QString &text)
 {
-    qleText->setText (text);
+    textEdit_->setText (text);
 }
 
 QString PCCommandEditDialog::commandText ()
 {
-    return qleText->text ();
+    return textEdit_->text ();
 }
 
 void PCCommandEditDialog::setCommandToolTip (const QString &text)
 {
-    qleToolTip->setText (text);
+    toolTipEdit_->setText (text);
 }
 
 QString PCCommandEditDialog::commandToolTip ()
 {
-    return qleToolTip->text ();
+    return toolTipEdit_->text ();
 }
 
 void PCCommandEditDialog::setCommandShortcuts (QList<QKeySequence> shortcuts)
 {
-    qDeleteAll (qlShortcutWidgets);
-    qlShortcutWidgets.clear ();
+    qDeleteAll (shortcutWidgets_);
+    shortcutWidgets_.clear ();
 
         foreach(const QKeySequence &ks, shortcuts) {
             PCShortcutWidget *shortcut = new PCShortcutWidget (this);
             shortcut->setShortcut (ks);
-            qlShortcutWidgets.append (shortcut);
-            m_shortcutsLayout->insertWidget (m_shortcutsLayout->count () - 1, shortcut);
+            shortcutWidgets_.append (shortcut);
+            shortcutsLayout_->insertWidget (shortcutsLayout_->count () - 1, shortcut);
         }
 
-    if (qlShortcutWidgets.isEmpty ()) {
+    if (shortcutWidgets_.isEmpty ()) {
         PCShortcutWidget *shortcut = new PCShortcutWidget (this);
-        qlShortcutWidgets.append (shortcut);
-        m_shortcutsLayout->insertWidget (m_shortcutsLayout->count () - 1, shortcut);
+        shortcutWidgets_.append (shortcut);
+        shortcutsLayout_->insertWidget (shortcutsLayout_->count () - 1, shortcut);
     }
 }
 
 QList<QKeySequence> PCCommandEditDialog::commandShortcuts ()
 {
     QList<QKeySequence> l;
-        foreach(PCShortcutWidget *shortcut, qlShortcutWidgets) {
+        foreach(PCShortcutWidget *shortcut, shortcutWidgets_) {
             QKeySequence ks = shortcut->shortcut ();
             if (!ks.isEmpty ()) {
                 l << ks;
@@ -179,16 +179,16 @@ QList<QKeySequence> PCCommandEditDialog::commandShortcuts ()
 void PCCommandEditDialog::addShortcut ()
 {
     PCShortcutWidget *shortcut = new PCShortcutWidget (this);
-    qlShortcutWidgets.append (shortcut);
-    m_shortcutsLayout->insertWidget (m_shortcutsLayout->count () - 1, shortcut);
+    shortcutWidgets_.append (shortcut);
+    shortcutsLayout_->insertWidget (shortcutsLayout_->count () - 1, shortcut);
 }
 
 void PCCommandEditDialog::removeShortcut ()
 {
-    if (qlShortcutWidgets.count () == 1) {
-        qlShortcutWidgets.first ()->clear ();
+    if (shortcutWidgets_.count () == 1) {
+        shortcutWidgets_.first ()->clear ();
         return;
     }
 
-    delete qlShortcutWidgets.takeLast ();
+    delete shortcutWidgets_.takeLast ();
 }

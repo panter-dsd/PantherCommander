@@ -15,16 +15,6 @@ class QStandardItemModel;
 class PCCopyMoveDialog : public QDialog
 {
 Q_OBJECT
-private:
-    QLabel *qlSources;
-    QLineEdit *qleDest;
-    QLabel *qlQueue;
-    QComboBox *qcbQueue;
-    QDialogButtonBox *qdbbButtons;
-
-    QStringList qslSource;
-    QString qsDest;
-    QString qsOperation;
 public:
     explicit PCCopyMoveDialog (QWidget *parent = 0);
 
@@ -50,5 +40,16 @@ private:
     void setLayouts ();
 
     void updateText ();
+
+private:
+    QLabel *sourcesLabel_;
+    QLineEdit *destEdit_;
+    QLabel *queueLabel_;
+    QComboBox *queueComboBox_;
+    QDialogButtonBox *buttons_;
+
+    QStringList source_;
+    QString dest_;
+    QString operation_;
 };
 

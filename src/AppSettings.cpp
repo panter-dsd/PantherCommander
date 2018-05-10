@@ -2,14 +2,14 @@
 
 #include <QtCore/QCoreApplication>
 
-AppSettings *AppSettings::pInstance = 0;
+AppSettings *AppSettings::instance_ = 0;
 
 AppSettings *AppSettings::instance ()
 {
-    if (!AppSettings::pInstance) {
-        pInstance = new AppSettings (qApp);
+    if (!AppSettings::instance_) {
+        instance_ = new AppSettings (qApp);
     }
-    return pInstance;
+    return instance_;
 }
 
 AppSettings::AppSettings (QObject *parent)
@@ -19,8 +19,8 @@ AppSettings::AppSettings (QObject *parent)
 
 AppSettings::~AppSettings ()
 {
-    if (pInstance == this) {
-        pInstance = 0;
+    if (instance_ == this) {
+        instance_ = 0;
     }
 }
 

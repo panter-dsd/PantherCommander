@@ -25,22 +25,6 @@ class PCShortcutWidget;
 class PCCommandEditDialog : public QDialog
 {
 Q_OBJECT
-private:
-    QGroupBox *qgbMainBox;
-    QLabel *qlObjectName;
-    QLineEdit *qleObjectName;
-    QLabel *qlText;
-    QLineEdit *qleText;
-    QLabel *qlToolTip;
-    QLineEdit *qleToolTip;
-    QGroupBox *qgbShortcutBox;
-    QList<PCShortcutWidget *> qlShortcutWidgets;
-    QPushButton *qpbAddShortcut;
-    QPushButton *qpbRemoveShortcut;
-    QHBoxLayout *qhblButtonsLayout;
-    QDialogButtonBox *qdbbButtons;
-
-    QVBoxLayout *m_shortcutsLayout;
 
 public:
     PCCommandEditDialog (QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint);
@@ -68,5 +52,22 @@ private Q_SLOTS:
     void addShortcut ();
 
     void removeShortcut ();
+
+private:
+    QGroupBox *mainBox_;
+    QLabel *objectNameLabel_;
+    QLineEdit *objectNameEdit_;
+    QLabel *textLabel_;
+    QLineEdit *textEdit_;
+    QLabel *toolTipLabel_;
+    QLineEdit *toolTipEdit_;
+    QGroupBox *shortcutBox_;
+    QList<PCShortcutWidget *> shortcutWidgets_;
+    QPushButton *addShortcutButton_;
+    QPushButton *removeShortcutButton_;
+    QHBoxLayout *buttonsLayout_;
+    QDialogButtonBox *buttons_;
+
+    QVBoxLayout *shortcutsLayout_;
 };
 

@@ -40,16 +40,17 @@ private:
 
     void showFiles (const QFileInfoList &files);
 
-    QComboBox *fileComboBox;
-    QComboBox *textComboBox;
-    QComboBox *directoryComboBox;
-    QLabel *fileLabel;
-    QLabel *textLabel;
-    QLabel *directoryLabel;
-    QLabel *filesFoundLabel;
-    QPushButton *browseButton;
-    QPushButton *findButton;
-    QTableWidget *filesTable;
-    QTabWidget *tabber;
+private:
+    QComboBox *fileComboBox_;
+    QComboBox *textComboBox_;
+    QComboBox *directoryComboBox_;
+    QLabel *fileLabel_;
+    QLabel *textLabel_;
+    QLabel *directoryLabel_;
+    QLabel *filesFoundLabel_;
+    QPushButton *browseButton_;
+    QPushButton *findButton_;
+    QTableWidget *filesTable_;
+    QTabWidget *tabber_;
 };
 

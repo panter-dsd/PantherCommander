@@ -83,77 +83,77 @@ static bool findText (const QFileInfo &fileInfo, const QString &text)
 FindFilesDialog::FindFilesDialog (QWidget *parent)
     : QDialog (parent)
 {
-    tabber = new QTabWidget (this);
+    tabber_ = new QTabWidget (this);
 
     QWidget *preferencesPage = new QWidget (this);
 
-    browseButton = new QPushButton (tr ("&Browse..."), this);
-    connect (browseButton, SIGNAL(clicked ()), this, SLOT(browse ()));
+    browseButton_ = new QPushButton (tr ("&Browse..."), this);
+    connect (browseButton_, SIGNAL(clicked ()), this, SLOT(browse ()));
 
-    fileComboBox = new QComboBox (this);
-    fileComboBox->setEditable (true);
-    fileComboBox->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
-    fileComboBox->addItem (QLatin1String ("*"));
+    fileComboBox_ = new QComboBox (this);
+    fileComboBox_->setEditable (true);
+    fileComboBox_->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
+    fileComboBox_->addItem (QLatin1String ("*"));
 
-    textComboBox = new QComboBox (this);
-    textComboBox->setEditable (true);
-    textComboBox->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
+    textComboBox_ = new QComboBox (this);
+    textComboBox_->setEditable (true);
+    textComboBox_->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-    directoryComboBox = new QComboBox (this);
-    directoryComboBox->setEditable (true);
-    directoryComboBox->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
-    directoryComboBox->addItem (QDir::currentPath ());
+    directoryComboBox_ = new QComboBox (this);
+    directoryComboBox_->setEditable (true);
+    directoryComboBox_->setSizePolicy (QSizePolicy::Expanding, QSizePolicy::Preferred);
+    directoryComboBox_->addItem (QDir::currentPath ());
 
-    fileLabel = new QLabel (tr ("Named:"), this);
-    textLabel = new QLabel (tr ("Containing text:"), this);
-    directoryLabel = new QLabel (tr ("In directory:"), this);
+    fileLabel_ = new QLabel (tr ("Named:"), this);
+    textLabel_ = new QLabel (tr ("Containing text:"), this);
+    directoryLabel_ = new QLabel (tr ("In directory:"), this);
 
     QGridLayout *preferencesPageLayout = new QGridLayout;
-    preferencesPageLayout->addWidget (fileLabel, 0, 0);
-    preferencesPageLayout->addWidget (fileComboBox, 0, 1, 1, 2);
-    preferencesPageLayout->addWidget (textLabel, 1, 0);
-    preferencesPageLayout->addWidget (textComboBox, 1, 1, 1, 2);
-    preferencesPageLayout->addWidget (directoryLabel, 2, 0);
-    preferencesPageLayout->addWidget (directoryComboBox, 2, 1);
-    preferencesPageLayout->addWidget (browseButton, 2, 2);
+    preferencesPageLayout->addWidget (fileLabel_, 0, 0);
+    preferencesPageLayout->addWidget (fileComboBox_, 0, 1, 1, 2);
+    preferencesPageLayout->addWidget (textLabel_, 1, 0);
+    preferencesPageLayout->addWidget (textComboBox_, 1, 1, 1, 2);
+    preferencesPageLayout->addWidget (directoryLabel_, 2, 0);
+    preferencesPageLayout->addWidget (directoryComboBox_, 2, 1);
+    preferencesPageLayout->addWidget (browseButton_, 2, 2);
     preferencesPageLayout->addWidget (new QWidget (this), 3, 0, 1, 3);
     preferencesPageLayout->setRowStretch (3, 10);
     preferencesPage->setLayout (preferencesPageLayout);
 
-    tabber->addTab (preferencesPage, tr ("&Preferences"));
+    tabber_->addTab (preferencesPage, tr ("&Preferences"));
 
     QWidget *resultsPage = new QWidget (this);
 
-    filesTable = new QTableWidget (0, 3, this);
-    filesTable->setSelectionBehavior (QAbstractItemView::SelectRows);
-    filesTable->setHorizontalHeaderLabels (QStringList () << tr ("File Name") << tr ("File Path") << tr ("Size"));
+    filesTable_ = new QTableWidget (0, 3, this);
+    filesTable_->setSelectionBehavior (QAbstractItemView::SelectRows);
+    filesTable_->setHorizontalHeaderLabels (QStringList () << tr ("File Name") << tr ("File Path") << tr ("Size"));
 #if false
-    filesTable->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
+    filesTable_->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
 #endif
-    filesTable->verticalHeader ()->hide ();
-    filesTable->setShowGrid (false);
+    filesTable_->verticalHeader ()->hide ();
+    filesTable_->setShowGrid (false);
 
-    connect (filesTable, SIGNAL(cellActivated (int, int)),
+    connect (filesTable_, SIGNAL(cellActivated (int, int)),
              this, SLOT(_slot_cellActivated (int, int)));
 
-    filesFoundLabel = new QLabel (this);
+    filesFoundLabel_ = new QLabel (this);
 
     QVBoxLayout *resultsPageLayout = new QVBoxLayout;
-    resultsPageLayout->addWidget (filesTable);
-    resultsPageLayout->addWidget (filesFoundLabel);
+    resultsPageLayout->addWidget (filesTable_);
+    resultsPageLayout->addWidget (filesFoundLabel_);
     resultsPage->setLayout (resultsPageLayout);
 
-    tabber->addTab (resultsPage, tr ("&Results"));
+    tabber_->addTab (resultsPage, tr ("&Results"));
 
-    findButton = new QPushButton (tr ("&Find"), this);
-    connect (findButton, SIGNAL(clicked ()), this, SLOT(find ()));
+    findButton_ = new QPushButton (tr ("&Find"), this);
+    connect (findButton_, SIGNAL(clicked ()), this, SLOT(find ()));
 
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
     buttonsLayout->addStretch ();
-    buttonsLayout->addWidget (findButton);
+    buttonsLayout->addWidget (findButton_);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addWidget (tabber);
+    mainLayout->addWidget (tabber_);
     mainLayout->addLayout (buttonsLayout);
     setLayout (mainLayout);
 
@@ -177,10 +177,10 @@ void FindFilesDialog::browse ()
                                                            options
     );
     if (!directory.isEmpty ()) {
-        if (directoryComboBox->findText (directory) == -1) {
-            directoryComboBox->addItem (directory);
+        if (directoryComboBox_->findText (directory) == -1) {
+            directoryComboBox_->addItem (directory);
         }
-        directoryComboBox->setCurrentIndex (directoryComboBox->findText (directory));
+        directoryComboBox_->setCurrentIndex (directoryComboBox_->findText (directory));
     }
 }
 
@@ -193,16 +193,16 @@ static void updateComboBox (QComboBox *comboBox)
 
 void FindFilesDialog::find ()
 {
-    filesTable->setRowCount (0);
-    tabber->setCurrentIndex (1);
+    filesTable_->setRowCount (0);
+    tabber_->setCurrentIndex (1);
 
-    QString fileName = fileComboBox->currentText ();
-    QString text = textComboBox->currentText ();
-    QString path = directoryComboBox->currentText ();
+    QString fileName = fileComboBox_->currentText ();
+    QString text = textComboBox_->currentText ();
+    QString path = directoryComboBox_->currentText ();
 
-    updateComboBox (fileComboBox);
-    updateComboBox (textComboBox);
-    updateComboBox (directoryComboBox);
+    updateComboBox (fileComboBox_);
+    updateComboBox (textComboBox_);
+    updateComboBox (directoryComboBox_);
 
     //TODO: filename validation
     //TODO: regexp support
@@ -275,20 +275,20 @@ void FindFilesDialog::showFiles (const QFileInfoList &files)
         sizeItem->setFlags (sizeItem->flags () ^ Qt::ItemIsEditable);
         sizeItem->setTextAlignment (Qt::AlignRight | Qt::AlignVCenter);
 
-        int row = filesTable->rowCount ();
-        filesTable->insertRow (row);
-        filesTable->setItem (row, 0, fileNameItem);
-        filesTable->setItem (row, 1, filePathItem);
-        filesTable->setItem (row, 2, sizeItem);
+        int row = filesTable_->rowCount ();
+        filesTable_->insertRow (row);
+        filesTable_->setItem (row, 0, fileNameItem);
+        filesTable_->setItem (row, 1, filePathItem);
+        filesTable_->setItem (row, 2, sizeItem);
     }
-    filesFoundLabel->setText (tr ("%1 file(s) found").arg (files.size ()) +
+    filesFoundLabel_->setText (tr ("%1 file(s) found").arg (files.size ()) +
                               (" (Double click on a file to open it)"));
 }
 
 void FindFilesDialog::_slot_cellActivated (int row, int /* column */)
 {
-    QTableWidgetItem *fileNameItem = filesTable->item (row, 0);
-    QTableWidgetItem *filePathItem = filesTable->item (row, 1);
+    QTableWidgetItem *fileNameItem = filesTable_->item (row, 0);
+    QTableWidgetItem *filePathItem = filesTable_->item (row, 1);
 
     QFileInfo fi (QDir (filePathItem->text ()), fileNameItem->text ());
 

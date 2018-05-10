@@ -20,24 +20,24 @@ PCCopyMoveDialog::PCCopyMoveDialog (QWidget *parent)
 
 void PCCopyMoveDialog::createControls ()
 {
-    qlSources = new QLabel (this);
-    qlSources->setWordWrap (true);
+    sourcesLabel_ = new QLabel (this);
+    sourcesLabel_->setWordWrap (true);
 
-    qleDest = new QLineEdit (this);
+    destEdit_ = new QLineEdit (this);
 
-    qlQueue = new QLabel (tr ("Queue"), this);
+    queueLabel_ = new QLabel (tr ("Queue"), this);
 
-    qcbQueue = new QComboBox (this);
+    queueComboBox_ = new QComboBox (this);
 
-    qdbbButtons = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+    buttons_ = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                         Qt::Horizontal,
                                         this
     );
-    connect (qdbbButtons,
+    connect (buttons_,
              SIGNAL(accepted ()),
              this,
              SLOT(accept ()));
-    connect (qdbbButtons,
+    connect (buttons_,
              SIGNAL(rejected ()),
              this,
              SLOT(reject ()));
@@ -46,68 +46,68 @@ void PCCopyMoveDialog::createControls ()
 void PCCopyMoveDialog::setLayouts ()
 {
     QVBoxLayout *qvblMainLayout = new QVBoxLayout ();
-    qvblMainLayout->addWidget (qlSources);
-    qvblMainLayout->addWidget (qleDest);
-    qvblMainLayout->addWidget (qlQueue);
-    qvblMainLayout->addWidget (qcbQueue);
-    qvblMainLayout->addWidget (qdbbButtons);
+    qvblMainLayout->addWidget (sourcesLabel_);
+    qvblMainLayout->addWidget (destEdit_);
+    qvblMainLayout->addWidget (queueLabel_);
+    qvblMainLayout->addWidget (queueComboBox_);
+    qvblMainLayout->addWidget (buttons_);
 
     this->setLayout (qvblMainLayout);
 }
 
 void PCCopyMoveDialog::setSource (const QStringList &fileList)
 {
-    qslSource = fileList;
+    source_ = fileList;
     updateText ();
 }
 
 void PCCopyMoveDialog::setDest (const QString &dest)
 {
-    qsDest = dest;
-    if (!qsDest.endsWith (QLatin1Char ('/'))) {
-        qsDest += QLatin1String ("/");
+    dest_ = dest;
+    if (!dest_.endsWith (QLatin1Char ('/'))) {
+        dest_ += QLatin1String ("/");
     }
     updateText ();
 }
 
 QString PCCopyMoveDialog::dest ()
 {
-    return QDir::fromNativeSeparators (qleDest->text ());
+    return QDir::fromNativeSeparators (destEdit_->text ());
 }
 
 void PCCopyMoveDialog::setOperation (const QString &operation)
 {
-    qsOperation = operation;
+    operation_ = operation;
     updateText ();
 }
 
 void PCCopyMoveDialog::updateText ()
 {
-    if (qslSource.size () == 1) {
-        qlSources->setText (oneFileString.arg (qsOperation).arg (QDir::toNativeSeparators (qslSource.at (0))));
-        QFileInfo info (qslSource.at (0));
+    if (source_.size () == 1) {
+        sourcesLabel_->setText (oneFileString.arg (operation_).arg (QDir::toNativeSeparators (source_.at (0))));
+        QFileInfo info (source_.at (0));
         if (info.isFile ()) {
-            qleDest->setText (QDir::toNativeSeparators (qsDest + QFileInfo (qslSource.at (0)).fileName ()));
+            destEdit_->setText (QDir::toNativeSeparators (dest_ + QFileInfo (source_.at (0)).fileName ()));
         } else {
-            qleDest->setText (QDir::toNativeSeparators (qsDest));
+            destEdit_->setText (QDir::toNativeSeparators (dest_));
         }
     } else {
-        qlSources->setText (manyFileString.arg (qsOperation).arg (qslSource.size ()));
-        qleDest->setText (QDir::toNativeSeparators (qsDest));
+        sourcesLabel_->setText (manyFileString.arg (operation_).arg (source_.size ()));
+        destEdit_->setText (QDir::toNativeSeparators (dest_));
     }
 
-    this->setWindowTitle (qsOperation);
+    this->setWindowTitle (operation_);
 }
 
 void PCCopyMoveDialog::setQueueModel (QStandardItemModel *model)
 {
-    qcbQueue->setModel (model);
-    qcbQueue->setModelColumn (0);
-    qcbQueue->setCurrentIndex (-1);
+    queueComboBox_->setModel (model);
+    queueComboBox_->setModelColumn (0);
+    queueComboBox_->setCurrentIndex (-1);
 }
 
 int PCCopyMoveDialog::queueIndex () const
 {
-    return qcbQueue->currentIndex ();
+    return queueComboBox_->currentIndex ();
 }
 

@@ -1,4 +1,4 @@
-#include "MainWindowImpl.h"
+#include "MainWindow.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
@@ -36,7 +36,7 @@
 #include "PCToolBar.h"
 #include "PCCommands.h"
 
-MainWindowImpl::MainWindowImpl (QWidget *parent)
+MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent)
     , qlConsolePath (0)
 {
@@ -60,7 +60,7 @@ MainWindowImpl::MainWindowImpl (QWidget *parent)
 }
 
 //
-MainWindowImpl::~MainWindowImpl ()
+MainWindow::~MainWindow ()
 {
     qflvLeftPanel->saveSettings ();
     qflvRightPanel->saveSettings ();
@@ -68,7 +68,7 @@ MainWindowImpl::~MainWindowImpl ()
 }
 
 //
-void MainWindowImpl::createWidgets ()
+void MainWindow::createWidgets ()
 {
     QWidget *widget = new QWidget (this);
 
@@ -156,7 +156,7 @@ void MainWindowImpl::createWidgets ()
 }
 
 //
-void MainWindowImpl::createActions ()
+void MainWindow::createActions ()
 {
     actionCpCurFileName2Cmd = new QAction (this);
     actionCpCurFileName2Cmd->setObjectName ("actionCpCurFileName2Cmd");
@@ -286,7 +286,7 @@ void MainWindowImpl::createActions ()
 }
 
 //
-void MainWindowImpl::createMenus ()
+void MainWindow::createMenus ()
 {
     QMenu *qmFile = menuBar ()->addMenu (tr ("File"));
     qmFile->addAction (actionRename);
@@ -307,7 +307,7 @@ void MainWindowImpl::createMenus ()
 }
 
 //
-void MainWindowImpl::createCommandButtons ()
+void MainWindow::createCommandButtons ()
 {
     QFrame *splitter;
     QHBoxLayout *qhblLayout = new QHBoxLayout ();
@@ -418,7 +418,7 @@ void MainWindowImpl::createCommandButtons ()
 }
 
 //
-void MainWindowImpl::saveSettings ()
+void MainWindow::saveSettings ()
 {
     QSettings *settings = AppSettings::instance ();
     settings->beginGroup ("MainWindow");
@@ -449,7 +449,7 @@ void MainWindowImpl::saveSettings ()
 }
 
 //
-void MainWindowImpl::loadSettings ()
+void MainWindow::loadSettings ()
 {
     QSettings *settings = AppSettings::instance ();
 
@@ -492,7 +492,7 @@ void MainWindowImpl::loadSettings ()
 }
 
 //
-void MainWindowImpl::showSplitterContextMenu (const QPoint &pos)
+void MainWindow::showSplitterContextMenu (const QPoint &pos)
 {
     QMenu *menu = new QMenu (qsplitSplitter);
     for (int size = 20; size <= 80; size += 10) {
@@ -510,7 +510,7 @@ void MainWindowImpl::showSplitterContextMenu (const QPoint &pos)
 }
 
 //
-void MainWindowImpl::slotResizeSplitter ()
+void MainWindow::slotResizeSplitter ()
 {
     const QAction *action = qobject_cast<const QAction *> (sender ());
     if (action) {
@@ -525,7 +525,7 @@ void MainWindowImpl::slotResizeSplitter ()
 #warning "TODO: make eventFilter instead"
 #endif
 
-void MainWindowImpl::slotChangedFocus ()
+void MainWindow::slotChangedFocus ()
 {
     qfpFocusedFilePanel = qobject_cast<QFilePanel *> (sender ());
     if (qfpFocusedFilePanel) {
@@ -534,14 +534,14 @@ void MainWindowImpl::slotChangedFocus ()
 }
 
 //
-void MainWindowImpl::slotPathChanged (const QString &path)
+void MainWindow::slotPathChanged (const QString &path)
 {
     qlConsolePath->setText (QDir::toNativeSeparators (path));
     qlConsolePath->setToolTip (QDir::toNativeSeparators (path));
 }
 
 //
-void MainWindowImpl::resizeEvent (QResizeEvent *event)
+void MainWindow::resizeEvent (QResizeEvent *event)
 {
     QMainWindow::resizeEvent (event);
 
@@ -551,7 +551,7 @@ void MainWindowImpl::resizeEvent (QResizeEvent *event)
 }
 
 //
-void MainWindowImpl::slotRunCommand ()
+void MainWindow::slotRunCommand ()
 {
 #ifndef Q_CC_MSVC
 #warning "TODO: `_localpath_ _params_' command must not run consle - just execute program"
@@ -585,7 +585,7 @@ void MainWindowImpl::slotRunCommand ()
 }
 
 //
-void MainWindowImpl::slotCpCurFileName2Cmd ()
+void MainWindow::slotCpCurFileName2Cmd ()
 {
     if (qfpFocusedFilePanel->currentFileName ().contains (" ")) {
         qcbConsoleCommand->setEditText (qcbConsoleCommand->currentText () +
@@ -603,7 +603,7 @@ void MainWindowImpl::slotCpCurFileName2Cmd ()
 }
 
 //
-void MainWindowImpl::slotCpCurFileNameWhithPath2Cmd ()
+void MainWindow::slotCpCurFileNameWhithPath2Cmd ()
 {
     QString qsName = qfpFocusedFilePanel->path ();
     if (qsName.at (qsName.length () - 1) != QDir::separator ()) {
@@ -626,7 +626,7 @@ void MainWindowImpl::slotCpCurFileNameWhithPath2Cmd ()
 }
 
 //
-void MainWindowImpl::slotRunConsole ()
+void MainWindow::slotRunConsole ()
 {
 #ifdef Q_WS_X11
     //	myProcess->startDetached("/bin/sh");
@@ -637,7 +637,7 @@ void MainWindowImpl::slotRunConsole ()
 }
 
 //
-void MainWindowImpl::slotView (const QString &fileName)
+void MainWindow::slotView (const QString &fileName)
 {
     if (!qflvRightPanel->hasFocus () && !qflvLeftPanel->hasFocus ()) {
         return;
@@ -663,7 +663,7 @@ void MainWindowImpl::slotView (const QString &fileName)
 }
 
 //
-void MainWindowImpl::slotRename ()
+void MainWindow::slotRename ()
 {
     bool ok;
     QString newName = QInputDialog::getText (this,
@@ -681,7 +681,7 @@ void MainWindowImpl::slotRename ()
 }
 
 //
-void MainWindowImpl::slotCopy (const QString &destDir, const QStringList &fileList)
+void MainWindow::slotCopy (const QString &destDir, const QStringList &fileList)
 {
     if (!qflvRightPanel->hasFocus () && !qflvLeftPanel->hasFocus ()) {
         return;
@@ -729,7 +729,7 @@ void MainWindowImpl::slotCopy (const QString &destDir, const QStringList &fileLi
 }
 
 //
-void MainWindowImpl::slotRemove (const QStringList &fileList)
+void MainWindow::slotRemove (const QStringList &fileList)
 {
     if (!qflvRightPanel->hasFocus () && !qflvLeftPanel->hasFocus ()) {
         return;
@@ -806,7 +806,7 @@ void MainWindowImpl::slotRemove (const QStringList &fileList)
 
 //
 QFileOperationsDialog *
-MainWindowImpl::addJob (QFileOperationsDialog *queue, QFileOperationsThread::FileOperation operation,
+MainWindow::addJob (QFileOperationsDialog *queue, QFileOperationsThread::FileOperation operation,
                         const QStringList &parameters)
 {
     if (!queue) {
@@ -825,7 +825,7 @@ MainWindowImpl::addJob (QFileOperationsDialog *queue, QFileOperationsThread::Fil
 }
 
 //
-void MainWindowImpl::slotQueueFinished ()
+void MainWindow::slotQueueFinished ()
 {
     QFileOperationsDialog *dialog = qobject_cast<QFileOperationsDialog *> (sender ());
     if (dialog) {
@@ -837,7 +837,7 @@ void MainWindowImpl::slotQueueFinished ()
 }
 
 //
-void MainWindowImpl::slotQueueChanged ()
+void MainWindow::slotQueueChanged ()
 {
     qsimQeueuModel->clear ();
     QStandardItem *item;
@@ -848,7 +848,7 @@ void MainWindowImpl::slotQueueChanged ()
 }
 
 //
-void MainWindowImpl::slotMkDir ()
+void MainWindow::slotMkDir ()
 {
     if (!qflvRightPanel->hasFocus () && !qflvLeftPanel->hasFocus ()) {
         return;
@@ -919,7 +919,7 @@ void MainWindowImpl::slotMkDir ()
     delete qdMkDirDialog;
 }
 
-QStringList MainWindowImpl::commandHistory () const
+QStringList MainWindow::commandHistory () const
 {
     QStringList history;
     for (int i = 0, count = qcbConsoleCommand->count (); i < count; ++i) {
@@ -928,7 +928,7 @@ QStringList MainWindowImpl::commandHistory () const
     return history;
 }
 
-void MainWindowImpl::setCommandHistory (const QStringList &commandHistory)
+void MainWindow::setCommandHistory (const QStringList &commandHistory)
 {
     qcbConsoleCommand->clear ();
     qcbConsoleCommand->addItems (commandHistory);
@@ -936,7 +936,7 @@ void MainWindowImpl::setCommandHistory (const QStringList &commandHistory)
 }
 
 //
-void MainWindowImpl::slotMove (const QString &destDir, const QStringList &fileList)
+void MainWindow::slotMove (const QString &destDir, const QStringList &fileList)
 {
     if (!qflvRightPanel->hasFocus () && !qflvLeftPanel->hasFocus ()) {
         return;
@@ -984,7 +984,7 @@ void MainWindowImpl::slotMove (const QString &destDir, const QStringList &fileLi
 }
 
 //
-void MainWindowImpl::dropEvent (QDropEvent *event)
+void MainWindow::dropEvent (QDropEvent *event)
 {
     QWidget *widget = childAt (event->pos ());
     if (widget == qpbRunConsole) {
@@ -1042,7 +1042,7 @@ void MainWindowImpl::dropEvent (QDropEvent *event)
 }
 
 //
-void MainWindowImpl::dragMoveEvent (QDragMoveEvent *event)
+void MainWindow::dragMoveEvent (QDragMoveEvent *event)
 {
     bool isAccepted = false;
     QWidget *widget = childAt (event->pos ());
@@ -1076,7 +1076,7 @@ void MainWindowImpl::dragMoveEvent (QDragMoveEvent *event)
 }
 
 //
-void MainWindowImpl::dragEnterEvent (QDragEnterEvent *event)
+void MainWindow::dragEnterEvent (QDragEnterEvent *event)
 {
     if (event->mimeData ()->hasFormat ("text/uri-list")) {
         event->acceptProposedAction ();
@@ -1086,7 +1086,7 @@ void MainWindowImpl::dragEnterEvent (QDragEnterEvent *event)
 }
 
 //
-void MainWindowImpl::toolBarActionExecute (const SToolBarButton &actionButton)
+void MainWindow::toolBarActionExecute (const SToolBarButton &actionButton)
 {
 #ifndef Q_CC_MSVC
 #warning "TODO: parse params"
@@ -1108,21 +1108,21 @@ void MainWindowImpl::toolBarActionExecute (const SToolBarButton &actionButton)
     }
 }
 
-void MainWindowImpl::slotFindFiles ()
+void MainWindow::slotFindFiles ()
 {
     FindFilesDialog dialog (this);
     dialog.exec ();
 }
 
 //
-void MainWindowImpl::slotPreferences ()
+void MainWindow::slotPreferences ()
 {
     QPreferencesDialog dialog (this);
     dialog.exec ();
 }
 
 //
-void MainWindowImpl::slotSetDisc (const QString &path)
+void MainWindow::slotSetDisc (const QString &path)
 {
     if (sender () == qdbDriveBarLeft) {
         if (qdbDriveBarRight->isVisible ()) {
@@ -1142,7 +1142,7 @@ void MainWindowImpl::slotSetDisc (const QString &path)
     }
 }
 
-void MainWindowImpl::slotAddToolBar ()
+void MainWindow::slotAddToolBar ()
 {
     bool ok;
     QString qsToolBarName = QInputDialog::getText (this,
@@ -1175,7 +1175,7 @@ void MainWindowImpl::slotAddToolBar ()
     qlpcToolBars << toolBar;
 }
 
-void MainWindowImpl::slotRemoveToolBar ()
+void MainWindow::slotRemoveToolBar ()
 {
     QAction *action = qobject_cast<QAction *> (sender ());
     if (!action) {
@@ -1204,7 +1204,7 @@ void MainWindowImpl::slotRemoveToolBar ()
     }
 }
 
-void MainWindowImpl::slotRenameToolBar ()
+void MainWindow::slotRenameToolBar ()
 {
     QAction *action = qobject_cast<QAction *> (sender ());
     if (!action) {
@@ -1263,7 +1263,7 @@ void MainWindowImpl::slotRenameToolBar ()
     settings->sync ();
 }
 
-void MainWindowImpl::connectToolBar (PCToolBar *toolBar)
+void MainWindow::connectToolBar (PCToolBar *toolBar)
 {
     connect (toolBar, SIGNAL(toolBarActionExecuted (SToolBarButton)),
              this, SLOT(toolBarActionExecute (SToolBarButton)));
@@ -1273,7 +1273,7 @@ void MainWindowImpl::connectToolBar (PCToolBar *toolBar)
              this, SLOT(slotToolBarContextMenu (QPoint)));
 }
 
-void MainWindowImpl::cdExecute (const QString &path)
+void MainWindow::cdExecute (const QString &path)
 {
     if (!qflvRightPanel->hasFocus () && !qflvLeftPanel->hasFocus ()) {
         return;
@@ -1284,7 +1284,7 @@ void MainWindowImpl::cdExecute (const QString &path)
     qfpFocusedFilePanel->setPath (dir.absolutePath ());
 }
 
-QMenu *MainWindowImpl::createToolBarsMenu (PCToolBar *currentToolBar)
+QMenu *MainWindow::createToolBarsMenu (PCToolBar *currentToolBar)
 {
     QMenu *qmToolBarMenu = new QMenu (tr ("Toolbars"), this);
     QAction *menuAction;
@@ -1352,7 +1352,7 @@ QMenu *MainWindowImpl::createToolBarsMenu (PCToolBar *currentToolBar)
     return qmToolBarMenu;
 }
 
-void MainWindowImpl::slotToolBarContextMenu (const QPoint &pos)
+void MainWindow::slotToolBarContextMenu (const QPoint &pos)
 {
     PCToolBar *pcToolBar = qobject_cast<PCToolBar *> (sender ());
     if (!pcToolBar) {
@@ -1365,7 +1365,7 @@ void MainWindowImpl::slotToolBarContextMenu (const QPoint &pos)
 /* ** TESTING PURPOSES ONLY ** */
 #include <QFileDialog>
 
-void MainWindowImpl::slotTestingFileDialog ()
+void MainWindow::slotTestingFileDialog ()
 {
     QFileDialog dialog (this);
     dialog.exec ();
@@ -1374,7 +1374,7 @@ void MainWindowImpl::slotTestingFileDialog ()
 #ifdef Q_WS_WIN
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
-void MainWindowImpl::slotTestingEnableNTFSPermissionLookup(bool enable)
+void MainWindow::slotTestingEnableNTFSPermissionLookup(bool enable)
 {
     if(enable)
         qt_ntfs_permission_lookup = 1;
