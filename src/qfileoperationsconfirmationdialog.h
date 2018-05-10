@@ -27,6 +27,8 @@
 //
 class QVBoxLayout;
 //
+
+#include <QtCore/QFlags>
 #include <QDialog>
 //
 class QFileOperationsConfirmationDialog : public QDialog
@@ -49,18 +51,16 @@ public:
 		All=0x800,
 		Retry=0x1000
 	};
-	Q_DECLARE_FLAGS(StandardButtons, StandardButton)
 private:
 	int				result;
 	QVBoxLayout* qvblMainLayout;
 public:
 	QFileOperationsConfirmationDialog(QWidget* parent=0);
-	void setButtons(QFlags<StandardButtons> buttons);
+	void setButtons(int buttons);
 	void setFiles(const QString& source,const QString& dest);
 	void setText(const QString& text);
 	int getResult() {return result;}
 private Q_SLOTS:
 	void slotButtonClick();
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(QFileOperationsConfirmationDialog::StandardButtons)
 #endif // QFILEOPERATIONSCONFIRMATIONDIALOG_H

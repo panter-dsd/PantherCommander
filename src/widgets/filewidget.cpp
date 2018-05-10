@@ -29,16 +29,16 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QFileInfo>
 
-#include <QtGui/QActionGroup>
-#include <QtGui/QApplication>
+#include <QtWidgets/QActionGroup>
+#include <QtWidgets/QApplication>
 #include <QtGui/QFontMetrics>
-#include <QtGui/QHeaderView>
+#include <QtWidgets/QHeaderView>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QLayout>
-#include <QtGui/QLineEdit>
-#include <QtGui/QMenu>
-#include <QtGui/QStyle>
-#include <QtGui/QToolButton>
+#include <QtWidgets/QLayout>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QToolButton>
 
 #include "qfileoperationsthread.h"
 //#include "qfilelistsortfilterproxymodel.h"
@@ -47,7 +47,7 @@
 #  include "filecontextmenu.h"
 #endif
 #include <QDebug>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 inline static QString _helper_get_directory(const QString& path)
 {

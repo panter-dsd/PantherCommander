@@ -22,6 +22,8 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 #include <QtGui>
+#include <QtWidgets>
+#include <QtWidgets/QPushButton>
 #include "qfileoperationsconfirmationdialog.h"
 //
 QFileOperationsConfirmationDialog::QFileOperationsConfirmationDialog(QWidget* parent)
@@ -31,7 +33,7 @@ QFileOperationsConfirmationDialog::QFileOperationsConfirmationDialog(QWidget* pa
 	this->setLayout(qvblMainLayout);
 }
 //
-void QFileOperationsConfirmationDialog::setButtons(QFlags<StandardButtons> buttons)
+void QFileOperationsConfirmationDialog::setButtons(int buttons)
 {
 	QPushButton* button;
 	QGridLayout* buttonsLayout=new QGridLayout();

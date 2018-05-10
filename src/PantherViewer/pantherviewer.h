@@ -49,7 +49,7 @@ private:
 	QAction*						actionCloseCurrentTab;
 
 public:
-	PantherViewer(QWidget* parent=0,Qt::WFlags f=0);
+	PantherViewer(QWidget* parent=0,Qt::WindowFlags f=0);
 	~PantherViewer();
 	void viewFile(const QString& fileName);
 private:

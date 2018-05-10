@@ -24,12 +24,12 @@
 
 #include "qfullview.h"
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 #include <QtGui/QDrag>
-#include <QtGui/QHeaderView>
+#include <QtWidgets/QHeaderView>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
-#include <QtGui/QStyle>
+#include <QtWidgets/QStyle>
 
 QFullView::QFullView(QWidget* parent) : QTreeView(parent)
 {

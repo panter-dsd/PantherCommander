@@ -646,6 +646,7 @@ bool QFileOperationsThread::error(const QStringList& params)
 
 bool QFileOperationsThread::isLocalFileSystem(const QString& filePath)
 {
+#if false
 #if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 	bool isLocalDisk = false;
 	QAbstractFileEngine* engine = QAbstractFileEngine::create(filePath);
@@ -658,6 +659,7 @@ bool QFileOperationsThread::isLocalFileSystem(const QString& filePath)
 	if(fe)
 		return (engine->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
 	return false;
+#endif
 #endif
 }
 

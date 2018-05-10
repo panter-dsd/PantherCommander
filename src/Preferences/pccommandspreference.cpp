@@ -22,17 +22,17 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-#include <QtGui/QAction>
-#include <QtGui/QListWidget>
-#include <QtGui/QTableWidget>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QGroupBox>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QToolButton>
-#include <QtGui/QHeaderView>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QTableWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QHeaderView>
 
 #include "pccommandspreference.h"
 #include "pccommands.h"
@@ -167,7 +167,7 @@ void PCCommandsPreference::loadActions(const QString &category)
 
 		QStringList qslShortcuts;
 		foreach(const QKeySequence& ks, action->shortcuts()) {
-			qslShortcuts << ks;
+			qslShortcuts << ks.toString ();
 		}
 		item = new QTableWidgetItem(qslShortcuts.join(QLatin1String("\n")));
 		item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);

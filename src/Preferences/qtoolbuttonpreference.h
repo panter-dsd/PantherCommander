@@ -31,7 +31,7 @@ class QListWidget;
 class QToolButton;
 class QAction;
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QtGui/QIcon>
 
 struct SToolBarButton

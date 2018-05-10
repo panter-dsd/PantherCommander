@@ -24,11 +24,11 @@
 
 #include "pantherviewer.h"
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include "appsettings.h"
 
-PantherViewer::PantherViewer(QWidget* parent, Qt::WFlags f) : QMainWindow(parent, f)
+PantherViewer::PantherViewer(QWidget* parent, Qt::WindowFlags f) : QMainWindow(parent, f)
 {
 	setWindowTitle(tr("PantherViewer"));
 	createControls();

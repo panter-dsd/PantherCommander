@@ -24,9 +24,9 @@
 
 #include "qinterfacepreference.h"
 
-#include <QtGui/QGroupBox>
-#include <QtGui/QCheckBox>
-#include <QtGui/QVBoxLayout>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QVBoxLayout>
 
 #include "appsettings.h"
 

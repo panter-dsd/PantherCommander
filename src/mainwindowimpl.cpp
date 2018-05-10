@@ -28,28 +28,29 @@
 #include <QtCore/QProcess>
 #include <QtCore/QDebug>
 #include <QtCore/QUrl>
-#include <QtGui/QAction>
-#include <QtGui/QComboBox>
-#include <QtGui/QFrame>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
-#include <QtGui/QSplitter>
+#include <QtCore/QMimeData>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSplitter>
 #include <QtGui/QStandardItemModel>
-#include <QtGui/QToolBar>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QApplication>
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
-#include <QtGui/QMessageBox>
-#include <QtGui/QInputDialog>
-#include <QtGui/QStringListModel>
-#include <QtGui/QListView>
-#include <QtGui/QDialogButtonBox>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QInputDialog>
+#include <QtCore/QStringListModel>
+#include <QtWidgets/QListView>
+#include <QtWidgets/QDialogButtonBox>
 #include <QtGui/QDropEvent>
-#include <QtGui/QToolButton>
+#include <QtWidgets/QToolButton>
 
 
 #include "appsettings.h"
@@ -63,7 +64,7 @@
 #include "pctoolbar.h"
 #include "pccommands.h"
 
-MainWindowImpl::MainWindowImpl(QWidget* parent, Qt::WFlags f) : QMainWindow(parent, f)
+MainWindowImpl::MainWindowImpl(QWidget* parent) : QMainWindow(parent)
 	, qlConsolePath(0)
 {
 	resize(640, 480);

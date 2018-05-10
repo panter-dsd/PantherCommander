@@ -30,7 +30,8 @@
 #include <QtCore/QList>
 #include <QtCore/QMimeData>
 #include <QtCore/QUrl>
-#include <QtCore/qtconcurrentrun.h>
+#include <QtConcurrent/qtconcurrentrun.h>
+#include <QtGui>
 
 #ifdef Q_WS_WIN
 #  include <qt_windows.h>
@@ -618,7 +619,7 @@ QVariant QFileListModel::data (const QModelIndex &index, int role) const
 
 		case Qt::ForegroundRole:
 			if (node->lastModified().date().daysTo (QDate::currentDate()) <= 3) {
-				return Qt::blue;
+				return QColor(Qt::blue);
 			}
 
 			break;

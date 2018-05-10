@@ -25,6 +25,7 @@
 #include "qfileoperationsdialog.h"
 
 #include  <QtGui>
+#include  <QtWidgets>
 
 #include "appsettings.h"
 

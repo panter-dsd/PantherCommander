@@ -30,7 +30,7 @@ class QActionGroup;
 class VolumeInfoProvider;
 class QFileIconProvider;
 
-#include <QtGui/QFrame>
+#include <QtWidgets/QFrame>
 
 class DriveBar : public QFrame
 {

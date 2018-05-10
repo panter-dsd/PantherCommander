@@ -22,7 +22,7 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include "qpreferenceglobal.h"
 #include "appsettings.h"

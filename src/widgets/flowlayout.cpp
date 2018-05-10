@@ -63,7 +63,7 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-#include <QtGui>
+#include <QtWidgets>
 
 #include "flowlayout.h"
 

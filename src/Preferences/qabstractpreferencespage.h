@@ -27,7 +27,7 @@
 
 #include <QtCore/QSettings>
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 class QString;
 

@@ -27,11 +27,11 @@
 
 #include "filewidget.h"
 
-#include <QtGui/QAction>
-#include <QtGui/QAbstractProxyModel>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QTreeView>
+#include <QtWidgets/QAction>
+#include <QtCore/QAbstractProxyModel>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QTreeView>
 
 #include <QtGui/QFocusEvent>
 #include <QtGui/QMouseEvent>

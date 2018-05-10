@@ -23,12 +23,13 @@
 *******************************************************************/
 #include <QtCore/QUrl>
 #include <QtCore/QDir>
-#include <QtGui/QAction>
-#include <QtGui/QMenu>
+#include <QtCore/QMimeData>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QDialog>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QVBoxLayout>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QVBoxLayout>
 
 #include "pctoolbar.h"
 #include "appsettings.h"

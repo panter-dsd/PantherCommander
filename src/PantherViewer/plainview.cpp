@@ -21,7 +21,7 @@
 * Author:		PanteR
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
-#include <QtGui>
+#include <QtWidgets>
 #include "plainview.h"
 //
 PlainView::PlainView(const QString& fileName,QWidget* parent)
@@ -120,7 +120,7 @@ void PlainView::slotReadFile()
 //
 void PlainView::setTextCodec(const QString& codecName)
 {
-	qtcCodec=QTextCodec::codecForName(codecName.toAscii());
+	qtcCodec=QTextCodec::codecForName(codecName.toLatin1 ());
 	slotReadFile();
 }
 //

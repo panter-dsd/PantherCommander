@@ -79,7 +79,7 @@ void PCShortcutEdit::handleKeyEvent(QKeyEvent *e)
 	}
 	m_keyNum++;
 	QKeySequence ks(m_key[0], m_key[1], m_key[2], m_key[3]);
-	setText(ks);
+	setText(ks.toString ());
 	e->accept();
 }
 
@@ -109,7 +109,7 @@ void PCShortcutEdit::setShortcut(const QKeySequence& ks)
 	for (int i = 0; i < m_keyNum; ++i) {
 		m_key[i] = ks[i];
 	}
-	this->setText(ks);
+	this->setText(ks.toString ());
 }
 
 QKeySequence PCShortcutEdit::shortcut()

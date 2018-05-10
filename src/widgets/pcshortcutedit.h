@@ -25,7 +25,7 @@
 #ifndef PCSHORTCUTEDIT_H
 #define PCSHORTCUTEDIT_H
 
-#include <QtGui/QLineEdit>
+#include <QtWidgets/QLineEdit>
 
 class PCShortcutEdit : public QLineEdit
 {

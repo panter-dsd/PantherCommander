@@ -23,16 +23,16 @@
 *******************************************************************/
 
 #include <QtCore/QDir>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QListWidget>
-#include <QtGui/QToolButton>
-#include <QtGui/QAction>
-#include <QtGui/QGridLayout>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QFileDialog>
 #include <QtGui/QPixmap>
-#include <QtGui/QFileIconProvider>
+#include <QtWidgets/QFileIconProvider>
 #include <QtGui/QBitmap>
 
 #include "qtoolbuttonpreference.h"

@@ -25,11 +25,11 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 
-#include <QtGui/QAction>
-#include <QtGui/QActionGroup>
-#include <QtGui/QFileIconProvider>
-#include <QtGui/QMessageBox>
-#include <QtGui/QToolButton>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QActionGroup>
+#include <QtWidgets/QFileIconProvider>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QToolButton>
 
 #include "drivebar.h"
 #include "appsettings.h"

@@ -93,7 +93,7 @@ private:
 	QAction*										actionFindFiles;
 	QAction*										actionPreferences;
 public:
-	explicit MainWindowImpl(QWidget* parent = 0, Qt::WFlags f = 0);
+	explicit MainWindowImpl(QWidget* parent = 0);
 	virtual ~MainWindowImpl();
 
 	QStringList commandHistory() const;

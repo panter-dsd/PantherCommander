@@ -26,8 +26,8 @@
 
 #include <QtCore/QDir>
 
-#include <QtGui/QLayout>
-#include <QtGui/QListWidget>
+#include <QtWidgets/QLayout>
+#include <QtWidgets/QListWidget>
 
 #include "volumeinfoprovider.h"
 

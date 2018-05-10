@@ -25,6 +25,7 @@
 #include "qfilepanel.h"
 
 #include <QtGui>
+#include <QtWidgets>
 #include <QMap>
 #include <QIcon>
 #include <QFileIconProvider>

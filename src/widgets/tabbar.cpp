@@ -26,8 +26,8 @@
 
 #include <QtCore/QEvent>
 
-#include <QtGui/QAction>
-#include <QtGui/QMenu>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
 TabBar::TabBar(QWidget* parent) : QTabBar(parent),

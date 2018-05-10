@@ -32,16 +32,17 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QUrl>
 
-#include <QtGui/QComboBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QHeaderView>
 #include <QtGui/QDesktopServices>
-#include <QtGui/QFileDialog>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QProgressDialog>
-#include <QtGui/QPushButton>
-#include <QtGui/QTabWidget>
-#include <QtGui/QTableWidget>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLayout>
+#include <QtWidgets/QProgressDialog>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTableWidget>
 
 #include "dirsorter.h"
 #include "appsettings.h"
@@ -159,7 +160,9 @@ FindFilesDialog::FindFilesDialog(QWidget* parent) : QDialog(parent)
 	filesTable = new QTableWidget(0, 3, this);
 	filesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 	filesTable->setHorizontalHeaderLabels(QStringList() << tr("File Name") << tr("File Path") << tr("Size"));
+#if false
 	filesTable->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
+#endif
 	filesTable->verticalHeader()->hide();
 	filesTable->setShowGrid(false);
 

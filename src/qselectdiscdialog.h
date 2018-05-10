@@ -28,7 +28,7 @@
 class QListWidget;
 class QListWidgetItem;
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 class QSelectDiscDialog : public QDialog
 {

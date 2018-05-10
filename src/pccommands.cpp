@@ -23,7 +23,7 @@
 *******************************************************************/
 
 #include <QtCore/QCoreApplication>
-#include <QtGui/QAction>
+#include <QtWidgets/QAction>
 
 #include "pccommands.h"
 #include "appsettings.h"
@@ -95,8 +95,9 @@ void PCCommands::saveAction(const QString& actionName)
 {
 	QAction *savedAction = action(actionName);
 	QStringList qslShortcuts;
-	foreach(QKeySequence ks, savedAction->shortcuts())
-		qslShortcuts << ks;
+	foreach(QKeySequence ks, savedAction->shortcuts()) {
+			qslShortcuts << ks.toString ();
+		}
 
 	QSettings* settings = AppSettings::instance();
 	settings->beginGroup("Actions");

@@ -3,8 +3,8 @@
 
 #include <QtCore/QStringList>
 
-#include <QtGui/QAction>
-#include <QtGui/QMenu>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
 
 class FileContextMenuPrivate;
 class FileContextMenu : public QMenu

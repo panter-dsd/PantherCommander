@@ -27,7 +27,7 @@
 
 #include <QtCore/QList>
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 class QFileInfo;
 typedef QList<QFileInfo> QFileInfoList;

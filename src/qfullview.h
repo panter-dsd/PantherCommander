@@ -25,7 +25,7 @@
 #ifndef QFULLVIEW_H
 #define QFULLVIEW_H
 
-#include <QtGui/QTreeView>
+#include <QtWidgets/QTreeView>
 
 class QFullView : public QTreeView
 {

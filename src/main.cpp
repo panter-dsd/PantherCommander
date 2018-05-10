@@ -25,7 +25,7 @@
 #include <QtCore/QSettings>
 #include <QtCore/QTextCodec>
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 
 #include "mainwindowimpl.h"
 
@@ -33,9 +33,6 @@
 
 int main(int argc, char **argv)
 {
-	QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
-	QTextCodec::setCodecForCStrings(QTextCodec::codecForName("System"));
-
 	QApplication app(argc, argv);
 	app.setOrganizationDomain("panter.org");
 	app.setOrganizationName("PanteR");

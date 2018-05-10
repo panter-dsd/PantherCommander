@@ -22,9 +22,9 @@
 * Contact:	panter.dsd@gmail.com
 *******************************************************************/
 
-#include <QtGui/QAction>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QDialogButtonBox>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QDialogButtonBox>
 
 #include "pccommandsdialog.h"
 #include "appsettings.h"

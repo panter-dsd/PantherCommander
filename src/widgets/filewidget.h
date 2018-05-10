@@ -29,7 +29,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 class QAbstractItemDelegate;
 class QFileIconProvider;

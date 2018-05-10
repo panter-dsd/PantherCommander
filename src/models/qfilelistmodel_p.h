@@ -27,7 +27,6 @@
 
 #include "qfilelistmodel.h"
 
-#include <QtCore/QAbstractFileEngine>
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
@@ -37,7 +36,7 @@
 #include <QtCore/QTimer>
 
 #include <QtGui/QIcon>
-#include <QtGui/QFileIconProvider>
+#include <QtWidgets/QFileIconProvider>
 
 class QPCFileInfo
 {
@@ -59,6 +58,7 @@ public:
 
 	bool isCaseSensitive() const
 	{
+#if false
 #if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 		QAbstractFileEngine* fe = QAbstractFileEngine::create(m_fileInfo.absoluteFilePath());
 		bool cs = fe->caseSensitive();
@@ -74,9 +74,11 @@ public:
 		return true;
 #endif
 #endif
+#endif
 	}
 	bool isLocalFile() const
 	{
+#if false
 #if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
 		QAbstractFileEngine* fe = QAbstractFileEngine::create(m_fileInfo.absoluteFilePath());
 		bool localDisc = (fe->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
@@ -87,6 +89,7 @@ public:
 		if(fe)
 			return (fe->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag);
 		return false;
+#endif
 #endif
 	}
 

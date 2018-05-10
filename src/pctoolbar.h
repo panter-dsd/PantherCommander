@@ -24,7 +24,7 @@
 #ifndef PCTOOLBAR_H
 #define PCTOOLBAR_H
 
-#include <QtGui/QToolBar>
+#include <QtWidgets/QToolBar>
 #include "qtoolbuttonpreference.h"
 
 class PCToolBar : public QToolBar

@@ -5,10 +5,7 @@ SET(CMAKE_AUTOMOC ON)
 SET(CMAKE_INCLUDE_CURRENT_DIR ON)
 SET(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra")
 
-INCLUDE(FindQt4)
-INCLUDE(FindPkgConfig)
-find_package( Qt4 REQUIRED )
-include( ${QT_USE_FILE})
+FIND_PACKAGE(Qt5 REQUIRED Core Gui Widgets)
 
 INCLUDE_DIRECTORIES(
 exp
@@ -164,7 +161,7 @@ src/Preferences/qtoolbuttonpreference.h
 
 
 ################################################################
-# tools 
+# tools
 ################################################################
 
 set( tools_SOURCE
@@ -197,27 +194,27 @@ src/widgets/pcshortcutedit.h
 src/widgets/tabbar.h
 )
 
-add_executable( PantherCommander 
-	${exp_SOURCE} 
+add_executable( PantherCommander
+	${exp_SOURCE}
         ${exp_HEADERS}
-	${src_SOURCE} 
+	${src_SOURCE}
         ${src_HEADERS}
-	${models_SOURCE} 
+	${models_SOURCE}
         ${models_HEADERS}
-	${dialogs_SOURCE}  
+	${dialogs_SOURCE}
         ${dialogs_HEADERS}
 	${io_SOURCE}
         ${io_HEADERS}
-	${PantherViewer_SOURCE} 
+	${PantherViewer_SOURCE}
         ${PantherViewer_HEADERS}
-	${Preferences_SOURCE} 
+	${Preferences_SOURCE}
         ${Preferences_HEADERS}
-	${tools_SOURCE} 
+	${tools_SOURCE}
         ${tools_HEADERS}
-	${widgets_SOURCE} 
+	${widgets_SOURCE}
         ${widgets_HEADERS}
  )
 
 
-target_link_libraries( PantherCommander ${QT_LIBRARIES} )
+target_link_libraries( PantherCommander Qt5::Core Qt5::Gui Qt5::Widgets)
 
