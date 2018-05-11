@@ -15,7 +15,7 @@
 const QString allCategoryName = QObject::tr ("All");
 
 CommandsPreference::CommandsPreference (QWidget *parent)
-    : QAbstractPreferencesPage (parent)
+    : AbstractPreferencesPage (parent)
 {
     qgbCommands = new QGroupBox (tr ("Commands"), this);
 

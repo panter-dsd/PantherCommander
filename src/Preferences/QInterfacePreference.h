@@ -1,6 +1,6 @@
 #pragma once
 //
-#include "QAbstractPreferencesPage.h"
+#include "AbstractPreferencesPage.h"
 
 //
 class QCheckBox;
@@ -8,7 +8,7 @@ class QCheckBox;
 class QGroupBox;
 
 //
-class QInterfacePreference : public QAbstractPreferencesPage
+class QInterfacePreference : public AbstractPreferencesPage
 {
 Q_OBJECT
 

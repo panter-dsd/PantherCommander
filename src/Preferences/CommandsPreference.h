@@ -18,9 +18,9 @@ class QToolButton;
 
 class QTableWidgetItem;
 
-#include "QAbstractPreferencesPage.h"
+#include "AbstractPreferencesPage.h"
 
-class CommandsPreference : public QAbstractPreferencesPage
+class CommandsPreference : public AbstractPreferencesPage
 {
 Q_OBJECT
     enum Columns

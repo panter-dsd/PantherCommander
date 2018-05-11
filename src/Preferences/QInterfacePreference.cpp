@@ -7,7 +7,7 @@
 #include "src/AppSettings.h"
 
 QInterfacePreference::QInterfacePreference (QWidget *parent)
-    : QAbstractPreferencesPage (parent)
+    : AbstractPreferencesPage (parent)
 {
     createControls ();
     setLayouts ();

@@ -6,12 +6,12 @@
 
 class QString;
 
-class QAbstractPreferencesPage : public QWidget
+class AbstractPreferencesPage : public QWidget
 {
 Q_OBJECT
 
 public:
-    QAbstractPreferencesPage (QWidget *parent = 0);
+    AbstractPreferencesPage (QWidget *parent = 0);
 
     virtual void saveSettings () = 0;
 

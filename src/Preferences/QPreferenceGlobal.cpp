@@ -5,7 +5,7 @@
 
 //
 QPreferenceGlobal::QPreferenceGlobal (QWidget *parent)
-    : QAbstractPreferencesPage (parent)
+    : AbstractPreferencesPage (parent)
 {
     createControls ();
     setConnects ();

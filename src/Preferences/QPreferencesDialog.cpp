@@ -7,7 +7,7 @@
 
 #include "QPreferencesDialog.h"
 
-#include "QAbstractPreferencesPage.h"
+#include "AbstractPreferencesPage.h"
 #include "QPreferenceGlobal.h"
 #include "QInterfacePreference.h"
 #include "CommandsPreference.h"
@@ -105,7 +105,7 @@ void QPreferencesDialog::setConnects ()
         if (!area) {
             continue;
         }
-        QAbstractPreferencesPage *widget = qobject_cast<QAbstractPreferencesPage *> (area->widget ());
+        AbstractPreferencesPage *widget = qobject_cast<AbstractPreferencesPage *> (area->widget ());
         if (widget) {
             connect (widget, SIGNAL(modified ()), this, SLOT(slotSetApplyEnabled ()));
         }
@@ -132,7 +132,7 @@ void QPreferencesDialog::slotSavePreferences ()
         if (!area) {
             continue;
         }
-        QAbstractPreferencesPage *widget = qobject_cast<QAbstractPreferencesPage *> (area->widget ());
+        AbstractPreferencesPage *widget = qobject_cast<AbstractPreferencesPage *> (area->widget ());
         if (widget) {
             widget->saveSettings ();
         }
@@ -154,7 +154,7 @@ void QPreferencesDialog::slotSetDefaults ()
         if (!area) {
             continue;
         }
-        QAbstractPreferencesPage *widget = qobject_cast<QAbstractPreferencesPage *> (area->widget ());
+        AbstractPreferencesPage *widget = qobject_cast<AbstractPreferencesPage *> (area->widget ());
         if (widget) {
             widget->setDefaults ();
         }

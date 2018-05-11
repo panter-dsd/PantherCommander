@@ -1,6 +1,6 @@
 #pragma once
 //
-#include "QAbstractPreferencesPage.h"
+#include "AbstractPreferencesPage.h"
 
 //
 class QLabel;
@@ -10,7 +10,7 @@ class QLineEdit;
 class QCheckBox;
 
 //
-class QPreferenceGlobal : public QAbstractPreferencesPage
+class QPreferenceGlobal : public AbstractPreferencesPage
 {
 Q_OBJECT
 private:
