@@ -6,7 +6,7 @@ class QDialogButtonBox;
 
 #include <QDialog>
 
-class PCCommandsDialog : public QDialog
+class CommandsDialog : public QDialog
 {
 Q_OBJECT
 
@@ -15,9 +15,9 @@ private:
     QDialogButtonBox *qdbbButtons;
 
 public:
-    PCCommandsDialog (QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
+    CommandsDialog (QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
 
-    ~PCCommandsDialog ();
+    ~CommandsDialog ();
 
     QAction *getCurrentAction ();
 

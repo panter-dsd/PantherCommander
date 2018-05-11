@@ -2,11 +2,11 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QDialogButtonBox>
 
-#include "PCCommandsDialog.h"
+#include "CommandsDialog.h"
 #include "src/AppSettings.h"
 #include "PCCommandsPreference.h"
 
-PCCommandsDialog::PCCommandsDialog (QWidget *parent, Qt::WindowFlags f)
+CommandsDialog::CommandsDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f)
 {
     commandReference = new PCCommandsPreference (this);
@@ -30,22 +30,22 @@ PCCommandsDialog::PCCommandsDialog (QWidget *parent, Qt::WindowFlags f)
     loadSettings ();
 }
 
-PCCommandsDialog::~PCCommandsDialog ()
+CommandsDialog::~CommandsDialog ()
 {
     saveSetings ();
 }
 
-QAction *PCCommandsDialog::getCurrentAction ()
+QAction *CommandsDialog::getCurrentAction ()
 {
     return commandReference->getCurrentAction ();
 }
 
-QString PCCommandsDialog::getCurrentActionName ()
+QString CommandsDialog::getCurrentActionName ()
 {
     return commandReference->getCurrentActionName ();
 }
 
-void PCCommandsDialog::loadSettings ()
+void CommandsDialog::loadSettings ()
 {
     QSettings *settings = AppSettings::instance ();
     settings->beginGroup ("CommandsDialog");
@@ -58,7 +58,7 @@ void PCCommandsDialog::loadSettings ()
     settings->endGroup ();
 }
 
-void PCCommandsDialog::saveSetings ()
+void CommandsDialog::saveSetings ()
 {
     QSettings *settings = AppSettings::instance ();
     settings->beginGroup ("CommandsDialog");
@@ -72,7 +72,7 @@ void PCCommandsDialog::saveSetings ()
     settings->sync ();
 }
 
-void PCCommandsDialog::saveAndAccept ()
+void CommandsDialog::saveAndAccept ()
 {
     commandReference->saveSettings ();
 }

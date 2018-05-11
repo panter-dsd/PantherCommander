@@ -12,7 +12,7 @@ INCLUDE_DIRECTORIES(
 ################################################################
 
 SET(SOURCE
-    PCCommandsDialog.cpp
+    CommandsDialog.cpp
     PCCommandsPreference.cpp
     QAbstractPreferencesPage.cpp
     QInterfacePreference.cpp
@@ -22,7 +22,7 @@ SET(SOURCE
     )
 
 SET(HEADERS
-    PCCommandsDialog.h
+    CommandsDialog.h
     PCCommandsPreference.h
     QAbstractPreferencesPage.h
     QInterfacePreference.h

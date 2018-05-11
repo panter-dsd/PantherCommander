@@ -10,7 +10,7 @@
 
 #include "QToolButtonPreference.h"
 #include "src/AppSettings.h"
-#include "PCCommandsDialog.h"
+#include "CommandsDialog.h"
 
 #ifdef Q_WS_WIN
 #  include <qt_windows.h>
@@ -134,7 +134,7 @@ void QToolButtonPreference::slotChooseCommandFile ()
 
 void QToolButtonPreference::slotChoosePCCommand ()
 {
-    PCCommandsDialog *dialog = new PCCommandsDialog (this);
+    CommandsDialog *dialog = new CommandsDialog (this);
     if (dialog->exec ()) {
         qleCommand->setText (dialog->getCurrentActionName ());
     }
