@@ -6,7 +6,7 @@
 #include "AppSettings.h"
 #include "widgets/FileWidget.h"
 #include "widgets/TabBar.h"
-#include "QSelectDiscDialog.h"
+#include "SelectDiscDialog.h"
 #include "io/VolumeInfoProvider.h"
 
 #define TIMER_INTERVAL 5000
@@ -448,7 +448,7 @@ void FilePanel::timerEvent (QTimerEvent */*event*/)
 //
 void FilePanel::slotSelectDisc ()
 {
-    QSelectDiscDialog *dialog = new QSelectDiscDialog (this);
+    SelectDiscDialog *dialog = new SelectDiscDialog (this);
     dialog->setPath (path ());
     connect (dialog, SIGNAL(setectedDisc (QString)), this, SLOT(setPath (QString)));
 

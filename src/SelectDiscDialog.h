@@ -6,12 +6,12 @@ class QListWidgetItem;
 
 #include <QtWidgets/QDialog>
 
-class QSelectDiscDialog : public QDialog
+class SelectDiscDialog : public QDialog
 {
 Q_OBJECT
 
 public:
-    QSelectDiscDialog (QWidget *parent = 0);
+    SelectDiscDialog (QWidget *parent = 0);
 
     void setPath (const QString &path);
 

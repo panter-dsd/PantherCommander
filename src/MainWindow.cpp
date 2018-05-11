@@ -1266,8 +1266,8 @@ void MainWindow::slotRenameToolBar ()
 
 void MainWindow::connectToolBar (ToolBar *toolBar)
 {
-    connect (toolBar, SIGNAL(toolBarActionExecuted (SToolBarButton)),
-             this, SLOT(toolBarActionExecute (SToolBarButton)));
+    connect (toolBar, SIGNAL(toolBarActionExecuted (ToolBarButton)),
+             this, SLOT(toolBarActionExecute (ToolBarButton)));
     connect (toolBar, SIGNAL(cdExecuted (QString)),
              this, SLOT(cdExecute (QString)));
     connect (toolBar, SIGNAL(toolbarContextMenu (QPoint)),

@@ -32,7 +32,7 @@ SET(src_SOURCE
     src/FileOperationsThread.cpp
     src/FilePanel.cpp
     src/FullView.cpp
-    src/QSelectDiscDialog.cpp
+    src/SelectDiscDialog.cpp
     )
 
 SET(src_HEADERS
@@ -48,7 +48,7 @@ SET(src_HEADERS
     src/FileOperationsThread.h
     src/FilePanel.h
     src/FullView.h
-    src/QSelectDiscDialog.h
+    src/SelectDiscDialog.h
     )
 
 

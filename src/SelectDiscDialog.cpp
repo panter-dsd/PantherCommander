@@ -1,4 +1,4 @@
-#include "QSelectDiscDialog.h"
+#include "SelectDiscDialog.h"
 
 #include <QtCore/QDir>
 
@@ -7,7 +7,7 @@
 
 #include "io/VolumeInfoProvider.h"
 
-QSelectDiscDialog::QSelectDiscDialog (QWidget *parent)
+SelectDiscDialog::SelectDiscDialog (QWidget *parent)
     : QDialog (parent)
 {
     discList = new QListWidget (this);
@@ -34,13 +34,13 @@ QSelectDiscDialog::QSelectDiscDialog (QWidget *parent)
     discList->setFocus ();
 }
 
-void QSelectDiscDialog::selectDisc (QListWidgetItem *item)
+void SelectDiscDialog::selectDisc (QListWidgetItem *item)
 {
     emit setectedDisc (item->text ());
     accept ();
 }
 
-void QSelectDiscDialog::setPath (const QString &path)
+void SelectDiscDialog::setPath (const QString &path)
 {
     for (int i = 0; i < discList->count (); i++) {
         if (path.startsWith (discList->item (i)->data (Qt::EditRole).toString ())) {
