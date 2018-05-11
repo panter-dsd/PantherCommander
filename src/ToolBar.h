@@ -3,16 +3,16 @@
 #include <QtWidgets/QToolBar>
 #include "src/Preferences/ToolButtonPreference.h"
 
-class PCToolBar : public QToolBar
+class ToolBar : public QToolBar
 {
 Q_OBJECT
 private:
     QList<ToolBarButton> qlButtons;
     QString qsName;
 public:
-    PCToolBar (const QString &name, QWidget *parent = 0);
+    ToolBar (const QString &name, QWidget *parent = 0);
 
-    virtual ~PCToolBar ()
+    virtual ~ToolBar ()
     {
     }
 

@@ -26,7 +26,7 @@ SET(src_SOURCE
     src/main.cpp
     src/MainWindow.cpp
     src/Commands.cpp
-    src/PCToolBar.cpp
+    src/ToolBar.cpp
     src/QFileOperationsConfirmationDialog.cpp
     src/QFileOperationsDialog.cpp
     src/QFileOperationsThread.cpp
@@ -42,7 +42,7 @@ SET(src_HEADERS
     src/FileOperationThread_p.h
     src/MainWindow.h
     src/Commands.h
-    src/PCToolBar.h
+    src/ToolBar.h
     src/QFileOperationsConfirmationDialog.h
     src/QFileOperationsDialog.h
     src/QFileOperationsThread.h

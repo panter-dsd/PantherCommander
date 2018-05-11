@@ -8,10 +8,10 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QVBoxLayout>
 
-#include "PCToolBar.h"
+#include "ToolBar.h"
 #include "AppSettings.h"
 
-PCToolBar::PCToolBar (const QString &name, QWidget *parent)
+ToolBar::ToolBar (const QString &name, QWidget *parent)
     : QToolBar (name, parent)
 {
     qsName = name;
@@ -20,7 +20,7 @@ PCToolBar::PCToolBar (const QString &name, QWidget *parent)
     this->setAcceptDrops (true);
 }
 
-void PCToolBar::restore ()
+void ToolBar::restore ()
 {
     QSettings *settings = AppSettings::instance ();
     settings->beginGroup ("ToolBar_" + qsName);
@@ -40,7 +40,7 @@ void PCToolBar::restore ()
     refreshActions ();
 }
 
-void PCToolBar::save ()
+void ToolBar::save ()
 {
     QSettings *settings = AppSettings::instance ();
 
@@ -63,7 +63,7 @@ void PCToolBar::save ()
     settings->sync ();
 }
 
-void PCToolBar::refreshActions ()
+void ToolBar::refreshActions ()
 {
         foreach(QAction *act, this->actions ()) {
             this->removeAction (act);
@@ -87,7 +87,7 @@ void PCToolBar::refreshActions ()
         }
 }
 
-void PCToolBar::contextMenuEvent (QContextMenuEvent *event)
+void ToolBar::contextMenuEvent (QContextMenuEvent *event)
 {
     QMenu *qmToolBarMenu = new QMenu (this);
     QAction *action = this->actionAt (event->pos ());
@@ -130,7 +130,7 @@ void PCToolBar::contextMenuEvent (QContextMenuEvent *event)
     delete qmToolBarMenu;
 }
 
-void PCToolBar::slotToolButtonPress ()
+void ToolBar::slotToolButtonPress ()
 {
     QAction *action = qobject_cast<QAction *> (sender ());
     if (!action) {
@@ -141,14 +141,14 @@ void PCToolBar::slotToolButtonPress ()
     emit toolBarActionExecuted (button);
 }
 
-void PCToolBar::rename (const QString &name)
+void ToolBar::rename (const QString &name)
 {
     qsName = name;
     this->setObjectName (qsName);
     save ();
 }
 
-void PCToolBar::slotToolButtonChange ()
+void ToolBar::slotToolButtonChange ()
 {
     QAction *action = qobject_cast<QAction *> (sender ());
     if (!action) {
@@ -187,7 +187,7 @@ void PCToolBar::slotToolButtonChange ()
     delete toolButtonChangeDialog;
 }
 
-void PCToolBar::slotToolButtonDelete ()
+void ToolBar::slotToolButtonDelete ()
 {
     QAction *action = qobject_cast<QAction *> (sender ());
     if (!action) {
@@ -198,7 +198,7 @@ void PCToolBar::slotToolButtonDelete ()
     refreshActions ();
 }
 
-void PCToolBar::slotToolButtonCD ()
+void ToolBar::slotToolButtonCD ()
 {
     QAction *action = qobject_cast<QAction *> (sender ());
     if (!action) {
@@ -209,7 +209,7 @@ void PCToolBar::slotToolButtonCD ()
     emit cdExecuted (button.qsWorkDir);
 }
 
-void PCToolBar::dropEvent (QDropEvent *event)
+void ToolBar::dropEvent (QDropEvent *event)
 {
     QAction *action = this->actionAt (event->pos ());
     if (action && !(event->keyboardModifiers () & Qt::ShiftModifier)) {
@@ -246,20 +246,20 @@ void PCToolBar::dropEvent (QDropEvent *event)
     event->accept ();
 }
 
-void PCToolBar::dragMoveEvent (QDragMoveEvent *event)
+void ToolBar::dragMoveEvent (QDragMoveEvent *event)
 {
     event->setAccepted (true);
     event->accept ();
 }
 
-void PCToolBar::dragEnterEvent (QDragEnterEvent *event)
+void ToolBar::dragEnterEvent (QDragEnterEvent *event)
 {
     if (event->mimeData ()->hasFormat ("text/uri-list")) {
         event->acceptProposedAction ();
     }
 }
 
-void PCToolBar::slotAddSeparator ()
+void ToolBar::slotAddSeparator ()
 {
     qlButtons << ToolBarButton ();
     refreshActions ();

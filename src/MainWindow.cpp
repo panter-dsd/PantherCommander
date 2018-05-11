@@ -33,7 +33,7 @@
 #include "QFileOperationsDialog.h"
 #include "src/Preferences/PreferencesDialog.h"
 #include "src/dialogs/CopyMoveDialog.h"
-#include "PCToolBar.h"
+#include "ToolBar.h"
 #include "Commands.h"
 
 MainWindow::MainWindow (QWidget *parent)
@@ -436,7 +436,7 @@ void MainWindow::saveSettings ()
     settings->endGroup ();
 
     QStringList qslToolBars;
-        foreach(PCToolBar *toolBar, toolBars_) {
+        foreach(ToolBar *toolBar, toolBars_) {
             qslToolBars << toolBar->name ();
             toolBar->save ();
         }
@@ -459,14 +459,14 @@ void MainWindow::loadSettings ()
     settings->endGroup ();
 
     if (toolBarNames.isEmpty ()) {
-        PCToolBar *toolBar = new PCToolBar (tr ("Main toolbar"), this);
+        ToolBar *toolBar = new ToolBar (tr ("Main toolbar"), this);
         connectToolBar (toolBar);
         this->addToolBar (toolBar);
         toolBars_ << toolBar;
     }
 
         foreach(const QString &toolBarName, toolBarNames) {
-            PCToolBar *toolBar = new PCToolBar (toolBarName, this);
+            ToolBar *toolBar = new ToolBar (toolBarName, this);
             connectToolBar (toolBar);
             this->addToolBar (toolBar);
             toolBars_ << toolBar;
@@ -1050,7 +1050,7 @@ void MainWindow::dragMoveEvent (QDragMoveEvent *event)
     isAccepted = widget == runConsoleButton_ || widget == viewButton_ || widget == editButton_ ||
                  widget == removeButton_;
 
-        foreach(PCToolBar *toolBar, toolBars_) {
+        foreach(ToolBar *toolBar, toolBars_) {
             if (toolBar == widget || toolBar == widget->parentWidget ()) {
                 isAccepted = true;
                 break;
@@ -1162,7 +1162,7 @@ void MainWindow::slotAddToolBar ()
         return;
     }
 
-        foreach (PCToolBar *toolBar, toolBars_) {
+        foreach (ToolBar *toolBar, toolBars_) {
             if (toolBar->name () == qsToolBarName) {
                 QMessageBox::critical (this, "", tr ("This name is not unique."));
                 slotAddToolBar ();
@@ -1170,7 +1170,7 @@ void MainWindow::slotAddToolBar ()
             }
         }
 
-    PCToolBar *toolBar = new PCToolBar (qsToolBarName, this);
+    ToolBar *toolBar = new ToolBar (qsToolBarName, this);
     connectToolBar (toolBar);
     this->addToolBar (toolBar);
     toolBars_ << toolBar;
@@ -1182,7 +1182,7 @@ void MainWindow::slotRemoveToolBar ()
     if (!action) {
         return;
     }
-    PCToolBar *toolBar = toolBars_.at (action->data ().toInt ());
+    ToolBar *toolBar = toolBars_.at (action->data ().toInt ());
     if (!toolBar) {
         return;
     }
@@ -1197,7 +1197,7 @@ void MainWindow::slotRemoveToolBar ()
     settings->sync ();
 
     if (toolBars_.count () == 0) {
-        PCToolBar *toolBar = new PCToolBar (tr ("Main toolbar"), this);
+        ToolBar *toolBar = new ToolBar (tr ("Main toolbar"), this);
         toolBar->hide ();
         connectToolBar (toolBar);
         this->addToolBar (toolBar);
@@ -1211,7 +1211,7 @@ void MainWindow::slotRenameToolBar ()
     if (!action) {
         return;
     }
-    PCToolBar *toolBar = toolBars_.at (action->data ().toInt ());
+    ToolBar *toolBar = toolBars_.at (action->data ().toInt ());
     if (!toolBar) {
         return;
     }
@@ -1238,7 +1238,7 @@ void MainWindow::slotRenameToolBar ()
         return;
     }
 
-        foreach (PCToolBar *toolBar, toolBars_) {
+        foreach (ToolBar *toolBar, toolBars_) {
             if (toolBar->name () == qsToolBarNewName) {
                 QMessageBox::critical (this, "", tr ("This name is not unique. Break."));
                 return;
@@ -1251,7 +1251,7 @@ void MainWindow::slotRenameToolBar ()
     settings->remove ("ToolBar_" + qsName);
 
     QStringList qslToolBars;
-        foreach(PCToolBar *toolBar, toolBars_) {
+        foreach(ToolBar *toolBar, toolBars_) {
             qslToolBars << toolBar->name ();
         }
 
@@ -1264,7 +1264,7 @@ void MainWindow::slotRenameToolBar ()
     settings->sync ();
 }
 
-void MainWindow::connectToolBar (PCToolBar *toolBar)
+void MainWindow::connectToolBar (ToolBar *toolBar)
 {
     connect (toolBar, SIGNAL(toolBarActionExecuted (SToolBarButton)),
              this, SLOT(toolBarActionExecute (SToolBarButton)));
@@ -1285,7 +1285,7 @@ void MainWindow::cdExecute (const QString &path)
     focusedFilePanel_->setPath (dir.absolutePath ());
 }
 
-QMenu *MainWindow::createToolBarsMenu (PCToolBar *currentToolBar)
+QMenu *MainWindow::createToolBarsMenu (ToolBar *currentToolBar)
 {
     QMenu *qmToolBarMenu = new QMenu (tr ("Toolbars"), this);
     QAction *menuAction;
@@ -1301,7 +1301,7 @@ QMenu *MainWindow::createToolBarsMenu (PCToolBar *currentToolBar)
 
     QMenu *removeMenu = new QMenu (tr ("&Remove toolbar"), this);
     int i = 0;
-        foreach(PCToolBar *toolBar, toolBars_) {
+        foreach(ToolBar *toolBar, toolBars_) {
             menuAction = new QAction (toolBar->name (), removeMenu);
             menuAction->setData (i++);
             connect (menuAction, SIGNAL(triggered ()),
@@ -1315,7 +1315,7 @@ QMenu *MainWindow::createToolBarsMenu (PCToolBar *currentToolBar)
 
     QMenu *renameMenu = new QMenu (tr ("Re&name toolbar"), this);
     i = 0;
-        foreach(PCToolBar *toolBar, toolBars_) {
+        foreach(ToolBar *toolBar, toolBars_) {
             menuAction = new QAction (toolBar->name (), renameMenu);
             menuAction->setData (i++);
             connect (menuAction, SIGNAL(triggered ()),
@@ -1328,7 +1328,7 @@ QMenu *MainWindow::createToolBarsMenu (PCToolBar *currentToolBar)
     qmToolBarMenu->addMenu (renameMenu);
 
     QMenu *showHideMenu = new QMenu (tr ("&Show/Hide toolbar"), this);
-        foreach(PCToolBar *toolBar, toolBars_) {
+        foreach(ToolBar *toolBar, toolBars_) {
             menuAction = new QAction (toolBar->name (), showHideMenu);
             menuAction->setCheckable (true);
             menuAction->setChecked (toolBar->isVisible ());
@@ -1355,7 +1355,7 @@ QMenu *MainWindow::createToolBarsMenu (PCToolBar *currentToolBar)
 
 void MainWindow::slotToolBarContextMenu (const QPoint &pos)
 {
-    PCToolBar *pcToolBar = qobject_cast<PCToolBar *> (sender ());
+    ToolBar *pcToolBar = qobject_cast<ToolBar *> (sender ());
     if (!pcToolBar) {
         return;
     }

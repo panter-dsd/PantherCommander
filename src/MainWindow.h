@@ -30,7 +30,7 @@ class QFileOperationsDialog;
 
 class PantherViewer;
 
-class PCToolBar;
+class ToolBar;
 
 class ToolBarButton;
 
@@ -67,9 +67,9 @@ private:
 
     void loadSettings ();
 
-    inline void connectToolBar (PCToolBar *toolBar);
+    inline void connectToolBar (ToolBar *toolBar);
 
-    QMenu *createToolBarsMenu (PCToolBar *currentToolBar);
+    QMenu *createToolBarsMenu (ToolBar *currentToolBar);
 
 protected:
     void resizeEvent (QResizeEvent *event);
@@ -155,7 +155,7 @@ private:
     QPointer<PantherViewer> viewer_;
     QStandardItemModel *qeueuModel_;
     QList<QFileOperationsDialog *> queueList_;
-    QList<PCToolBar *> toolBars_;
+    QList<ToolBar *> toolBars_;
 
     QPushButton *runConsoleButton_;
     QPushButton *viewButton_;
