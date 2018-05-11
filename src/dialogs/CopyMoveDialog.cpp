@@ -1,4 +1,4 @@
-#include "PCCopyMoveDialog.h"
+#include "CopyMoveDialog.h"
 
 #include <QtCore/QDir>
 #include <QtWidgets/QLabel>
@@ -11,14 +11,14 @@
 const QString oneFileString = "%1 \"%2\" to";
 const QString manyFileString = "%1 \"%2\" file(s) to";
 
-PCCopyMoveDialog::PCCopyMoveDialog (QWidget *parent)
+CopyMoveDialog::CopyMoveDialog (QWidget *parent)
     : QDialog (parent)
 {
     createControls ();
     setLayouts ();
 }
 
-void PCCopyMoveDialog::createControls ()
+void CopyMoveDialog::createControls ()
 {
     sourcesLabel_ = new QLabel (this);
     sourcesLabel_->setWordWrap (true);
@@ -43,7 +43,7 @@ void PCCopyMoveDialog::createControls ()
              SLOT(reject ()));
 }
 
-void PCCopyMoveDialog::setLayouts ()
+void CopyMoveDialog::setLayouts ()
 {
     QVBoxLayout *qvblMainLayout = new QVBoxLayout ();
     qvblMainLayout->addWidget (sourcesLabel_);
@@ -55,13 +55,13 @@ void PCCopyMoveDialog::setLayouts ()
     this->setLayout (qvblMainLayout);
 }
 
-void PCCopyMoveDialog::setSource (const QStringList &fileList)
+void CopyMoveDialog::setSource (const QStringList &fileList)
 {
     source_ = fileList;
     updateText ();
 }
 
-void PCCopyMoveDialog::setDest (const QString &dest)
+void CopyMoveDialog::setDest (const QString &dest)
 {
     dest_ = dest;
     if (!dest_.endsWith (QLatin1Char ('/'))) {
@@ -70,18 +70,18 @@ void PCCopyMoveDialog::setDest (const QString &dest)
     updateText ();
 }
 
-QString PCCopyMoveDialog::dest ()
+QString CopyMoveDialog::dest ()
 {
     return QDir::fromNativeSeparators (destEdit_->text ());
 }
 
-void PCCopyMoveDialog::setOperation (const QString &operation)
+void CopyMoveDialog::setOperation (const QString &operation)
 {
     operation_ = operation;
     updateText ();
 }
 
-void PCCopyMoveDialog::updateText ()
+void CopyMoveDialog::updateText ()
 {
     if (source_.size () == 1) {
         sourcesLabel_->setText (oneFileString.arg (operation_).arg (QDir::toNativeSeparators (source_.at (0))));
@@ -99,14 +99,14 @@ void PCCopyMoveDialog::updateText ()
     this->setWindowTitle (operation_);
 }
 
-void PCCopyMoveDialog::setQueueModel (QStandardItemModel *model)
+void CopyMoveDialog::setQueueModel (QStandardItemModel *model)
 {
     queueComboBox_->setModel (model);
     queueComboBox_->setModelColumn (0);
     queueComboBox_->setCurrentIndex (-1);
 }
 
-int PCCopyMoveDialog::queueIndex () const
+int CopyMoveDialog::queueIndex () const
 {
     return queueComboBox_->currentIndex ();
 }

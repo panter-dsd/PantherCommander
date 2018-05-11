@@ -32,7 +32,7 @@
 #include "QFilePanel.h"
 #include "QFileOperationsDialog.h"
 #include "Preferences/QPreferencesDialog.h"
-#include "dialogs/PCCopyMoveDialog.h"
+#include "src/dialogs/CopyMoveDialog.h"
 #include "PCToolBar.h"
 #include "PCCommands.h"
 
@@ -696,7 +696,7 @@ void MainWindow::slotCopy (const QString &destDir, const QStringList &fileList)
     sourcePath = destDir.isEmpty () ? sourcePanel->path () : "";
     destPath = destDir.isEmpty () ? destPanel->path () : destDir;
 
-    PCCopyMoveDialog *copyDialog = new PCCopyMoveDialog (this);
+    CopyMoveDialog *copyDialog = new CopyMoveDialog (this);
     copyDialog->setSource (qslFileNames);
     copyDialog->setDest (destPath);
     copyDialog->setOperation (tr ("Copy"));
@@ -951,7 +951,7 @@ void MainWindow::slotMove (const QString &destDir, const QStringList &fileList)
     sourcePath = destDir.isEmpty () ? sourcePanel->path () : "";
     destPath = destDir.isEmpty () ? destPanel->path () : destDir;
 
-    PCCopyMoveDialog *moveDialog = new PCCopyMoveDialog (this);
+    CopyMoveDialog *moveDialog = new CopyMoveDialog (this);
     moveDialog->setSource (qslFileNames);
     moveDialog->setDest (destPath);
     moveDialog->setOperation (tr ("Move"));

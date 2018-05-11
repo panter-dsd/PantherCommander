@@ -12,13 +12,13 @@ class QDialogButtonBox;
 
 class QStandardItemModel;
 
-class PCCopyMoveDialog : public QDialog
+class CopyMoveDialog : public QDialog
 {
 Q_OBJECT
 public:
-    explicit PCCopyMoveDialog (QWidget *parent = 0);
+    explicit CopyMoveDialog (QWidget *parent = 0);
 
-    virtual ~PCCopyMoveDialog ()
+    virtual ~CopyMoveDialog ()
     {
     }
 

@@ -10,13 +10,13 @@ INCLUDE_DIRECTORIES(
 SET(dialogs_SOURCE
     FindFilesDialog.cpp
     CommandEditDialog.cpp
-    PCCopyMoveDialog.cpp
+    CopyMoveDialog.cpp
     )
 
 SET(dialogs_HEADERS
     FindFilesDialog.h
     CommandEditDialog.h
-    PCCopyMoveDialog.h
+    CopyMoveDialog.h
     )
 
 ADD_LIBRARY(${TARGET}
