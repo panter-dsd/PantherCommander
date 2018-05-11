@@ -8,7 +8,7 @@
 #include <QtWidgets/QToolButton>
 
 #include "src/FileOperationsThread.h"
-#include "src/QFullView.h"
+#include "src/FullView.h"
 
 #ifdef Q_WS_WIN
 #  include "filecontextmenu.h"
@@ -75,7 +75,7 @@ void FileWidgetPrivate::createWidgets ()
 */
 
 //	treeView = new QTreeView(q);
-    treeView = new QFullView (q);
+    treeView = new FullView (q);
     treeView->installEventFilter (q);
     treeView->setRootIsDecorated (false);
     treeView->setItemsExpandable (false);

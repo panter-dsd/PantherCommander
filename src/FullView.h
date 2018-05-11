@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QTreeView>
 
-class QFullView : public QTreeView
+class FullView : public QTreeView
 {
 Q_OBJECT
 
@@ -13,9 +13,9 @@ private:
 //	bool						bFocused;
 
 public:
-    explicit QFullView (QWidget *parent = 0);
+    explicit FullView (QWidget *parent = 0);
 
-    virtual ~QFullView ();
+    virtual ~FullView ();
 
 protected:
     void drawRow (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;

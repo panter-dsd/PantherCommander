@@ -1,4 +1,4 @@
-#include "QFullView.h"
+#include "FullView.h"
 
 #include <QtWidgets/QApplication>
 #include <QtGui/QDrag>
@@ -6,18 +6,18 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
 
-QFullView::QFullView (QWidget *parent)
+FullView::FullView (QWidget *parent)
     : QTreeView (parent)
 {
 //	isRightMouseButtonPressed=false;
 //	isMouseSelect=false;
 }
 
-QFullView::~QFullView ()
+FullView::~FullView ()
 {
 }
 
-void QFullView::drawRow (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void FullView::drawRow (QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QTreeView::drawRow (painter, option, index);
 
@@ -29,7 +29,7 @@ void QFullView::drawRow (QPainter *painter, const QStyleOptionViewItem &option, 
     }
 }
 
-QRect QFullView::visualRect (const QModelIndex &index) const
+QRect FullView::visualRect (const QModelIndex &index) const
 {
     if (index.row () < 0 || index.column () < 0 || index.model () != model ()) {
         return QRect ();
@@ -46,7 +46,7 @@ QRect QFullView::visualRect (const QModelIndex &index) const
 /*!
 	Starts a drag by calling drag->exec() using the given \a supportedActions.
 */
-void QFullView::startDrag (Qt::DropActions supportedActions)
+void FullView::startDrag (Qt::DropActions supportedActions)
 {
     QModelIndexList indexes = selectedIndexes ();
 /*	if(indexes.isEmpty())
@@ -80,7 +80,7 @@ void QFullView::startDrag (Qt::DropActions supportedActions)
 #endif // QT_NO_DRAGANDDROP
 
 /*
-void QFullView::mousePressEvent ( QMouseEvent * event)
+void FullView::mousePressEvent ( QMouseEvent * event)
 {
 	if (event->button()==Qt::RightButton)
 	{
@@ -104,7 +104,7 @@ void QFullView::mousePressEvent ( QMouseEvent * event)
 	QTreeView::mousePressEvent(event);
 }
 //
-void QFullView::mouseMoveEvent (QMouseEvent* event)
+void FullView::mouseMoveEvent (QMouseEvent* event)
 {
 	if (isRightMouseButtonPressed)
 	{
@@ -127,7 +127,7 @@ void QFullView::mouseMoveEvent (QMouseEvent* event)
 	QTreeView::mouseMoveEvent(event);
 }
 //
-void QFullView::mouseReleaseEvent (QMouseEvent* event)
+void FullView::mouseReleaseEvent (QMouseEvent* event)
 {
 	if (event->button()==Qt::RightButton)
 	{
@@ -136,7 +136,7 @@ void QFullView::mouseReleaseEvent (QMouseEvent* event)
 	QTreeView::mouseReleaseEvent(event);
 }
 
-void QFullView::focusInEvent (QFocusEvent* event)
+void FullView::focusInEvent (QFocusEvent* event)
 {
 	QTreeView::focusInEvent(event);
 
@@ -151,7 +151,7 @@ void QFullView::focusInEvent (QFocusEvent* event)
 	}
 }
 
-void QFullView::focusOutEvent (QFocusEvent* event)
+void FullView::focusOutEvent (QFocusEvent* event)
 {
 	QTreeView::focusOutEvent(event);
 
@@ -166,7 +166,7 @@ void QFullView::focusOutEvent (QFocusEvent* event)
 	}
 }*/
 
-QItemSelectionModel::SelectionFlags QFullView::selectionBehaviorFlags () const
+QItemSelectionModel::SelectionFlags FullView::selectionBehaviorFlags () const
 {
     if (selectionBehavior () == QAbstractItemView::SelectRows) {
         return QItemSelectionModel::Rows;
@@ -177,7 +177,7 @@ QItemSelectionModel::SelectionFlags QFullView::selectionBehaviorFlags () const
     return QItemSelectionModel::NoUpdate;
 }
 
-QItemSelectionModel::SelectionFlags QFullView::selectionCommand (const QModelIndex &index, const QEvent *event) const
+QItemSelectionModel::SelectionFlags FullView::selectionCommand (const QModelIndex &index, const QEvent *event) const
 {
     if (selectionMode () != ExtendedSelection) {
         return QItemSelectionModel::NoUpdate;
@@ -279,7 +279,7 @@ QItemSelectionModel::SelectionFlags QFullView::selectionCommand (const QModelInd
     return QItemSelectionModel::Clear;
 }
 
-void QFullView::keyPressEvent (QKeyEvent *event)
+void FullView::keyPressEvent (QKeyEvent *event)
 {
 /*	QModelIndex index = currentIndex();
 	switch(event->key())
@@ -323,7 +323,7 @@ void QFullView::keyPressEvent (QKeyEvent *event)
     QTreeView::keyPressEvent (event);
 }
 
-void QFullView::mousePressEvent (QMouseEvent *event)
+void FullView::mousePressEvent (QMouseEvent *event)
 {
     QTreeView::mousePressEvent (event);
 
