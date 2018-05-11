@@ -1,4 +1,4 @@
-#include "QFilePanel.h"
+#include "FilePanel.h"
 
 #include <QtGui>
 #include <QtWidgets>
@@ -11,7 +11,7 @@
 
 #define TIMER_INTERVAL 5000
 
-QFilePanel::QFilePanel (QWidget *parent)
+FilePanel::FilePanel (QWidget *parent)
     : QWidget (parent)
     , m_currentIndex (-1)
 {
@@ -26,7 +26,7 @@ QFilePanel::QFilePanel (QWidget *parent)
     timerID = startTimer (TIMER_INTERVAL);
 }
 
-QFilePanel::~QFilePanel ()
+FilePanel::~FilePanel ()
 {
 }
 
@@ -37,7 +37,7 @@ static bool isDrive (const QString &path)
             || (length >= 2 && length <= 3 && path.at (0).isLetter () && path.at (1) == QLatin1Char (':')));
 }
 
-void QFilePanel::createWidgets ()
+void FilePanel::createWidgets ()
 {
     setContextMenuPolicy (Qt::PreventContextMenu);
 
@@ -98,7 +98,7 @@ void QFilePanel::createWidgets ()
     setFocusProxy (qflvCurrentFileList);
 }
 
-void QFilePanel::slotPathChanged (const QString &path)
+void FilePanel::slotPathChanged (const QString &path)
 {
     updateDiscInformation ();
 
@@ -125,7 +125,7 @@ void QFilePanel::slotPathChanged (const QString &path)
 }
 
 //
-int QFilePanel::addTab (const QString &path, bool bSetCurrent)
+int FilePanel::addTab (const QString &path, bool bSetCurrent)
 {
     QString qsPath = path;
     if (qsPath.isEmpty ()) {
@@ -157,14 +157,14 @@ int QFilePanel::addTab (const QString &path, bool bSetCurrent)
     return index;
 }
 
-void QFilePanel::slotAddTab ()
+void FilePanel::slotAddTab ()
 {
     addTab (QString ());
 
     saveSettings ();
 }
 
-void QFilePanel::slotCurrentTabChange (int index)
+void FilePanel::slotCurrentTabChange (int index)
 {
     if (m_currentIndex == index) {
         return;
@@ -183,7 +183,7 @@ void QFilePanel::slotCurrentTabChange (int index)
     qflvCurrentFileList->setFocus ();
 }
 
-void QFilePanel::saveSettings ()
+void FilePanel::saveSettings ()
 {
     int count = qtabbTabs->count ();
     int currentIndex = qtabbTabs->currentIndex ();
@@ -248,7 +248,7 @@ void QFilePanel::saveSettings ()
     settings->endGroup ();
 }
 
-void QFilePanel::loadSettings ()
+void FilePanel::loadSettings ()
 {
     /*	NavigationHistoryType
         0 - for all tabs
@@ -328,13 +328,13 @@ void QFilePanel::loadSettings ()
 }
 
 //
-void QFilePanel::setDisc (const QString &name)
+void FilePanel::setDisc (const QString &name)
 {
     setPath (name);
 }
 
 //
-void QFilePanel::slotSetDisc ()
+void FilePanel::slotSetDisc ()
 {
     killTimer (timerID);
 
@@ -357,43 +357,43 @@ void QFilePanel::slotSetDisc ()
 }
 
 //
-void QFilePanel::clearSelection ()
+void FilePanel::clearSelection ()
 {
     qflvCurrentFileList->clearSelection ();
 }
 
 //
-QString QFilePanel::path () const
+QString FilePanel::path () const
 {
     return qflvCurrentFileList->directory ().absolutePath ();
 }
 
 //
-QString QFilePanel::currentFileName () const
+QString FilePanel::currentFileName () const
 {
     return qflvCurrentFileList->currentFile ();
 }
 
 //
-void QFilePanel::setPath (const QString &path)
+void FilePanel::setPath (const QString &path)
 {
     qflvCurrentFileList->setDirectory (path);
 }
 
 //
-QStringList QFilePanel::selectedFiles () const
+QStringList FilePanel::selectedFiles () const
 {
     return qflvCurrentFileList->selectedFiles ();
 }
 
 //
-void QFilePanel::slotInformationChanged ()
+void FilePanel::slotInformationChanged ()
 {
     updateDiscInformation ();
 }
 
 //
-QString QFilePanel::size (qint64 bytes)
+QString FilePanel::size (qint64 bytes)
 {
     // According to the Si standard KB is 1000 bytes, KiB is 1024
     // but on windows sizes are calculated by dividing by 1024 so we do what they do.
@@ -417,7 +417,7 @@ QString QFilePanel::size (qint64 bytes)
 }
 
 //
-void QFilePanel::updateDiscInformation ()
+void FilePanel::updateDiscInformation ()
 {
     QString text;
 
@@ -440,13 +440,13 @@ void QFilePanel::updateDiscInformation ()
 }
 
 //
-void QFilePanel::timerEvent (QTimerEvent */*event*/)
+void FilePanel::timerEvent (QTimerEvent */*event*/)
 {
     updateDiscInformation ();
 }
 
 //
-void QFilePanel::slotSelectDisc ()
+void FilePanel::slotSelectDisc ()
 {
     QSelectDiscDialog *dialog = new QSelectDiscDialog (this);
     dialog->setPath (path ());

@@ -16,7 +16,7 @@ class FileWidget;
 
 class TabBar;
 
-class QFilePanel : public QWidget
+class FilePanel : public QWidget
 {
 Q_OBJECT
 
@@ -31,9 +31,9 @@ private:
     int timerID;
 
 public:
-    explicit QFilePanel (QWidget *parent = 0);
+    explicit FilePanel (QWidget *parent = 0);
 
-    virtual ~QFilePanel ();
+    virtual ~FilePanel ();
 
     void setDisc (const QString &name);
 

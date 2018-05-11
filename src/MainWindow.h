@@ -22,7 +22,7 @@ class QToolBar;
 
 class DriveBar;
 
-class QFilePanel;
+class FilePanel;
 
 class FileOperationsDialog;
 
@@ -145,9 +145,9 @@ private Q_SLOTS:
 private:
     DriveBar *leftDriveBar_;
     DriveBar *rightDriveBar_;
-    QFilePanel *leftPanel_;
-    QFilePanel *rightPanel_;
-    QFilePanel *focusedFilePanel_;
+    FilePanel *leftPanel_;
+    FilePanel *rightPanel_;
+    FilePanel *focusedFilePanel_;
     QSplitter *panelsSplitter_;
     QLabel *consolePath_;
     QComboBox *consoleCommandComboBox_;

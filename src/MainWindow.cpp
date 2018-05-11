@@ -29,7 +29,7 @@
 #include "dialogs/FindFilesDialog.h"
 #include "PantherViewer/PantherViewer.h"
 #include "widgets/DriveBar.h"
-#include "QFilePanel.h"
+#include "FilePanel.h"
 #include "FileOperationsDialog.h"
 #include "src/Preferences/PreferencesDialog.h"
 #include "src/dialogs/CopyMoveDialog.h"
@@ -84,7 +84,7 @@ void MainWindow::createWidgets ()
              this, SLOT(slotSetDisc (
                             const QString&)));
 
-    leftPanel_ = new QFilePanel (this);
+    leftPanel_ = new FilePanel (this);
     leftPanel_->setObjectName ("LeftPanel");
     connect (leftPanel_, SIGNAL(pathChanged (
                                     const QString&)),
@@ -96,7 +96,7 @@ void MainWindow::createWidgets ()
                             const QString&)));
     leftDriveBar_->slotSetDisc (leftPanel_->path ());
 
-    rightPanel_ = new QFilePanel (this);
+    rightPanel_ = new FilePanel (this);
     rightPanel_->setObjectName ("RightPanel");
     connect (rightPanel_, SIGNAL(pathChanged (
                                      const QString&)),
@@ -527,7 +527,7 @@ void MainWindow::slotResizeSplitter ()
 
 void MainWindow::slotChangedFocus ()
 {
-    focusedFilePanel_ = qobject_cast<QFilePanel *> (sender ());
+    focusedFilePanel_ = qobject_cast<FilePanel *> (sender ());
     if (focusedFilePanel_) {
         slotPathChanged (focusedFilePanel_->path ());
     }
@@ -642,7 +642,7 @@ void MainWindow::slotView (const QString &fileName)
     if (!rightPanel_->hasFocus () && !leftPanel_->hasFocus ()) {
         return;
     }
-    QFilePanel *sourcePanel = rightPanel_->hasFocus () ? rightPanel_ : leftPanel_;
+    FilePanel *sourcePanel = rightPanel_->hasFocus () ? rightPanel_ : leftPanel_;
 
     if (!viewer_) {
         viewer_ = new PantherViewer ();
@@ -686,8 +686,8 @@ void MainWindow::slotCopy (const QString &destDir, const QStringList &fileList)
     if (!rightPanel_->hasFocus () && !leftPanel_->hasFocus ()) {
         return;
     }
-    QFilePanel *sourcePanel = rightPanel_->hasFocus () ? rightPanel_ : leftPanel_;
-    QFilePanel *destPanel = rightPanel_->hasFocus () ? leftPanel_ : rightPanel_;
+    FilePanel *sourcePanel = rightPanel_->hasFocus () ? rightPanel_ : leftPanel_;
+    FilePanel *destPanel = rightPanel_->hasFocus () ? leftPanel_ : rightPanel_;
 
     QStringList qslFileNames = fileList.isEmpty ()
                                ? sourcePanel->selectedFiles ()
@@ -734,7 +734,7 @@ void MainWindow::slotRemove (const QStringList &fileList)
     if (!rightPanel_->hasFocus () && !leftPanel_->hasFocus ()) {
         return;
     }
-    QFilePanel *sourcePanel = rightPanel_->hasFocus () ? rightPanel_ : leftPanel_;
+    FilePanel *sourcePanel = rightPanel_->hasFocus () ? rightPanel_ : leftPanel_;
 
     QString path = fileList.isEmpty () ? sourcePanel->path () : "";
 
@@ -853,7 +853,7 @@ void MainWindow::slotMkDir ()
     if (!rightPanel_->hasFocus () && !leftPanel_->hasFocus ()) {
         return;
     }
-    QFilePanel *sourcePanel = rightPanel_->hasFocus () ? rightPanel_ : leftPanel_;
+    FilePanel *sourcePanel = rightPanel_->hasFocus () ? rightPanel_ : leftPanel_;
 
     QDialog *qdMkDirDialog = new QDialog (this);
     qdMkDirDialog->setWindowTitle (tr ("Creating directory"));
@@ -941,8 +941,8 @@ void MainWindow::slotMove (const QString &destDir, const QStringList &fileList)
     if (!rightPanel_->hasFocus () && !leftPanel_->hasFocus ()) {
         return;
     }
-    QFilePanel *sourcePanel = rightPanel_->hasFocus () ? rightPanel_ : leftPanel_;
-    QFilePanel *destPanel = rightPanel_->hasFocus () ? leftPanel_ : rightPanel_;
+    FilePanel *sourcePanel = rightPanel_->hasFocus () ? rightPanel_ : leftPanel_;
+    FilePanel *destPanel = rightPanel_->hasFocus () ? leftPanel_ : rightPanel_;
 
     QStringList qslFileNames = fileList.isEmpty ()
                                ? sourcePanel->selectedFiles ()
