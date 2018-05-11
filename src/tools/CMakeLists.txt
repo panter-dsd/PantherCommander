@@ -1,0 +1,20 @@
+SET(TARGET tools)
+
+FIND_PACKAGE(Qt5 REQUIRED Core Gui Widgets)
+
+INCLUDE_DIRECTORIES(
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+SET(SOURCE
+    DirSorter.cpp
+    )
+
+SET(HEADERS
+    DirSorter.h
+    )
+
+ADD_LIBRARY(${TARGET} ${SOURCE} ${HEADERS})
+
+TARGET_LINK_LIBRARIES(${TARGET} Qt5::Core Qt5::Gui Qt5::Widgets)
+
