@@ -8,13 +8,13 @@
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QHeaderView>
 
-#include "PCCommandsPreference.h"
+#include "CommandsPreference.h"
 #include "src/PCCommands.h"
 #include "src/dialogs/CommandEditDialog.h"
 
 const QString allCategoryName = QObject::tr ("All");
 
-PCCommandsPreference::PCCommandsPreference (QWidget *parent)
+CommandsPreference::CommandsPreference (QWidget *parent)
     : QAbstractPreferencesPage (parent)
 {
     qgbCommands = new QGroupBox (tr ("Commands"), this);
@@ -74,7 +74,7 @@ PCCommandsPreference::PCCommandsPreference (QWidget *parent)
     qtwActionsTable->addAction (qaEditCommand);
 }
 
-void PCCommandsPreference::saveSettings ()
+void CommandsPreference::saveSettings ()
 {
         foreach(QAction *newAction, editingActions.values ()) {
             const QString name = newAction->objectName ();
@@ -86,24 +86,24 @@ void PCCommandsPreference::saveSettings ()
         }
 }
 
-void PCCommandsPreference::loadSettings ()
+void CommandsPreference::loadSettings ()
 {
     loadCategories ();
 }
 
-void PCCommandsPreference::setDefaults ()
+void CommandsPreference::setDefaults ()
 {
 
 }
 
-void PCCommandsPreference::loadCategories ()
+void CommandsPreference::loadCategories ()
 {
     qlwCategoryList->addItems (PCCommands::instance ()->categories ());
     qlwCategoryList->insertItem (0, allCategoryName);
     setMaximumSizeCategoriesList ();
 }
 
-void PCCommandsPreference::setMaximumSizeCategoriesList ()
+void CommandsPreference::setMaximumSizeCategoriesList ()
 {
     qlwCategoryList->setMaximumWidth (40);
     for (int i = 0; i < qlwCategoryList->count (); i++) {
@@ -114,7 +114,7 @@ void PCCommandsPreference::setMaximumSizeCategoriesList ()
     }
 }
 
-void PCCommandsPreference::loadActions (const QString &category)
+void CommandsPreference::loadActions (const QString &category)
 {
     QString qsCategory = (category == allCategoryName) ? QString () : category;
     QTableWidgetItem *item;
@@ -154,7 +154,7 @@ void PCCommandsPreference::loadActions (const QString &category)
 //	qtwActionsTable->resizeRowsToContents();
 }
 
-void PCCommandsPreference::filterChange (const QString &filter)
+void CommandsPreference::filterChange (const QString &filter)
 {
     for (int i = 0; i < qtwActionsTable->rowCount (); i++) {
         qtwActionsTable->showRow (i);
@@ -171,7 +171,7 @@ void PCCommandsPreference::filterChange (const QString &filter)
     }
 }
 
-void PCCommandsPreference::editCommand ()
+void CommandsPreference::editCommand ()
 {
     CommandEditDialog *dialog = new CommandEditDialog (this);
 
@@ -201,14 +201,14 @@ void PCCommandsPreference::editCommand ()
     delete dialog;
 }
 
-QAction *PCCommandsPreference::getCurrentAction ()
+QAction *CommandsPreference::getCurrentAction ()
 {
     QTableWidgetItem *item;
     item = qtwActionsTable->item (qtwActionsTable->currentRow (), COMMAND);
     return item ? PCCommands::instance ()->action (item->text ()) : 0;
 }
 
-QString PCCommandsPreference::getCurrentActionName ()
+QString CommandsPreference::getCurrentActionName ()
 {
     QAction *action = getCurrentAction ();
     return action ? action->objectName () : QString ();

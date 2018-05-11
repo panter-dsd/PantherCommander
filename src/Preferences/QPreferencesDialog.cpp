@@ -10,7 +10,7 @@
 #include "QAbstractPreferencesPage.h"
 #include "QPreferenceGlobal.h"
 #include "QInterfacePreference.h"
-#include "PCCommandsPreference.h"
+#include "CommandsPreference.h"
 #include "src/AppSettings.h"
 
 QPreferencesDialog::QPreferencesDialog (QWidget *parent, Qt::WindowFlags f)
@@ -36,7 +36,7 @@ void QPreferencesDialog::createControls ()
     QStringList qslPreferenceItems;
     qslPreferenceItems << QPreferenceGlobal::preferenceGroup ()
                        << QInterfacePreference::preferenceGroup ()
-                       << PCCommandsPreference::preferenceGroup ();
+                       << CommandsPreference::preferenceGroup ();
     qlwPreferencesList->addItems (qslPreferenceItems);
     qlwPreferencesList->setCurrentRow (0);
     setMaximumSizePreferencesList ();
@@ -56,7 +56,7 @@ void QPreferencesDialog::createControls ()
 
     area = new QScrollArea (this);
     area->setWidgetResizable (true);
-    area->setWidget (new PCCommandsPreference (qswPreferencesWidgets));
+    area->setWidget (new CommandsPreference (qswPreferencesWidgets));
     qswPreferencesWidgets->addWidget (area);
 
     qdbbButtons = new QDialogButtonBox (QDialogButtonBox::Ok

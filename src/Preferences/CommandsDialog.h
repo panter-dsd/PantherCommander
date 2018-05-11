@@ -1,6 +1,6 @@
 #pragma once
 
-class PCCommandsPreference;
+class CommandsPreference;
 
 class QDialogButtonBox;
 
@@ -11,7 +11,7 @@ class CommandsDialog : public QDialog
 Q_OBJECT
 
 private:
-    PCCommandsPreference *commandReference;
+    CommandsPreference *commandReference;
     QDialogButtonBox *qdbbButtons;
 
 public:

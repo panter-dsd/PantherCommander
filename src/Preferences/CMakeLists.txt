@@ -13,7 +13,7 @@ INCLUDE_DIRECTORIES(
 
 SET(SOURCE
     CommandsDialog.cpp
-    PCCommandsPreference.cpp
+    CommandsPreference.cpp
     QAbstractPreferencesPage.cpp
     QInterfacePreference.cpp
     QPreferenceGlobal.cpp
@@ -23,7 +23,7 @@ SET(SOURCE
 
 SET(HEADERS
     CommandsDialog.h
-    PCCommandsPreference.h
+    CommandsPreference.h
     QAbstractPreferencesPage.h
     QInterfacePreference.h
     QPreferenceGlobal.h

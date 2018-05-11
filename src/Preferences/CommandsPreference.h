@@ -20,7 +20,7 @@ class QTableWidgetItem;
 
 #include "QAbstractPreferencesPage.h"
 
-class PCCommandsPreference : public QAbstractPreferencesPage
+class CommandsPreference : public QAbstractPreferencesPage
 {
 Q_OBJECT
     enum Columns
@@ -44,9 +44,9 @@ private:
 
     QMap<QString, QAction *> editingActions;
 public:
-    PCCommandsPreference (QWidget *parent = 0);
+    CommandsPreference (QWidget *parent = 0);
 
-    virtual ~PCCommandsPreference ()
+    virtual ~CommandsPreference ()
     {
     }
 

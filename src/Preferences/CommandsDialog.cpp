@@ -4,12 +4,12 @@
 
 #include "CommandsDialog.h"
 #include "src/AppSettings.h"
-#include "PCCommandsPreference.h"
+#include "CommandsPreference.h"
 
 CommandsDialog::CommandsDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f)
 {
-    commandReference = new PCCommandsPreference (this);
+    commandReference = new CommandsPreference (this);
     connect (commandReference, SIGNAL(itemActivated ()),
              this, SLOT(accept ()));
 
