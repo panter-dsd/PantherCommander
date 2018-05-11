@@ -9,13 +9,13 @@ INCLUDE_DIRECTORIES(
 
 SET(dialogs_SOURCE
     FindFilesDialog.cpp
-    PCCommandEditDialog.cpp
+    CommandEditDialog.cpp
     PCCopyMoveDialog.cpp
     )
 
 SET(dialogs_HEADERS
     FindFilesDialog.h
-    PCCommandEditDialog.h
+    CommandEditDialog.h
     PCCopyMoveDialog.h
     )
 

@@ -10,7 +10,7 @@
 
 #include "PCCommandsPreference.h"
 #include "src/PCCommands.h"
-#include "src/dialogs/PCCommandEditDialog.h"
+#include "src/dialogs/CommandEditDialog.h"
 
 const QString allCategoryName = QObject::tr ("All");
 
@@ -173,7 +173,7 @@ void PCCommandsPreference::filterChange (const QString &filter)
 
 void PCCommandsPreference::editCommand ()
 {
-    PCCommandEditDialog *dialog = new PCCommandEditDialog (this);
+    CommandEditDialog *dialog = new CommandEditDialog (this);
 
     QString actionName = qtwActionsTable->item (qtwActionsTable->currentRow (), COMMAND)->text ();
     QAction *action = PCCommands::instance ()->action (actionName);

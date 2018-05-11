@@ -1,4 +1,4 @@
-#include "PCCommandEditDialog.h"
+#include "CommandEditDialog.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtWidgets/QLabel>
@@ -60,7 +60,7 @@ void PCShortcutWidget::clear ()
     qcseEdit->clear ();
 }
 
-PCCommandEditDialog::PCCommandEditDialog (QWidget *parent, Qt::WindowFlags f)
+CommandEditDialog::CommandEditDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f)
 {
     mainBox_ = new QGroupBox (this);
@@ -120,32 +120,32 @@ PCCommandEditDialog::PCCommandEditDialog (QWidget *parent, Qt::WindowFlags f)
     setLayout (qvblMainLayout);
 }
 
-void PCCommandEditDialog::setCommandObjectName (const QString &objectName)
+void CommandEditDialog::setCommandObjectName (const QString &objectName)
 {
     objectNameEdit_->setText (objectName);
 }
 
-void PCCommandEditDialog::setCommandText (const QString &text)
+void CommandEditDialog::setCommandText (const QString &text)
 {
     textEdit_->setText (text);
 }
 
-QString PCCommandEditDialog::commandText ()
+QString CommandEditDialog::commandText ()
 {
     return textEdit_->text ();
 }
 
-void PCCommandEditDialog::setCommandToolTip (const QString &text)
+void CommandEditDialog::setCommandToolTip (const QString &text)
 {
     toolTipEdit_->setText (text);
 }
 
-QString PCCommandEditDialog::commandToolTip ()
+QString CommandEditDialog::commandToolTip ()
 {
     return toolTipEdit_->text ();
 }
 
-void PCCommandEditDialog::setCommandShortcuts (QList<QKeySequence> shortcuts)
+void CommandEditDialog::setCommandShortcuts (QList<QKeySequence> shortcuts)
 {
     qDeleteAll (shortcutWidgets_);
     shortcutWidgets_.clear ();
@@ -164,7 +164,7 @@ void PCCommandEditDialog::setCommandShortcuts (QList<QKeySequence> shortcuts)
     }
 }
 
-QList<QKeySequence> PCCommandEditDialog::commandShortcuts ()
+QList<QKeySequence> CommandEditDialog::commandShortcuts ()
 {
     QList<QKeySequence> l;
         foreach(PCShortcutWidget *shortcut, shortcutWidgets_) {
@@ -176,14 +176,14 @@ QList<QKeySequence> PCCommandEditDialog::commandShortcuts ()
     return l;
 }
 
-void PCCommandEditDialog::addShortcut ()
+void CommandEditDialog::addShortcut ()
 {
     PCShortcutWidget *shortcut = new PCShortcutWidget (this);
     shortcutWidgets_.append (shortcut);
     shortcutsLayout_->insertWidget (shortcutsLayout_->count () - 1, shortcut);
 }
 
-void PCCommandEditDialog::removeShortcut ()
+void CommandEditDialog::removeShortcut ()
 {
     if (shortcutWidgets_.count () == 1) {
         shortcutWidgets_.first ()->clear ();

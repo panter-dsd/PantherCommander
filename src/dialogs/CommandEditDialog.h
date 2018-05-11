@@ -22,14 +22,14 @@ class PCShortcutWidget;
 
 #include <QDialog>
 
-class PCCommandEditDialog : public QDialog
+class CommandEditDialog : public QDialog
 {
 Q_OBJECT
 
 public:
-    PCCommandEditDialog (QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint);
+    CommandEditDialog (QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint);
 
-    virtual ~PCCommandEditDialog ()
+    virtual ~CommandEditDialog ()
     {
     }
 
