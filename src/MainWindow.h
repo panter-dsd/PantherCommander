@@ -24,9 +24,9 @@ class DriveBar;
 
 class QFilePanel;
 
-class QFileOperationsDialog;
+class FileOperationsDialog;
 
-class QFileOperationsDialog;
+class FileOperationsDialog;
 
 class PantherViewer;
 
@@ -80,7 +80,7 @@ protected:
 
     void dragEnterEvent (QDragEnterEvent *event);
 
-    QFileOperationsDialog *addJob (QFileOperationsDialog *queue, QFileOperationsThread::FileOperation operation,
+    FileOperationsDialog *addJob (FileOperationsDialog *queue, QFileOperationsThread::FileOperation operation,
                                    const QStringList &parameters);
 
 private Q_SLOTS:
@@ -154,7 +154,7 @@ private:
     QFrame *commandButtonsFrame_;
     QPointer<PantherViewer> viewer_;
     QStandardItemModel *qeueuModel_;
-    QList<QFileOperationsDialog *> queueList_;
+    QList<FileOperationsDialog *> queueList_;
     QList<ToolBar *> toolBars_;
 
     QPushButton *runConsoleButton_;

@@ -1,11 +1,11 @@
-#include "QFileOperationsDialog.h"
+#include "FileOperationsDialog.h"
 
 #include  <QtGui>
 #include  <QtWidgets>
 
 #include "AppSettings.h"
 
-QFileOperationsDialog::QFileOperationsDialog (QWidget *parent, Qt::WindowFlags f)
+FileOperationsDialog::FileOperationsDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f)
 {
     createControls ();
@@ -21,14 +21,14 @@ QFileOperationsDialog::QFileOperationsDialog (QWidget *parent, Qt::WindowFlags f
 }
 
 //
-QFileOperationsDialog::~QFileOperationsDialog ()
+FileOperationsDialog::~FileOperationsDialog ()
 {
     saveSettings ();
     delete qfotOperatinThread;
 }
 
 //
-void QFileOperationsDialog::createControls ()
+void FileOperationsDialog::createControls ()
 {
     qlSpeed = new QLabel (this);
     qlSpeed->setAlignment (Qt::AlignHCenter);
@@ -57,7 +57,7 @@ void QFileOperationsDialog::createControls ()
 }
 
 //
-void QFileOperationsDialog::setLayouts ()
+void FileOperationsDialog::setLayouts ()
 {
     QGridLayout *qglProgressLayuout = new QGridLayout ();
     qglProgressLayuout->addWidget (qlCurrentFile, 0, 0);
@@ -84,7 +84,7 @@ void QFileOperationsDialog::setLayouts ()
 }
 
 //
-void QFileOperationsDialog::createActions ()
+void FileOperationsDialog::createActions ()
 {
     actionPauseResume = new QAction (tr ("Pause"), this);
     actionPauseResume->setCheckable (true);
@@ -99,7 +99,7 @@ void QFileOperationsDialog::createActions ()
 }
 
 //
-void QFileOperationsDialog::setConnects ()
+void FileOperationsDialog::setConnects ()
 {
     connect (actionPauseResume,
              SIGNAL(triggered ()),
@@ -143,7 +143,7 @@ void QFileOperationsDialog::setConnects ()
 }
 
 //
-void QFileOperationsDialog::slotPauseResume ()
+void FileOperationsDialog::slotPauseResume ()
 {
     if (actionPauseResume->isChecked ()) {
         actionPauseResume->setText (tr ("Resume"));
@@ -155,7 +155,7 @@ void QFileOperationsDialog::slotPauseResume ()
 }
 
 //
-void QFileOperationsDialog::slotCancel ()
+void FileOperationsDialog::slotCancel ()
 {
     qfotOperatinThread->slotPause ();
     if (qlJobs.isEmpty ()) {
@@ -195,7 +195,7 @@ void QFileOperationsDialog::slotCancel ()
 }
 
 //
-void QFileOperationsDialog::addJob (QFileOperationsThread::FileOperation operation, QStringList parameters)
+void FileOperationsDialog::addJob (QFileOperationsThread::FileOperation operation, QStringList parameters)
 {
     addingJobs++;
     SJob job;
@@ -209,7 +209,7 @@ void QFileOperationsDialog::addJob (QFileOperationsThread::FileOperation operati
 }
 
 //
-void QFileOperationsDialog::slotAddingJob (SJob &job)
+void FileOperationsDialog::slotAddingJob (SJob &job)
 {
     QFileOperationsThread *qfotCalculateValueThread = new QFileOperationsThread ();
     qfotCalculateValueThread->setJob (QFileOperationsThread::GetDirSizeOperation, job.params);
@@ -256,7 +256,7 @@ void QFileOperationsDialog::slotAddingJob (SJob &job)
 }
 
 //
-void QFileOperationsDialog::updateListJobs ()
+void FileOperationsDialog::updateListJobs ()
 {
     qlwJobs->clear ();
     QListWidgetItem *item;
@@ -285,7 +285,7 @@ void QFileOperationsDialog::updateListJobs ()
 }
 
 //
-void QFileOperationsDialog::slotNextJob ()
+void FileOperationsDialog::slotNextJob ()
 {
     if (qfotOperatinThread->isRunning ()) {
         return;
@@ -319,7 +319,7 @@ void QFileOperationsDialog::slotNextJob ()
 }
 
 //
-void QFileOperationsDialog::slotValueChanged (qint64 value)
+void FileOperationsDialog::slotValueChanged (qint64 value)
 {
     qApp->processEvents ();
     currentJobCompleteValue += value;
@@ -390,7 +390,7 @@ void QFileOperationsDialog::slotValueChanged (qint64 value)
 }
 
 //
-void QFileOperationsDialog::slotCurrentFileCopyChanged (const QString &sourceFile, const QString &destFile)
+void FileOperationsDialog::slotCurrentFileCopyChanged (const QString &sourceFile, const QString &destFile)
 {
     QString source = QDir::toNativeSeparators (sourceFile);
 
@@ -406,13 +406,13 @@ void QFileOperationsDialog::slotCurrentFileCopyChanged (const QString &sourceFil
 }
 
 //
-QString QFileOperationsDialog::jobName ()
+QString FileOperationsDialog::jobName ()
 {
     return currentJob.params.join (" -> ");
 }
 
 //
-QString QFileOperationsDialog::getSizeStr (double size) const
+QString FileOperationsDialog::getSizeStr (double size) const
 {
     if (size < 1024) {
         return QString (tr ("%1 b ")).arg (size);
@@ -430,7 +430,7 @@ QString QFileOperationsDialog::getSizeStr (double size) const
 }
 
 //
-void QFileOperationsDialog::slotShowHideJobList ()
+void FileOperationsDialog::slotShowHideJobList ()
 {
     qlwJobs->setVisible (actionShowHideJobList->isChecked ());
 #ifndef Q_CC_MSVC
@@ -441,7 +441,7 @@ void QFileOperationsDialog::slotShowHideJobList ()
 }
 
 //
-void QFileOperationsDialog::saveSettings ()
+void FileOperationsDialog::saveSettings ()
 {
     QSettings *settings = AppSettings::instance ();
     settings->beginGroup ("FileOperationsDialog");
@@ -451,7 +451,7 @@ void QFileOperationsDialog::saveSettings ()
 }
 
 //
-void QFileOperationsDialog::loadSettings ()
+void FileOperationsDialog::loadSettings ()
 {
     QSettings *settings = AppSettings::instance ();
     settings->beginGroup ("FileOperationsDialog");
@@ -461,7 +461,7 @@ void QFileOperationsDialog::loadSettings ()
 }
 
 //
-void QFileOperationsDialog::slotOperationError ()
+void FileOperationsDialog::slotOperationError ()
 {
     FileOperationsConfirmationDialog *qfocdDialog;
     qfocdDialog = new FileOperationsConfirmationDialog (this);
@@ -610,7 +610,7 @@ void QFileOperationsDialog::slotOperationError ()
 }
 
 //
-QStringList QFileOperationsDialog::normalizeFileNames (const QStringList &names)
+QStringList FileOperationsDialog::normalizeFileNames (const QStringList &names)
 {
     QStringList list;
         foreach(const QString &name, names) {
@@ -620,7 +620,7 @@ QStringList QFileOperationsDialog::normalizeFileNames (const QStringList &names)
 }
 
 //
-QString QFileOperationsDialog::normalizeFileName (const QString &name)
+QString FileOperationsDialog::normalizeFileName (const QString &name)
 {
     static QString sep (2, QDir::separator ());
 

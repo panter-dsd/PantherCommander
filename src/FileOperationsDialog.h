@@ -17,7 +17,7 @@ class QListWidget;
 #include "FileOperationsConfirmationDialog.h"
 
 //
-class QFileOperationsDialog : public QDialog
+class FileOperationsDialog : public QDialog
 {
 Q_OBJECT
 private:
@@ -59,10 +59,10 @@ private:
     int addingJobs;
 
 public:
-    QFileOperationsDialog (QWidget *parent = 0,
+    FileOperationsDialog (QWidget *parent = 0,
                            Qt::WindowFlags f = Qt::Dialog | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint);
 
-    ~QFileOperationsDialog ();
+    ~FileOperationsDialog ();
 
     void addJob (QFileOperationsThread::FileOperation operation, QStringList parameters);
 

@@ -30,7 +30,7 @@
 #include "PantherViewer/PantherViewer.h"
 #include "widgets/DriveBar.h"
 #include "QFilePanel.h"
-#include "QFileOperationsDialog.h"
+#include "FileOperationsDialog.h"
 #include "src/Preferences/PreferencesDialog.h"
 #include "src/dialogs/CopyMoveDialog.h"
 #include "ToolBar.h"
@@ -703,7 +703,7 @@ void MainWindow::slotCopy (const QString &destDir, const QStringList &fileList)
     copyDialog->setQueueModel (qeueuModel_);
 
     if (copyDialog->exec ()) {
-        QFileOperationsDialog *queue = 0;
+        FileOperationsDialog *queue = 0;
         int queueIndex = copyDialog->queueIndex ();
         if (queueIndex >= 0 && queueList_.at (queueIndex)) {
             queue = queueList_.at (queueIndex);
@@ -782,7 +782,7 @@ void MainWindow::slotRemove (const QStringList &fileList)
     qdRemoveDialog->setLayout (qvblMainLayout);
 
     if (qdRemoveDialog->exec ()) {
-        QFileOperationsDialog *queue = 0;
+        FileOperationsDialog *queue = 0;
         int queueIndex = qcbQueue->currentIndex ();
         if (queueIndex >= 0 && queueList_.at (queueIndex)) {
             queue = queueList_.at (queueIndex);
@@ -805,12 +805,12 @@ void MainWindow::slotRemove (const QStringList &fileList)
 }
 
 //
-QFileOperationsDialog *
-MainWindow::addJob (QFileOperationsDialog *queue, QFileOperationsThread::FileOperation operation,
+FileOperationsDialog *
+MainWindow::addJob (FileOperationsDialog *queue, QFileOperationsThread::FileOperation operation,
                     const QStringList &parameters)
 {
     if (!queue) {
-        queue = new QFileOperationsDialog (0);
+        queue = new FileOperationsDialog (0);
         connect (queue, SIGNAL(finished (int)),
                  this, SLOT(slotQueueFinished ()));
         connect (queue, SIGNAL(jobChanged ()),
@@ -827,7 +827,7 @@ MainWindow::addJob (QFileOperationsDialog *queue, QFileOperationsThread::FileOpe
 //
 void MainWindow::slotQueueFinished ()
 {
-    QFileOperationsDialog *dialog = qobject_cast<QFileOperationsDialog *> (sender ());
+    FileOperationsDialog *dialog = qobject_cast<FileOperationsDialog *> (sender ());
     if (dialog) {
         if (queueList_.removeOne (dialog)) {
             dialog->deleteLater ();
@@ -958,7 +958,7 @@ void MainWindow::slotMove (const QString &destDir, const QStringList &fileList)
     moveDialog->setQueueModel (qeueuModel_);
 
     if (moveDialog->exec ()) {
-        QFileOperationsDialog *queue = 0;
+        FileOperationsDialog *queue = 0;
         int queueIndex = moveDialog->queueIndex ();
         if (queueIndex >= 0 && queueList_.at (queueIndex)) {
             queue = queueList_.at (queueIndex);
