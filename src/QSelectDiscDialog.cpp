@@ -5,7 +5,7 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QListWidget>
 
-#include "VolumeInfoProvider.h"
+#include "io/VolumeInfoProvider.h"
 
 QSelectDiscDialog::QSelectDiscDialog (QWidget *parent)
     : QDialog (parent)

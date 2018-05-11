@@ -3,7 +3,7 @@
 #include <QtWidgets/QDialogButtonBox>
 
 #include "PCCommandsDialog.h"
-#include "AppSettings.h"
+#include "src/AppSettings.h"
 #include "PCCommandsPreference.h"
 
 PCCommandsDialog::PCCommandsDialog (QWidget *parent, Qt::WindowFlags f)

@@ -12,7 +12,7 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPaintEvent>
 
-#include "QFileListModel.h"
+#include "src/models/QFileListModel.h"
 
 class AddressLineEdit : public QLineEdit
 {

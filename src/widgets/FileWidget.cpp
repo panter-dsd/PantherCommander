@@ -7,9 +7,8 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QToolButton>
 
-#include "QFileOperationsThread.h"
-//#include "qfilelistsortfilterproxymodel.h"
-#include "QFullView.h"
+#include "src/QFileOperationsThread.h"
+#include "src/QFullView.h"
 
 #ifdef Q_WS_WIN
 #  include "filecontextmenu.h"

@@ -1,7 +1,7 @@
 #include <QtWidgets>
 
 #include "QPreferenceGlobal.h"
-#include "AppSettings.h"
+#include "src/AppSettings.h"
 
 //
 QPreferenceGlobal::QPreferenceGlobal (QWidget *parent)

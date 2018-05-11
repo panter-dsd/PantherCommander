@@ -12,7 +12,7 @@
 #  include <qt_windows.h>
 #endif
 
-#include "DirSorter.h"
+#include "src/tools/DirSorter.h"
 
 static void getInfoList (const QDir &dir, QFileInfoList *infos)
 {

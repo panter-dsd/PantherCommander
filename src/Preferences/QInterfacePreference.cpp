@@ -4,7 +4,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QVBoxLayout>
 
-#include "AppSettings.h"
+#include "src/AppSettings.h"
 
 QInterfacePreference::QInterfacePreference (QWidget *parent)
     : QAbstractPreferencesPage (parent)

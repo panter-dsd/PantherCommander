@@ -2,7 +2,7 @@
 
 #include <QtWidgets>
 
-#include "AppSettings.h"
+#include "src/AppSettings.h"
 
 PantherViewer::PantherViewer (QWidget *parent, Qt::WindowFlags f)
     : QMainWindow (parent, f)

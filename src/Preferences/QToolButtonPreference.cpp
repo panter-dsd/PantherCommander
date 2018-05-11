@@ -9,7 +9,7 @@
 #include <QtGui/QBitmap>
 
 #include "QToolButtonPreference.h"
-#include "AppSettings.h"
+#include "src/AppSettings.h"
 #include "PCCommandsDialog.h"
 
 #ifdef Q_WS_WIN

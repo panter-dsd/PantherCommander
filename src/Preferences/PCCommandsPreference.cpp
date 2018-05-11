@@ -9,8 +9,8 @@
 #include <QtWidgets/QHeaderView>
 
 #include "PCCommandsPreference.h"
-#include "PCCommands.h"
-#include "PCCommandEditDialog.h"
+#include "src/PCCommands.h"
+#include "src/dialogs/PCCommandEditDialog.h"
 
 const QString allCategoryName = QObject::tr ("All");
 

@@ -9,7 +9,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QDialogButtonBox>
 
-#include "PCShortcutEdit.h"
+#include "src/widgets/PCShortcutEdit.h"
 
 class PCShortcutWidget : public QWidget
 {

@@ -11,7 +11,7 @@
 #include "QPreferenceGlobal.h"
 #include "QInterfacePreference.h"
 #include "PCCommandsPreference.h"
-#include "AppSettings.h"
+#include "src/AppSettings.h"
 
 QPreferencesDialog::QPreferencesDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f)

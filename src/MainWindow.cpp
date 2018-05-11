@@ -26,13 +26,13 @@
 #include <QtWidgets/QToolButton>
 
 #include "AppSettings.h"
-#include "FindFilesDialog.h"
-#include "PantherViewer.h"
-#include "DriveBar.h"
+#include "dialogs/FindFilesDialog.h"
+#include "PantherViewer/PantherViewer.h"
+#include "widgets/DriveBar.h"
 #include "QFilePanel.h"
 #include "QFileOperationsDialog.h"
-#include "QPreferencesDialog.h"
-#include "PCCopyMoveDialog.h"
+#include "Preferences/QPreferencesDialog.h"
+#include "dialogs/PCCopyMoveDialog.h"
 #include "PCToolBar.h"
 #include "PCCommands.h"
 

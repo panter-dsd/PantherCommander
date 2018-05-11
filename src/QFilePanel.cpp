@@ -4,10 +4,10 @@
 #include <QtWidgets>
 
 #include "AppSettings.h"
-#include "FileWidget.h"
-#include "TabBar.h"
+#include "widgets/FileWidget.h"
+#include "widgets/TabBar.h"
 #include "QSelectDiscDialog.h"
-#include "VolumeInfoProvider.h"
+#include "io/VolumeInfoProvider.h"
 
 #define TIMER_INTERVAL 5000
 

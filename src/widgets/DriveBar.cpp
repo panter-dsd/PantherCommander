@@ -6,14 +6,14 @@
 #include <QtWidgets/QToolButton>
 
 #include "DriveBar.h"
-#include "AppSettings.h"
+#include "src/AppSettings.h"
 
 #ifdef Q_WS_WIN
 #  include "filecontextmenu.h"
 #endif
 
 #include "FlowLayout.h"
-#include "VolumeInfoProvider.h"
+#include "src/io/VolumeInfoProvider.h"
 
 static bool isDrive (const QString &path)
 {

@@ -16,8 +16,8 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QTableWidget>
 
-#include "DirSorter.h"
-#include "AppSettings.h"
+#include "src/tools/DirSorter.h"
+#include "src/AppSettings.h"
 
 //TODO: implement in-text binary search algorithm
 //TODO: support regexp patterns in file mask and search text

@@ -8,17 +8,7 @@ SET(CMAKE_CXX_FLAGS "-std=c++0x -Wall -Wextra")
 FIND_PACKAGE(Qt5 REQUIRED Core Gui Widgets)
 
 INCLUDE_DIRECTORIES(
-    exp
-    src
-    src/PantherViewer
-    src/Preferences
-    src/dialogs
-    src/io
-    src/models
-    src/tools
-    src/widgets
-    ${QT_MKSPECS_DIR}/default
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}
 )
 
 ADD_SUBDIRECTORY(src/dialogs)

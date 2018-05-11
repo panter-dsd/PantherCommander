@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QToolBar>
-#include "QToolButtonPreference.h"
+#include "Preferences/QToolButtonPreference.h"
 
 class PCToolBar : public QToolBar
 {
