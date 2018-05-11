@@ -5,7 +5,7 @@
 #include <QtWidgets/QScrollArea>
 #include <QtWidgets/QHBoxLayout>
 
-#include "QPreferencesDialog.h"
+#include "PreferencesDialog.h"
 
 #include "AbstractPreferencesPage.h"
 #include "GlobalPreferencePage.h"
@@ -13,7 +13,7 @@
 #include "CommandsPreference.h"
 #include "src/AppSettings.h"
 
-QPreferencesDialog::QPreferencesDialog (QWidget *parent, Qt::WindowFlags f)
+PreferencesDialog::PreferencesDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f)
 {
     setWindowTitle (tr ("Preferences"));
@@ -24,13 +24,13 @@ QPreferencesDialog::QPreferencesDialog (QWidget *parent, Qt::WindowFlags f)
 }
 
 //
-QPreferencesDialog::~QPreferencesDialog ()
+PreferencesDialog::~PreferencesDialog ()
 {
     saveSattings ();
 }
 
 //
-void QPreferencesDialog::createControls ()
+void PreferencesDialog::createControls ()
 {
     qlwPreferencesList = new QListWidget (this);
     QStringList qslPreferenceItems;
@@ -72,7 +72,7 @@ void QPreferencesDialog::createControls ()
 }
 
 //
-void QPreferencesDialog::setLayouts ()
+void PreferencesDialog::setLayouts ()
 {
     QHBoxLayout *qhblPreferencesLayout = new QHBoxLayout ();
     qhblPreferencesLayout->addWidget (qlwPreferencesList);
@@ -86,7 +86,7 @@ void QPreferencesDialog::setLayouts ()
 }
 
 //
-void QPreferencesDialog::setConnects ()
+void PreferencesDialog::setConnects ()
 {
     connect (qdbbButtons, SIGNAL(accepted ()),
              this, SLOT(slotSavePreferencesAndExit ()));
@@ -113,7 +113,7 @@ void QPreferencesDialog::setConnects ()
 }
 
 //
-void QPreferencesDialog::setMaximumSizePreferencesList ()
+void PreferencesDialog::setMaximumSizePreferencesList ()
 {
     qlwPreferencesList->setMaximumWidth (50);
     for (int i = 0; i < qlwPreferencesList->count (); i++) {
@@ -125,7 +125,7 @@ void QPreferencesDialog::setMaximumSizePreferencesList ()
 }
 
 //
-void QPreferencesDialog::slotSavePreferences ()
+void PreferencesDialog::slotSavePreferences ()
 {
     for (int i = 0; i < qswPreferencesWidgets->count (); i++) {
         QScrollArea *area = qobject_cast<QScrollArea *> (qswPreferencesWidgets->widget (i));
@@ -141,13 +141,13 @@ void QPreferencesDialog::slotSavePreferences ()
 }
 
 //
-void QPreferencesDialog::slotSetApplyEnabled ()
+void PreferencesDialog::slotSetApplyEnabled ()
 {
     qdbbButtons->button (QDialogButtonBox::Apply)->setEnabled (true);
 }
 
 //
-void QPreferencesDialog::slotSetDefaults ()
+void PreferencesDialog::slotSetDefaults ()
 {
     for (int i = 0; i < qswPreferencesWidgets->count (); i++) {
         QScrollArea *area = qobject_cast<QScrollArea *> (qswPreferencesWidgets->widget (i));
@@ -162,7 +162,7 @@ void QPreferencesDialog::slotSetDefaults ()
 }
 //
 
-void QPreferencesDialog::loadSettings ()
+void PreferencesDialog::loadSettings ()
 {
     QSettings *settings = AppSettings::instance ();
     settings->beginGroup ("PreferencesDialog");
@@ -174,7 +174,7 @@ void QPreferencesDialog::loadSettings ()
     settings->endGroup ();
 }
 
-void QPreferencesDialog::saveSattings ()
+void PreferencesDialog::saveSattings ()
 {
     QSettings *settings = AppSettings::instance ();
     settings->beginGroup ("PreferencesDialog");

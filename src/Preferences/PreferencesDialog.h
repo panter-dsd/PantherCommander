@@ -10,7 +10,7 @@ class QPushButton;
 
 #include <QDialog>
 
-class QPreferencesDialog : public QDialog
+class PreferencesDialog : public QDialog
 {
 Q_OBJECT
 
@@ -34,10 +34,10 @@ private:
     void saveSattings ();
 
 public:
-    QPreferencesDialog (QWidget *parent = 0,
+    PreferencesDialog (QWidget *parent = 0,
                         Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
 
-    ~QPreferencesDialog ();
+    ~PreferencesDialog ();
 
 private Q_SLOTS:
 

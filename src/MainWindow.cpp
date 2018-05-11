@@ -31,7 +31,7 @@
 #include "widgets/DriveBar.h"
 #include "QFilePanel.h"
 #include "QFileOperationsDialog.h"
-#include "Preferences/QPreferencesDialog.h"
+#include "src/Preferences/PreferencesDialog.h"
 #include "src/dialogs/CopyMoveDialog.h"
 #include "PCToolBar.h"
 #include "PCCommands.h"
@@ -1118,7 +1118,7 @@ void MainWindow::slotFindFiles ()
 //
 void MainWindow::slotPreferences ()
 {
-    QPreferencesDialog dialog (this);
+    PreferencesDialog dialog (this);
     dialog.exec ();
 }
 
