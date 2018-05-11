@@ -518,7 +518,7 @@ QVariant FileListModel::data (const QModelIndex &index, int role) const
                 case AttributesColumn:
 #ifdef Q_WS_WIN
                     {
-                        qint64 attributes = QFileOperationsThread::winFileAttributes (node->absoluteFilePath());
+                        qint64 attributes = FileOperationsThread::winFileAttributes (node->absoluteFilePath());
 
                         if (attributes != INVALID_FILE_ATTRIBUTES) {
                             QString attr;

@@ -7,7 +7,7 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QToolButton>
 
-#include "src/QFileOperationsThread.h"
+#include "src/FileOperationsThread.h"
 #include "src/QFullView.h"
 
 #ifdef Q_WS_WIN
@@ -611,7 +611,7 @@ void FileWidgetPrivate::_q_addressChanged ()
 
     QString path = rootPath ();
     if (path != newPath) {
-        if (QFileOperationsThread::isLocalFileSystem (path)) {
+        if (FileOperationsThread::isLocalFileSystem (path)) {
             path = QDir::toNativeSeparators (path);
         }
         pathLineEdit->setText (path);
@@ -638,7 +638,7 @@ void FileWidgetPrivate::_q_activate (const QModelIndex &index)
             q->setDirectory (path);
         }
     } else {
-        QFileOperationsThread::execute (path);
+        FileOperationsThread::execute (path);
     }
 }
 
@@ -650,7 +650,7 @@ void FileWidgetPrivate::_q_activate (const QModelIndex &index)
 void FileWidgetPrivate::_q_pathChanged (const QString &newPath)
 {
     QString path = newPath;
-    if (QFileOperationsThread::isLocalFileSystem (newPath)) {
+    if (FileOperationsThread::isLocalFileSystem (newPath)) {
         path = QDir::toNativeSeparators (newPath);
     }
 
@@ -744,7 +744,7 @@ void FileWidgetPrivate::_q_navigateToHome ()
 */
 void FileWidgetPrivate::_q_navigateToRoot ()
 {
-    q_func ()->setDirectory (QFileOperationsThread::rootPath (rootPath ()));
+    q_func ()->setDirectory (FileOperationsThread::rootPath (rootPath ()));
 }
 
 FileWidget::FileWidget (QWidget *parent)

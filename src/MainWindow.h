@@ -34,7 +34,7 @@ class ToolBar;
 
 class ToolBarButton;
 
-#include "QFileOperationsThread.h"
+#include "FileOperationsThread.h"
 
 class MainWindow : public QMainWindow
 {
@@ -80,7 +80,7 @@ protected:
 
     void dragEnterEvent (QDragEnterEvent *event);
 
-    FileOperationsDialog *addJob (FileOperationsDialog *queue, QFileOperationsThread::FileOperation operation,
+    FileOperationsDialog *addJob (FileOperationsDialog *queue, FileOperationsThread::FileOperation operation,
                                    const QStringList &parameters);
 
 private Q_SLOTS:

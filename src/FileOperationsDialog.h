@@ -13,7 +13,7 @@ class QListWidget;
 //
 #include <QDialog>
 #include <QTime>
-#include "QFileOperationsThread.h"
+#include "FileOperationsThread.h"
 #include "FileOperationsConfirmationDialog.h"
 
 //
@@ -23,7 +23,7 @@ Q_OBJECT
 private:
     struct SJob
     {
-        QFileOperationsThread::FileOperation operation;
+        FileOperationsThread::FileOperation operation;
         QStringList params;
         qint64 value;
     };
@@ -43,7 +43,7 @@ private:
     QListWidget *qlwJobs;
     SJob currentJob;
     QList<SJob> qlJobs;
-    QFileOperationsThread *qfotOperatinThread;
+    FileOperationsThread *qfotOperatinThread;
     QTime qtWorkTime;
 
     QAction *actionPauseResume;
@@ -64,7 +64,7 @@ public:
 
     ~FileOperationsDialog ();
 
-    void addJob (QFileOperationsThread::FileOperation operation, QStringList parameters);
+    void addJob (FileOperationsThread::FileOperation operation, QStringList parameters);
 
     QString jobName ();
 

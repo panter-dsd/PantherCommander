@@ -6,7 +6,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QThread>
 
-class QFileOperationsThread : public QThread
+class FileOperationsThread : public QThread
 {
 Q_OBJECT
 
@@ -71,7 +71,7 @@ public:
     FileOperationConfirmations confirmation;
 
 public:
-    explicit QFileOperationsThread (QObject *parent = 0);
+    explicit FileOperationsThread (QObject *parent = 0);
 
     void stop ()
     {

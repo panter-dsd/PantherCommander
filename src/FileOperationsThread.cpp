@@ -1,4 +1,4 @@
-#include "QFileOperationsThread.h"
+#include "FileOperationsThread.h"
 
 #ifdef Q_WS_WIN
 #  define _WIN32_WINNT 0x0501
@@ -22,7 +22,7 @@
 
 #include "AppSettings.h"
 
-QFileOperationsThread::QFileOperationsThread (QObject *parent)
+FileOperationsThread::FileOperationsThread (QObject *parent)
     : QThread (parent)
 {
     QSettings *settings = AppSettings::instance ();
@@ -37,7 +37,7 @@ QFileOperationsThread::QFileOperationsThread (QObject *parent)
     dirSize = filesCount = dirsCount = iPercent = 0;
 }
 
-bool QFileOperationsThread::copyFile (const QString &qsSourceFileName, const QString &qsDestFileName)
+bool FileOperationsThread::copyFile (const QString &qsSourceFileName, const QString &qsDestFileName)
 {
     QString source = qsSourceFileName, dest = qsDestFileName;
     if (QFileInfo (dest).isDir ()) {
@@ -153,7 +153,7 @@ bool QFileOperationsThread::copyFile (const QString &qsSourceFileName, const QSt
     return true;
 }
 
-bool QFileOperationsThread::copyFileTime (const QString &qsSourceFileName, const QString &qsDestFileName)
+bool FileOperationsThread::copyFileTime (const QString &qsSourceFileName, const QString &qsDestFileName)
 {
     if (!isLocalFileSystem (qsDestFileName)) {
         return true;
@@ -206,7 +206,7 @@ bool QFileOperationsThread::copyFileTime (const QString &qsSourceFileName, const
     return ret;
 }
 
-bool QFileOperationsThread::copyPermisions (const QString &qsSourceFileName, const QString &qsDestFileName)
+bool FileOperationsThread::copyPermisions (const QString &qsSourceFileName, const QString &qsDestFileName)
 {
     if (!isLocalFileSystem (qsDestFileName)) {
         return true;
@@ -227,7 +227,7 @@ bool QFileOperationsThread::copyPermisions (const QString &qsSourceFileName, con
 #endif // Q_WS_WIN
 }
 
-bool QFileOperationsThread::removeFile (const QString &qsFileName)
+bool FileOperationsThread::removeFile (const QString &qsFileName)
 {
     QStringList params;
     params << QDir::toNativeSeparators (qsFileName);
@@ -241,7 +241,7 @@ bool QFileOperationsThread::removeFile (const QString &qsFileName)
 
     if (fileInfo.isHidden ()
 #ifdef Q_WS_WIN
-        || (QFileOperationsThread::winFileAttributes(qsFileName) & FILE_ATTRIBUTE_SYSTEM)
+        || (FileOperationsThread::winFileAttributes(qsFileName) & FILE_ATTRIBUTE_SYSTEM)
 #endif
         ) {
         lastError = FO_PERMISIONS_ERROR;
@@ -268,7 +268,7 @@ bool QFileOperationsThread::removeFile (const QString &qsFileName)
     return true;
 }
 
-void QFileOperationsThread::run ()
+void FileOperationsThread::run ()
 {
     dirSize = filesCount = dirsCount = iPercent = 0;
     bStopped = false;
@@ -300,7 +300,7 @@ void QFileOperationsThread::run ()
     bStopped = true;
 }
 
-void QFileOperationsThread::calculateDirSize (const QString &qsDir)
+void FileOperationsThread::calculateDirSize (const QString &qsDir)
 {
     QDir dir (qsDir);
     dir.setFilter (QDir::AllEntries | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot);
@@ -319,7 +319,7 @@ void QFileOperationsThread::calculateDirSize (const QString &qsDir)
     emit changedDirSize (dirSize, dirsCount, filesCount);
 }
 
-void QFileOperationsThread::setJob (FileOperation job, const QStringList &params)
+void FileOperationsThread::setJob (FileOperation job, const QStringList &params)
 {
     operation = job;
     qslParametres = params;
@@ -363,7 +363,7 @@ void copyDirTime(const QString& sourceDir, const QString& destDir)
 }
 #endif // Q_WS_WIN
 
-bool QFileOperationsThread::copyDir (const QString &qsDirName, const QString &qsDestDir)
+bool FileOperationsThread::copyDir (const QString &qsDirName, const QString &qsDestDir)
 {
     QDir sourceDir (qsDirName);
 
@@ -413,7 +413,7 @@ bool QFileOperationsThread::copyDir (const QString &qsDirName, const QString &qs
     return true;
 }
 
-bool QFileOperationsThread::removeDir (const QString &qsDirName)
+bool FileOperationsThread::removeDir (const QString &qsDirName)
 {
     QDir dir (qsDirName);
     dir.setFilter (QDir::AllEntries | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot);
@@ -463,7 +463,7 @@ bool QFileOperationsThread::removeDir (const QString &qsDirName)
     return true;
 }
 
-bool QFileOperationsThread::moveFile (const QString &qsSourceFileName, const QString &qsDestFileName)
+bool FileOperationsThread::moveFile (const QString &qsSourceFileName, const QString &qsDestFileName)
 {
     if (!QFileInfo (qsDestFileName).exists () && isSameDisc (qsSourceFileName, qsDestFileName)) {
         return QFile::rename (qsSourceFileName, qsDestFileName);
@@ -476,7 +476,7 @@ bool QFileOperationsThread::moveFile (const QString &qsSourceFileName, const QSt
     return false;
 }
 
-bool QFileOperationsThread::moveDir (const QString &qsSourceDir, const QString &qsDestDir)
+bool FileOperationsThread::moveDir (const QString &qsSourceDir, const QString &qsDestDir)
 {
     if (!QFileInfo (qsDestDir).exists () && isSameDisc (qsSourceDir, qsDestDir)) {
         return QFile::rename (qsSourceDir, qsDestDir + QDir (qsSourceDir).dirName ());
@@ -536,7 +536,7 @@ bool QFileOperationsThread::moveDir (const QString &qsSourceDir, const QString &
     return true;
 }
 
-bool QFileOperationsThread::error (const QStringList &params)
+bool FileOperationsThread::error (const QStringList &params)
 {
     errorParams = params;
     bool b;
@@ -602,7 +602,7 @@ bool QFileOperationsThread::error (const QStringList &params)
     return !bStopped;
 }
 
-bool QFileOperationsThread::isLocalFileSystem (const QString &filePath)
+bool FileOperationsThread::isLocalFileSystem (const QString &filePath)
 {
 #if false
 #if QT_VERSION < 0x040600 || !defined(IN_TRUNK)
@@ -621,7 +621,7 @@ bool QFileOperationsThread::isLocalFileSystem (const QString &filePath)
 #endif
 }
 
-bool QFileOperationsThread::isSameDisc (const QString &sourcePath, const QString &destPath)
+bool FileOperationsThread::isSameDisc (const QString &sourcePath, const QString &destPath)
 {
     //TODO: `source' and `dest' both must be absolutePath-ed and nativeSeparator-ed here
     QString source = QDir::toNativeSeparators (QFileInfo (sourcePath).absolutePath ());
@@ -666,7 +666,7 @@ bool QFileOperationsThread::isSameDisc (const QString &sourcePath, const QString
     return res;
 }
 
-QString QFileOperationsThread::rootPath (const QString &filePath)
+QString FileOperationsThread::rootPath (const QString &filePath)
 {
 #if 0
     QString rootPath;
@@ -718,23 +718,23 @@ QString QFileOperationsThread::rootPath (const QString &filePath)
     return dir.absolutePath ();
 }
 
-bool QFileOperationsThread::isRoot (const QString &path)
+bool FileOperationsThread::isRoot (const QString &path)
 {
     return path == rootPath (path);
 }
 
-bool QFileOperationsThread::execute (const QString &filePath)
+bool FileOperationsThread::execute (const QString &filePath)
 {
     return execute (filePath, QStringList (), QDir::currentPath ());
 }
 
-bool QFileOperationsThread::execute (const QString &filePath, const QStringList &arguments)
+bool FileOperationsThread::execute (const QString &filePath, const QStringList &arguments)
 {
     return execute (filePath, arguments, QDir::currentPath ());
 }
 
 bool
-QFileOperationsThread::execute (const QString &filePath, const QStringList &arguments, const QString &workingDirectory)
+FileOperationsThread::execute (const QString &filePath, const QStringList &arguments, const QString &workingDirectory)
 {
 #ifndef Q_CC_MSVC
 #warning "TODO: *panther: respect `arguments' and `workingDirectory'"
@@ -796,7 +796,7 @@ QFileOperationsThread::execute (const QString &filePath, const QStringList &argu
 }
 
 #ifdef Q_WS_WIN
-qint64 QFileOperationsThread::winFileAttributes(const QString& filePath)
+qint64 FileOperationsThread::winFileAttributes(const QString& filePath)
 {
     DWORD fileAttrib = INVALID_FILE_ATTRIBUTES;
     if(isLocalFileSystem(filePath))

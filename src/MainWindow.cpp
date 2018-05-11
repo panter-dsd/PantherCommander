@@ -711,13 +711,13 @@ void MainWindow::slotCopy (const QString &destDir, const QStringList &fileList)
         for (int i = 0; i < qslFileNames.count (); i++) {
             if (QFileInfo (qslFileNames.at (i)).isDir ()) {
                 queue = addJob (queue,
-                                QFileOperationsThread::CopyDirOperation,
+                                FileOperationsThread::CopyDirOperation,
                                 QStringList () << qslFileNames.at (i) + QDir::separator ()
                                                << destPath
                 );
             } else {
                 queue = addJob (queue,
-                                QFileOperationsThread::CopyFileOperation,
+                                FileOperationsThread::CopyFileOperation,
                                 QStringList () << qslFileNames.at (i)
                                                << copyDialog->dest ());
             }
@@ -790,11 +790,11 @@ void MainWindow::slotRemove (const QStringList &fileList)
         for (int i = 0; i < qslFiles.count (); i++) {
             if (QFileInfo (qslFiles.at (i)).isDir ()) {
                 queue = addJob (queue,
-                                QFileOperationsThread::RemoveDirOperation,
+                                FileOperationsThread::RemoveDirOperation,
                                 QStringList () << qslFiles.at (i));
             } else {
                 queue = addJob (queue,
-                                QFileOperationsThread::RemoveFileOperation,
+                                FileOperationsThread::RemoveFileOperation,
                                 QStringList () << qslFiles.at (i));
             }
         }
@@ -806,7 +806,7 @@ void MainWindow::slotRemove (const QStringList &fileList)
 
 //
 FileOperationsDialog *
-MainWindow::addJob (FileOperationsDialog *queue, QFileOperationsThread::FileOperation operation,
+MainWindow::addJob (FileOperationsDialog *queue, FileOperationsThread::FileOperation operation,
                     const QStringList &parameters)
 {
     if (!queue) {
@@ -966,12 +966,12 @@ void MainWindow::slotMove (const QString &destDir, const QStringList &fileList)
         for (int i = 0; i < qslFileNames.count (); i++) {
             if (QFileInfo (qslFileNames.at (i)).isDir ()) {
                 queue = addJob (queue,
-                                QFileOperationsThread::MoveDirOperation,
+                                FileOperationsThread::MoveDirOperation,
                                 QStringList () << qslFileNames.at (i) + QDir::separator ()
                                                << moveDialog->dest () + QDir::separator ());
             } else {
                 queue = addJob (queue,
-                                QFileOperationsThread::MoveFileOperation,
+                                FileOperationsThread::MoveFileOperation,
                                 QStringList () << qslFileNames.at (i)
                                                << moveDialog->dest () + QDir::separator () +
                                                   QFileInfo (qslFileNames.at (i)).fileName ());
@@ -1102,7 +1102,7 @@ void MainWindow::toolBarActionExecute (const ToolBarButton &actionButton)
     if (fi.isDir ()) {
         cdExecute (fi.absoluteFilePath ());
     } else {
-        QFileOperationsThread::execute (actionButton.qsCommand,
+        FileOperationsThread::execute (actionButton.qsCommand,
                                         actionButton.qsParams.split (QLatin1Char (' ')),
                                         actionButton.qsWorkDir
         );

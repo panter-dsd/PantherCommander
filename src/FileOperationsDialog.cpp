@@ -12,7 +12,7 @@ FileOperationsDialog::FileOperationsDialog (QWidget *parent, Qt::WindowFlags f)
     setLayouts ();
     createActions ();
     loadSettings ();
-    qfotOperatinThread = new QFileOperationsThread ();
+    qfotOperatinThread = new FileOperationsThread ();
     jobsCompleteValue = jobsValue = addingJobs = 0;
     qtWorkTime = QTime::currentTime ();
     setConnects ();
@@ -195,7 +195,7 @@ void FileOperationsDialog::slotCancel ()
 }
 
 //
-void FileOperationsDialog::addJob (QFileOperationsThread::FileOperation operation, QStringList parameters)
+void FileOperationsDialog::addJob (FileOperationsThread::FileOperation operation, QStringList parameters)
 {
     addingJobs++;
     SJob job;
@@ -211,8 +211,8 @@ void FileOperationsDialog::addJob (QFileOperationsThread::FileOperation operatio
 //
 void FileOperationsDialog::slotAddingJob (SJob &job)
 {
-    QFileOperationsThread *qfotCalculateValueThread = new QFileOperationsThread ();
-    qfotCalculateValueThread->setJob (QFileOperationsThread::GetDirSizeOperation, job.params);
+    FileOperationsThread *qfotCalculateValueThread = new FileOperationsThread ();
+    qfotCalculateValueThread->setJob (FileOperationsThread::GetDirSizeOperation, job.params);
     qfotCalculateValueThread->start ();
     while (qfotCalculateValueThread->isRunning ()) {
         qfotCalculateValueThread->wait (50);
@@ -222,27 +222,27 @@ void FileOperationsDialog::slotAddingJob (SJob &job)
     qfotCalculateValueThread->getDirSize (size, dirsCount, filesCount);
     delete qfotCalculateValueThread;
     switch (job.operation) {
-        case QFileOperationsThread::CopyDirOperation: {
+        case FileOperationsThread::CopyDirOperation: {
             value = size;
             break;
         }
-        case QFileOperationsThread::RemoveDirOperation: {
+        case FileOperationsThread::RemoveDirOperation: {
             value = dirsCount + filesCount;
             break;
         }
-        case QFileOperationsThread::CopyFileOperation: {
+        case FileOperationsThread::CopyFileOperation: {
             value = QFile (job.params.at (0)).size ();
             break;
         }
-        case QFileOperationsThread::RemoveFileOperation: {
+        case FileOperationsThread::RemoveFileOperation: {
             value = 1;
             break;
         }
-        case QFileOperationsThread::MoveFileOperation: {
+        case FileOperationsThread::MoveFileOperation: {
             value = QFile (job.params.at (0)).size ();
             break;
         }
-        case QFileOperationsThread::MoveDirOperation: {
+        case FileOperationsThread::MoveDirOperation: {
             value = dirsCount + filesCount + size;
             break;
         }
@@ -263,16 +263,16 @@ void FileOperationsDialog::updateListJobs ()
     for (int i = 0; i < qlJobs.count (); i++) {
         QString jobText;
         switch (qlJobs.at (i).operation) {
-            case QFileOperationsThread::CopyFileOperation:
+            case FileOperationsThread::CopyFileOperation:
                 jobText = tr ("Copy: ");
                 break;
-            case QFileOperationsThread::CopyDirOperation:
+            case FileOperationsThread::CopyDirOperation:
                 jobText = tr ("Copy: ");
                 break;
-            case QFileOperationsThread::RemoveFileOperation:
+            case FileOperationsThread::RemoveFileOperation:
                 jobText = tr ("Remove: ");
                 break;
-            case QFileOperationsThread::RemoveDirOperation:
+            case FileOperationsThread::RemoveDirOperation:
                 jobText = tr ("Remove: ");
                 break;
             default:
@@ -329,22 +329,22 @@ void FileOperationsDialog::slotValueChanged (qint64 value)
 //Caption
     QString caption = "[" + QString::number (qprbAllJobs->value ()) + " %] ";
     switch (currentJob.operation) {
-        case QFileOperationsThread::CopyFileOperation:
+        case FileOperationsThread::CopyFileOperation:
             caption += tr ("Copy");
             break;
-        case QFileOperationsThread::RemoveFileOperation:
+        case FileOperationsThread::RemoveFileOperation:
             caption += tr ("Remove");
             break;
-        case QFileOperationsThread::CopyDirOperation:
+        case FileOperationsThread::CopyDirOperation:
             caption += tr ("Copy");
             break;
-        case QFileOperationsThread::RemoveDirOperation:
+        case FileOperationsThread::RemoveDirOperation:
             caption += tr ("Remove");
             break;
-        case QFileOperationsThread::MoveFileOperation:
+        case FileOperationsThread::MoveFileOperation:
             caption += tr ("Move");
             break;
-        case QFileOperationsThread::MoveDirOperation:
+        case FileOperationsThread::MoveDirOperation:
             caption += tr ("Move");
             break;
         default:
@@ -359,27 +359,27 @@ void FileOperationsDialog::slotValueChanged (qint64 value)
         double speed = (double) jobsCompleteValue / (double) time;
         int secs = int ((jobsValue - jobsCompleteValue) / speed);
         switch (currentJob.operation) {
-            case QFileOperationsThread::CopyFileOperation:
+            case FileOperationsThread::CopyFileOperation:
                 qlSpeed->setText (tr ("Coping %1/s. To job complete %2").arg (getSizeStr (speed)).arg (
                     QTime ().addSecs (secs).toString ("hh:mm:ss")));
                 break;
-            case QFileOperationsThread::RemoveFileOperation:
+            case FileOperationsThread::RemoveFileOperation:
                 qlSpeed->setText (
                     tr ("Deleting. To job complete %1").arg (QTime ().addSecs (secs).toString ("hh:mm:ss")));
                 break;
-            case QFileOperationsThread::CopyDirOperation:
+            case FileOperationsThread::CopyDirOperation:
                 qlSpeed->setText (tr ("Coping %1/s. To job complete %2").arg (getSizeStr (speed)).arg (
                     QTime ().addSecs (secs).toString ("hh:mm:ss")));
                 break;
-            case QFileOperationsThread::RemoveDirOperation:
+            case FileOperationsThread::RemoveDirOperation:
                 qlSpeed->setText (
                     tr ("Deleting. To job complete %1").arg (QTime ().addSecs (secs).toString ("hh:mm:ss")));
                 break;
-            case QFileOperationsThread::MoveFileOperation:
+            case FileOperationsThread::MoveFileOperation:
                 qlSpeed->setText (tr ("Moving %1/s. To job complete %2").arg (getSizeStr (speed)).arg (
                     QTime ().addSecs (secs).toString ("hh:mm:ss")));
                 break;
-            case QFileOperationsThread::MoveDirOperation:
+            case FileOperationsThread::MoveDirOperation:
                 qlSpeed->setText (tr ("Moving %1/s. To job complete %2").arg (getSizeStr (speed)).arg (
                     QTime ().addSecs (secs).toString ("hh:mm:ss")));
                 break;
@@ -467,7 +467,7 @@ void FileOperationsDialog::slotOperationError ()
     qfocdDialog = new FileOperationsConfirmationDialog (this);
     const QStringList &params = qfotOperatinThread->getErrorParams ();
     switch (qfotOperatinThread->getLastError ()) {
-        case QFileOperationsThread::FO_DEST_FILE_EXISTS:
+        case FileOperationsThread::FO_DEST_FILE_EXISTS:
             qfocdDialog->setFiles (params.at (0), params.at (1));
             qfocdDialog->setButtons (FileOperationsConfirmationDialog::Ovewrite |
                                      FileOperationsConfirmationDialog::OvewriteAll |
@@ -481,7 +481,7 @@ void FileOperationsDialog::slotOperationError ()
                                      FileOperationsConfirmationDialog::OvewriteAllLager
             );
             break;
-        case QFileOperationsThread::FO_PERMISIONS_ERROR:
+        case FileOperationsThread::FO_PERMISIONS_ERROR:
             qfocdDialog->setButtons (FileOperationsConfirmationDialog::Delete |
                                      FileOperationsConfirmationDialog::All |
                                      FileOperationsConfirmationDialog::Skip |
@@ -489,7 +489,7 @@ void FileOperationsDialog::slotOperationError ()
             );
             qfocdDialog->setText (tr ("File %1 is hidden or system. Delete anyway?").arg (params.at (0)));
             break;
-        case QFileOperationsThread::FO_REMOVE_ERROR:
+        case FileOperationsThread::FO_REMOVE_ERROR:
             qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
                                      FileOperationsConfirmationDialog::SkipAll |
                                      FileOperationsConfirmationDialog::Retry |
@@ -497,14 +497,14 @@ void FileOperationsDialog::slotOperationError ()
             );
             qfocdDialog->setText (tr ("Error remove file %1").arg (params.at (0)));
             break;
-        case QFileOperationsThread::FO_OPEN_ERROR:
+        case FileOperationsThread::FO_OPEN_ERROR:
             qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
                                      FileOperationsConfirmationDialog::Retry |
                                      FileOperationsConfirmationDialog::Cancel
             );
             qfocdDialog->setText (tr ("Error open file %1").arg (params.at (0)));
             break;
-        case QFileOperationsThread::FO_READ_ERROR:
+        case FileOperationsThread::FO_READ_ERROR:
             qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
                                      FileOperationsConfirmationDialog::SkipAll |
                                      FileOperationsConfirmationDialog::Retry |
@@ -512,7 +512,7 @@ void FileOperationsDialog::slotOperationError ()
             );
             qfocdDialog->setText (tr ("Error read file %1").arg (params.at (0)));
             break;
-        case QFileOperationsThread::FO_WRITE_ERROR:
+        case FileOperationsThread::FO_WRITE_ERROR:
             qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
                                      FileOperationsConfirmationDialog::SkipAll |
                                      FileOperationsConfirmationDialog::Retry |
@@ -520,7 +520,7 @@ void FileOperationsDialog::slotOperationError ()
             );
             qfocdDialog->setText (tr ("Error write file %1").arg (params.at (1)));
             break;
-        case QFileOperationsThread::FO_RESIZE_ERROR:
+        case FileOperationsThread::FO_RESIZE_ERROR:
             qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
                                      FileOperationsConfirmationDialog::SkipAll |
                                      FileOperationsConfirmationDialog::Retry |
@@ -545,7 +545,7 @@ void FileOperationsDialog::slotOperationError ()
             qfotOperatinThread->slotResume ();
             break;
         case FileOperationsConfirmationDialog::OvewriteAll:
-            qfotOperatinThread->confirmation |= QFileOperationsThread::OVEWRITE_ALL;
+            qfotOperatinThread->confirmation |= FileOperationsThread::OVEWRITE_ALL;
             qfotOperatinThread->slotResume ();
             break;
         case FileOperationsConfirmationDialog::Cancel:
@@ -559,34 +559,34 @@ void FileOperationsDialog::slotOperationError ()
             qfotOperatinThread->slotResume ();
             break;
         case FileOperationsConfirmationDialog::SkipAll:
-            qfotOperatinThread->confirmation |= QFileOperationsThread::SKIP_ALL;
+            qfotOperatinThread->confirmation |= FileOperationsThread::SKIP_ALL;
             qfotOperatinThread->skipFile ();
             qfotOperatinThread->stop ();
             qfotOperatinThread->slotResume ();
             break;
         case FileOperationsConfirmationDialog::OvewriteAllOlder:
-            qfotOperatinThread->confirmation |= QFileOperationsThread::OVERWRITE_OLDER;
+            qfotOperatinThread->confirmation |= FileOperationsThread::OVERWRITE_OLDER;
             if (QFileInfo (params.at (0)).lastModified () <= QFileInfo (params.at (1)).lastModified ()) {
                 qfotOperatinThread->stop ();
             }
             qfotOperatinThread->slotResume ();
             break;
         case FileOperationsConfirmationDialog::OvewriteAllNew:
-            qfotOperatinThread->confirmation |= QFileOperationsThread::OVERWRITE_NEW;
+            qfotOperatinThread->confirmation |= FileOperationsThread::OVERWRITE_NEW;
             if (QFileInfo (params.at (0)).lastModified () >= QFileInfo (params.at (1)).lastModified ()) {
                 qfotOperatinThread->stop ();
             }
             qfotOperatinThread->slotResume ();
             break;
         case FileOperationsConfirmationDialog::OvewriteAllSmallest:
-            qfotOperatinThread->confirmation |= QFileOperationsThread::OVERWRITE_SMALLEST;
+            qfotOperatinThread->confirmation |= FileOperationsThread::OVERWRITE_SMALLEST;
             if (QFileInfo (params.at (0)).size () <= QFileInfo (params.at (1)).size ()) {
                 qfotOperatinThread->stop ();
             }
             qfotOperatinThread->slotResume ();
             break;
         case FileOperationsConfirmationDialog::OvewriteAllLager:
-            qfotOperatinThread->confirmation |= QFileOperationsThread::OVERWRITE_LAGER;
+            qfotOperatinThread->confirmation |= FileOperationsThread::OVERWRITE_LAGER;
             if (QFileInfo (params.at (0)).size () >= QFileInfo (params.at (1)).size ()) {
                 qfotOperatinThread->stop ();
             }
@@ -596,7 +596,7 @@ void FileOperationsDialog::slotOperationError ()
             qfotOperatinThread->slotResume ();
             break;
         case FileOperationsConfirmationDialog::All:
-            qfotOperatinThread->confirmation |= QFileOperationsThread::OVEWRITE_REMOVE_HIDDEN_SYSTEM;
+            qfotOperatinThread->confirmation |= FileOperationsThread::OVEWRITE_REMOVE_HIDDEN_SYSTEM;
             qfotOperatinThread->slotResume ();
             break;
         case FileOperationsConfirmationDialog::Retry:
