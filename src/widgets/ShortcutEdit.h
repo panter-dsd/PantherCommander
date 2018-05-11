@@ -2,14 +2,14 @@
 
 #include <QtWidgets/QLineEdit>
 
-class PCShortcutEdit : public QLineEdit
+class ShortcutEdit : public QLineEdit
 {
 Q_OBJECT
 
 public:
-    PCShortcutEdit (QWidget *parent = 0);
+    ShortcutEdit (QWidget *parent = 0);
 
-    virtual ~PCShortcutEdit ()
+    virtual ~ShortcutEdit ()
     {
     }
 

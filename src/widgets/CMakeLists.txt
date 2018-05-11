@@ -11,7 +11,7 @@ SET(SOURCE
     DriveBar.cpp
     FileWidget.cpp
     FlowLayout.cpp
-    PCShortcutEdit.cpp
+    ShortcutEdit.cpp
     TabBar.cpp
     )
 
@@ -20,7 +20,7 @@ SET(HEADERS
     FileWidget.h
     FileWidget_p.h
     FlowLayout.h
-    PCShortcutEdit.h
+    ShortcutEdit.h
     TabBar.h
     )
 

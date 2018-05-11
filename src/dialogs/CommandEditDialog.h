@@ -16,7 +16,7 @@ class QHBoxLayout;
 
 class QVBoxLayout;
 
-class PCShortcutEdit;
+class ShortcutEdit;
 
 class PCShortcutWidget;
 

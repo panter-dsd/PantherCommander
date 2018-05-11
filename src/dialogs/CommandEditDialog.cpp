@@ -9,7 +9,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QDialogButtonBox>
 
-#include "src/widgets/PCShortcutEdit.h"
+#include "src/widgets/ShortcutEdit.h"
 
 class PCShortcutWidget : public QWidget
 {
@@ -23,7 +23,7 @@ public:
     void clear ();
 
 private:
-    PCShortcutEdit *qcseEdit;
+    ShortcutEdit *qcseEdit;
     QToolButton *qtbDefault;
     QToolButton *qtbClear;
 };
@@ -31,7 +31,7 @@ private:
 PCShortcutWidget::PCShortcutWidget (QWidget *parent)
     : QWidget (parent)
 {
-    qcseEdit = new PCShortcutEdit (this);
+    qcseEdit = new ShortcutEdit (this);
 
     qtbDefault = new QToolButton (this);
 

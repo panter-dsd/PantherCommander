@@ -1,9 +1,9 @@
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>
 
-#include "PCShortcutEdit.h"
+#include "ShortcutEdit.h"
 
-PCShortcutEdit::PCShortcutEdit (QWidget *parent)
+ShortcutEdit::ShortcutEdit (QWidget *parent)
     : QLineEdit (parent)
 {
     m_keyNum = m_key[0] = m_key[1] = m_key[2] = m_key[3] = 0;
@@ -11,7 +11,7 @@ PCShortcutEdit::PCShortcutEdit (QWidget *parent)
              this, SLOT(textChange (QString)));
 }
 
-bool PCShortcutEdit::event (QEvent *e)
+bool ShortcutEdit::event (QEvent *e)
 {
     if (e->type () == QEvent::KeyPress) {
         QKeyEvent *k = static_cast<QKeyEvent *>(e);
@@ -27,7 +27,7 @@ bool PCShortcutEdit::event (QEvent *e)
     return QLineEdit::event (e);
 }
 
-void PCShortcutEdit::handleKeyEvent (QKeyEvent *e)
+void ShortcutEdit::handleKeyEvent (QKeyEvent *e)
 {
     int nextKey = e->key ();
     if (m_keyNum > 3 ||
@@ -61,7 +61,7 @@ void PCShortcutEdit::handleKeyEvent (QKeyEvent *e)
     e->accept ();
 }
 
-int PCShortcutEdit::translateModifiers (Qt::KeyboardModifiers state,
+int ShortcutEdit::translateModifiers (Qt::KeyboardModifiers state,
                                         const QString &text)
 {
     int result = 0;
@@ -85,7 +85,7 @@ int PCShortcutEdit::translateModifiers (Qt::KeyboardModifiers state,
     return result;
 }
 
-void PCShortcutEdit::setShortcut (const QKeySequence &ks)
+void ShortcutEdit::setShortcut (const QKeySequence &ks)
 {
     m_keyNum = ks.count ();
     for (int i = 0; i < m_keyNum; ++i) {
@@ -94,12 +94,12 @@ void PCShortcutEdit::setShortcut (const QKeySequence &ks)
     this->setText (ks.toString ());
 }
 
-QKeySequence PCShortcutEdit::shortcut ()
+QKeySequence ShortcutEdit::shortcut ()
 {
     return QKeySequence::fromString (text ());
 }
 
-void PCShortcutEdit::textChange (const QString &text)
+void ShortcutEdit::textChange (const QString &text)
 {
     if (text.isEmpty ()) {
         m_keyNum = m_key[0] = m_key[1] = m_key[2] = m_key[3] = 0;
