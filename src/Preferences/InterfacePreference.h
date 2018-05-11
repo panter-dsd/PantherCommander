@@ -8,7 +8,7 @@ class QCheckBox;
 class QGroupBox;
 
 //
-class QInterfacePreference : public AbstractPreferencesPage
+class InterfacePreference : public AbstractPreferencesPage
 {
 Q_OBJECT
 
@@ -36,9 +36,9 @@ private:
     QCheckBox *qchbFlatDriveButtons;
     QCheckBox *qchbFlatFunctionButtons;
 public:
-    QInterfacePreference (QWidget *parent = 0);
+    InterfacePreference (QWidget *parent = 0);
 
-    ~QInterfacePreference ();
+    ~InterfacePreference ();
 
     void saveSettings ();
 

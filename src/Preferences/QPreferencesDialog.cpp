@@ -9,7 +9,7 @@
 
 #include "AbstractPreferencesPage.h"
 #include "QPreferenceGlobal.h"
-#include "QInterfacePreference.h"
+#include "InterfacePreference.h"
 #include "CommandsPreference.h"
 #include "src/AppSettings.h"
 
@@ -35,7 +35,7 @@ void QPreferencesDialog::createControls ()
     qlwPreferencesList = new QListWidget (this);
     QStringList qslPreferenceItems;
     qslPreferenceItems << QPreferenceGlobal::preferenceGroup ()
-                       << QInterfacePreference::preferenceGroup ()
+                       << InterfacePreference::preferenceGroup ()
                        << CommandsPreference::preferenceGroup ();
     qlwPreferencesList->addItems (qslPreferenceItems);
     qlwPreferencesList->setCurrentRow (0);
@@ -51,7 +51,7 @@ void QPreferencesDialog::createControls ()
 
     area = new QScrollArea (this);
     area->setWidgetResizable (true);
-    area->setWidget (new QInterfacePreference (qswPreferencesWidgets));
+    area->setWidget (new InterfacePreference (qswPreferencesWidgets));
     qswPreferencesWidgets->addWidget (area);
 
     area = new QScrollArea (this);

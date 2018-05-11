@@ -1,4 +1,4 @@
-#include "QInterfacePreference.h"
+#include "InterfacePreference.h"
 
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QCheckBox>
@@ -6,7 +6,7 @@
 
 #include "src/AppSettings.h"
 
-QInterfacePreference::QInterfacePreference (QWidget *parent)
+InterfacePreference::InterfacePreference (QWidget *parent)
     : AbstractPreferencesPage (parent)
 {
     createControls ();
@@ -16,13 +16,13 @@ QInterfacePreference::QInterfacePreference (QWidget *parent)
 }
 
 //
-QInterfacePreference::~QInterfacePreference ()
+InterfacePreference::~InterfacePreference ()
 {
 
 }
 
 //
-void QInterfacePreference::saveSettings ()
+void InterfacePreference::saveSettings ()
 {
     QSettings *settings = AppSettings::instance ();
     settings->setValue ("Interface/ShowDriveBar", qchbShowDriveBar->isChecked ());
@@ -49,7 +49,7 @@ void QInterfacePreference::saveSettings ()
 }
 
 //
-void QInterfacePreference::loadSettings ()
+void InterfacePreference::loadSettings ()
 {
     QSettings *settings = AppSettings::instance ();
     qchbShowDriveBar->setChecked (settings->value ("Interface/ShowDriveBar", true).toBool ());
@@ -74,12 +74,12 @@ void QInterfacePreference::loadSettings ()
 }
 
 //
-void QInterfacePreference::setDefaults ()
+void InterfacePreference::setDefaults ()
 {
 }
 
 //
-void QInterfacePreference::createControls ()
+void InterfacePreference::createControls ()
 {
     qgbGlobal = new QGroupBox (tr ("Global"), this);
     qchbShowDriveBar = new QCheckBox (tr ("Show drive bars"), this);
@@ -108,7 +108,7 @@ void QInterfacePreference::createControls ()
 }
 
 //
-void QInterfacePreference::setLayouts ()
+void InterfacePreference::setLayouts ()
 {
     QVBoxLayout *qvblGlobalLayout = new QVBoxLayout ();
     qvblGlobalLayout->addWidget (qchbShowDriveBar);
@@ -144,7 +144,7 @@ void QInterfacePreference::setLayouts ()
 }
 
 //
-void QInterfacePreference::setConnects ()
+void InterfacePreference::setConnects ()
 {
     connect (qchbShowDriveBar, SIGNAL(toggled (bool)), qchbShowTwoDriveBar, SLOT(setEnabled (bool)));
 
