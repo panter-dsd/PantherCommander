@@ -32,7 +32,7 @@ class PantherViewer;
 
 class PCToolBar;
 
-class SToolBarButton;
+class ToolBarButton;
 
 #include "QFileOperationsThread.h"
 
@@ -129,7 +129,7 @@ private Q_SLOTS:
 
     void slotPreferences ();
 
-    void toolBarActionExecute (const SToolBarButton &actionButton);
+    void toolBarActionExecute (const ToolBarButton &actionButton);
 
     void cdExecute (const QString &path);
 

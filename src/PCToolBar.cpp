@@ -26,7 +26,7 @@ void PCToolBar::restore ()
     settings->beginGroup ("ToolBar_" + qsName);
     int buttonsCount = settings->value ("ButtonsCount", 0).toInt ();
     for (int i = 0; i < buttonsCount; i++) {
-        SToolBarButton button;
+        ToolBarButton button;
         button.qsCommand = settings->value ("Command_" + QString::number (i), "").toString ();
         button.qsParams = settings->value ("Params_" + QString::number (i), "").toString ();
         button.qsWorkDir = settings->value ("WorkDir_" + QString::number (i), "").toString ();
@@ -49,7 +49,7 @@ void PCToolBar::save ()
     settings->setValue ("ButtonsCount", qlButtons.count ());
 
     int i = 0;
-        foreach(const SToolBarButton &button, qlButtons) {
+        foreach(const ToolBarButton &button, qlButtons) {
             settings->setValue ("Command_" + QString::number (i), button.qsCommand);
             settings->setValue ("Params_" + QString::number (i), button.qsParams);
             settings->setValue ("WorkDir_" + QString::number (i), button.qsWorkDir);
@@ -72,7 +72,7 @@ void PCToolBar::refreshActions ()
 
     QAction *action;
     int i = 0;
-        foreach(SToolBarButton button, qlButtons) {
+        foreach(ToolBarButton button, qlButtons) {
             if (!button.qsCommand.isEmpty ()) {
                 action = new QAction (button.qiIcon, button.qsCaption, this);
                 connect (action, SIGNAL(triggered ()),
@@ -94,7 +94,7 @@ void PCToolBar::contextMenuEvent (QContextMenuEvent *event)
     QAction *menuAction;
 
     if (action) {
-        SToolBarButton button = qlButtons.at (action->data ().toInt ());
+        ToolBarButton button = qlButtons.at (action->data ().toInt ());
         if (!button.qsCommand.isEmpty ()) {
             menuAction = new QAction (tr ("&Execute ") + button.qsCaption, qmToolBarMenu);
             connect (menuAction, SIGNAL(triggered ()),
@@ -137,7 +137,7 @@ void PCToolBar::slotToolButtonPress ()
         return;
     }
 
-    SToolBarButton button = qlButtons.at (action->data ().toInt ());
+    ToolBarButton button = qlButtons.at (action->data ().toInt ());
     emit toolBarActionExecuted (button);
 }
 
@@ -157,11 +157,11 @@ void PCToolBar::slotToolButtonChange ()
 
     int index = action->data ().toInt ();
 
-    SToolBarButton button = qlButtons.at (index);
+    ToolBarButton button = qlButtons.at (index);
 
     QDialog *toolButtonChangeDialog = new QDialog (this);
 
-    QToolButtonPreference *qtbpToolButtonPreference = new QToolButtonPreference (toolButtonChangeDialog);
+    ToolButtonPreference *qtbpToolButtonPreference = new ToolButtonPreference (toolButtonChangeDialog);
     qtbpToolButtonPreference->setButton (button);
 
     QDialogButtonBox *qdbbButtonBox = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
@@ -205,7 +205,7 @@ void PCToolBar::slotToolButtonCD ()
         return;
     }
 
-    SToolBarButton button = qlButtons.at (action->data ().toInt ());
+    ToolBarButton button = qlButtons.at (action->data ().toInt ());
     emit cdExecuted (button.qsWorkDir);
 }
 
@@ -213,7 +213,7 @@ void PCToolBar::dropEvent (QDropEvent *event)
 {
     QAction *action = this->actionAt (event->pos ());
     if (action && !(event->keyboardModifiers () & Qt::ShiftModifier)) {
-        SToolBarButton button = qlButtons.at (action->data ().toInt ());
+        ToolBarButton button = qlButtons.at (action->data ().toInt ());
         if (!button.qsCommand.isEmpty ()) {
             QStringList qslParams;
                 foreach(QUrl url, event->mimeData ()->urls ()) {
@@ -224,7 +224,7 @@ void PCToolBar::dropEvent (QDropEvent *event)
         } else {//If separator then insert
             int index = action->data ().toInt () + 1;
                 foreach(QUrl url, event->mimeData ()->urls ()) {
-                    SToolBarButton button = QToolButtonPreference::getButton (url.toLocalFile ());
+                    ToolBarButton button = ToolButtonPreference::getButton (url.toLocalFile ());
                     qlButtons.insert (index++, button);
                 }
             refreshActions ();
@@ -232,13 +232,13 @@ void PCToolBar::dropEvent (QDropEvent *event)
     } else if (action) {
         int index = action->data ().toInt ();
             foreach(QUrl url, event->mimeData ()->urls ()) {
-                SToolBarButton button = QToolButtonPreference::getButton (url.toLocalFile ());
+                ToolBarButton button = ToolButtonPreference::getButton (url.toLocalFile ());
                 qlButtons.insert (++index, button);
             }
         refreshActions ();
     } else {
             foreach(QUrl url, event->mimeData ()->urls ()) {
-                SToolBarButton button = QToolButtonPreference::getButton (url.toLocalFile ());
+                ToolBarButton button = ToolButtonPreference::getButton (url.toLocalFile ());
                 qlButtons << button;
             }
         refreshActions ();
@@ -261,6 +261,6 @@ void PCToolBar::dragEnterEvent (QDragEnterEvent *event)
 
 void PCToolBar::slotAddSeparator ()
 {
-    qlButtons << SToolBarButton ();
+    qlButtons << ToolBarButton ();
     refreshActions ();
 }

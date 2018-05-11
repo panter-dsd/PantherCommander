@@ -8,7 +8,7 @@
 #include <QtWidgets/QFileIconProvider>
 #include <QtGui/QBitmap>
 
-#include "QToolButtonPreference.h"
+#include "ToolButtonPreference.h"
 #include "src/AppSettings.h"
 #include "CommandsDialog.h"
 
@@ -17,7 +17,7 @@
 #  include <private/qpixmapdata_p.h>
 #endif
 
-QToolButtonPreference::QToolButtonPreference (QWidget *parent)
+ToolButtonPreference::ToolButtonPreference (QWidget *parent)
     : QWidget (parent)
 {
     createControls ();
@@ -25,7 +25,7 @@ QToolButtonPreference::QToolButtonPreference (QWidget *parent)
     setConnects ();
 }
 
-void QToolButtonPreference::createControls ()
+void ToolButtonPreference::createControls ()
 {
     qlCommand = new QLabel (tr ("Command"), this);
     qleCommand = new QLineEdit (this);
@@ -63,7 +63,7 @@ void QToolButtonPreference::createControls ()
     qleCaption = new QLineEdit (this);
 }
 
-void QToolButtonPreference::setLayouts ()
+void ToolButtonPreference::setLayouts ()
 {
     QGridLayout *qglMainLayout = new QGridLayout ();
 
@@ -96,7 +96,7 @@ void QToolButtonPreference::setLayouts ()
     this->setLayout (qglMainLayout);
 }
 
-void QToolButtonPreference::setConnects ()
+void ToolButtonPreference::setConnects ()
 {
     connect (qtbPCCommand, SIGNAL(clicked ()),
              this, SLOT(slotChoosePCCommand ()));
@@ -110,7 +110,7 @@ void QToolButtonPreference::setConnects ()
              this, SLOT(slotGetIconList (QString)));
 }
 
-void QToolButtonPreference::slotChooseCommandFile ()
+void ToolButtonPreference::slotChooseCommandFile ()
 {
     QString command;
     QFileDialog::Options options;
@@ -132,7 +132,7 @@ void QToolButtonPreference::slotChooseCommandFile ()
     }
 }
 
-void QToolButtonPreference::slotChoosePCCommand ()
+void ToolButtonPreference::slotChoosePCCommand ()
 {
     CommandsDialog *dialog = new CommandsDialog (this);
     if (dialog->exec ()) {
@@ -141,7 +141,7 @@ void QToolButtonPreference::slotChoosePCCommand ()
     delete dialog;
 }
 
-void QToolButtonPreference::slotChooseWorkDir ()
+void ToolButtonPreference::slotChooseWorkDir ()
 {
     QString dir;
     QFileDialog::Options options;
@@ -158,7 +158,7 @@ void QToolButtonPreference::slotChooseWorkDir ()
     }
 }
 
-void QToolButtonPreference::slotChooseIconFile ()
+void ToolButtonPreference::slotChooseIconFile ()
 {
     QString iconFileName;
     QStringList qslFilter;
@@ -178,7 +178,7 @@ void QToolButtonPreference::slotChooseIconFile ()
     }
 }
 
-QIcon QToolButtonPreference::getIcon (const QString &fileName, int number)
+QIcon ToolButtonPreference::getIcon (const QString &fileName, int number)
 {
 #ifdef Q_WS_WIN
     QIcon icon;
@@ -207,7 +207,7 @@ QIcon QToolButtonPreference::getIcon (const QString &fileName, int number)
 #endif
 }
 
-void QToolButtonPreference::slotGetIconList (const QString &iconFileName)
+void ToolButtonPreference::slotGetIconList (const QString &iconFileName)
 {
 #ifdef Q_WS_WIN
     qlwIcons->clear();
@@ -236,7 +236,7 @@ void QToolButtonPreference::slotGetIconList (const QString &iconFileName)
 #endif
 }
 
-void QToolButtonPreference::setButton (const SToolBarButton &button)
+void ToolButtonPreference::setButton (const ToolBarButton &button)
 {
     stbbButton = button;
     qleCommand->setText (button.qsCommand);
@@ -247,10 +247,10 @@ void QToolButtonPreference::setButton (const SToolBarButton &button)
     qlwIcons->setCurrentItem (qlwIcons->item (button.iconNumber));
 }
 
-SToolBarButton QToolButtonPreference::getButton ()
+ToolBarButton ToolButtonPreference::getButton ()
 {
     if (qleCommand->text ().isEmpty ()) {
-        return SToolBarButton ();
+        return ToolBarButton ();
     }
     stbbButton.qsCommand = qleCommand->text ();
     stbbButton.qsParams = qleParams->text ();
@@ -264,9 +264,9 @@ SToolBarButton QToolButtonPreference::getButton ()
     return stbbButton;
 }
 
-SToolBarButton QToolButtonPreference::getButton (const QString &command)
+ToolBarButton ToolButtonPreference::getButton (const QString &command)
 {
-    SToolBarButton button;
+    ToolBarButton button;
     if (command.isEmpty ()) {
         return button;
     }

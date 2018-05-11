@@ -1087,7 +1087,7 @@ void MainWindow::dragEnterEvent (QDragEnterEvent *event)
 }
 
 //
-void MainWindow::toolBarActionExecute (const SToolBarButton &actionButton)
+void MainWindow::toolBarActionExecute (const ToolBarButton &actionButton)
 {
 #ifndef Q_CC_MSVC
 #warning "TODO: parse params"

@@ -13,7 +13,7 @@ class QAction;
 #include <QtWidgets/QWidget>
 #include <QtGui/QIcon>
 
-struct SToolBarButton
+struct ToolBarButton
 {
     QString qsCommand;
     QString qsParams;
@@ -24,7 +24,7 @@ struct SToolBarButton
     QString qsCaption;
 };
 
-class QToolButtonPreference : public QWidget
+class ToolButtonPreference : public QWidget
 {
 Q_OBJECT
 private:
@@ -50,16 +50,16 @@ private:
     QLabel *qlCaption;
     QLineEdit *qleCaption;
 
-    SToolBarButton stbbButton;
+    ToolBarButton stbbButton;
 
 public:
-    QToolButtonPreference (QWidget *parent = 0);
+    ToolButtonPreference (QWidget *parent = 0);
 
-    void setButton (const SToolBarButton &button);
+    void setButton (const ToolBarButton &button);
 
-    SToolBarButton getButton ();
+    ToolBarButton getButton ();
 
-    static SToolBarButton getButton (const QString &command);
+    static ToolBarButton getButton (const QString &command);
 
 private:
     void createControls ();

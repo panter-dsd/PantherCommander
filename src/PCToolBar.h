@@ -1,13 +1,13 @@
 #pragma once
 
 #include <QtWidgets/QToolBar>
-#include "Preferences/QToolButtonPreference.h"
+#include "src/Preferences/ToolButtonPreference.h"
 
 class PCToolBar : public QToolBar
 {
 Q_OBJECT
 private:
-    QList<SToolBarButton> qlButtons;
+    QList<ToolBarButton> qlButtons;
     QString qsName;
 public:
     PCToolBar (const QString &name, QWidget *parent = 0);
@@ -55,7 +55,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-    void toolBarActionExecuted (const SToolBarButton &action);
+    void toolBarActionExecuted (const ToolBarButton &action);
 
     void cdExecuted (const QString &path);
 

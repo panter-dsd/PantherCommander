@@ -18,7 +18,7 @@ SET(SOURCE
     InterfacePreference.cpp
     GlobalPreferencePage.cpp
     PreferencesDialog.cpp
-    QToolButtonPreference.cpp
+    ToolButtonPreference.cpp
     )
 
 SET(HEADERS
@@ -28,7 +28,7 @@ SET(HEADERS
     InterfacePreference.h
     GlobalPreferencePage.h
     PreferencesDialog.h
-    QToolButtonPreference.h
+    ToolButtonPreference.h
     )
 
 
