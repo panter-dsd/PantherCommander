@@ -9,7 +9,7 @@
 #include <QtWidgets/QHeaderView>
 
 #include "CommandsPreference.h"
-#include "src/PCCommands.h"
+#include "src/Commands.h"
 #include "src/dialogs/CommandEditDialog.h"
 
 const QString allCategoryName = QObject::tr ("All");
@@ -78,11 +78,11 @@ void CommandsPreference::saveSettings ()
 {
         foreach(QAction *newAction, editingActions.values ()) {
             const QString name = newAction->objectName ();
-            QAction *action = PCCommands::instance ()->action (name);
+            QAction *action = Commands::instance ()->action (name);
             action->setText (newAction->text ());
             action->setToolTip (newAction->toolTip ());
             action->setShortcuts (newAction->shortcuts ());
-            PCCommands::instance ()->saveAction (name);
+            Commands::instance ()->saveAction (name);
         }
 }
 
@@ -98,7 +98,7 @@ void CommandsPreference::setDefaults ()
 
 void CommandsPreference::loadCategories ()
 {
-    qlwCategoryList->addItems (PCCommands::instance ()->categories ());
+    qlwCategoryList->addItems (Commands::instance ()->categories ());
     qlwCategoryList->insertItem (0, allCategoryName);
     setMaximumSizeCategoriesList ();
 }
@@ -120,7 +120,7 @@ void CommandsPreference::loadActions (const QString &category)
     QTableWidgetItem *item;
 
     qtwActionsTable->setRowCount (0);
-    QList<QAction *> l = PCCommands::instance ()->actions (qsCategory);
+    QList<QAction *> l = Commands::instance ()->actions (qsCategory);
     qtwActionsTable->setRowCount (l.count ());
 
     int i = 0;
@@ -176,7 +176,7 @@ void CommandsPreference::editCommand ()
     CommandEditDialog *dialog = new CommandEditDialog (this);
 
     QString actionName = qtwActionsTable->item (qtwActionsTable->currentRow (), COMMAND)->text ();
-    QAction *action = PCCommands::instance ()->action (actionName);
+    QAction *action = Commands::instance ()->action (actionName);
     if (editingActions.contains (action->objectName ())) {
         action = editingActions.value (action->objectName ());
     }
@@ -205,7 +205,7 @@ QAction *CommandsPreference::getCurrentAction ()
 {
     QTableWidgetItem *item;
     item = qtwActionsTable->item (qtwActionsTable->currentRow (), COMMAND);
-    return item ? PCCommands::instance ()->action (item->text ()) : 0;
+    return item ? Commands::instance ()->action (item->text ()) : 0;
 }
 
 QString CommandsPreference::getCurrentActionName ()

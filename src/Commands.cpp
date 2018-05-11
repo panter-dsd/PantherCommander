@@ -1,48 +1,48 @@
 #include <QtCore/QCoreApplication>
 #include <QtWidgets/QAction>
 
-#include "PCCommands.h"
+#include "Commands.h"
 #include "AppSettings.h"
 
-PCCommands *PCCommands::pInstance = 0;
+Commands *Commands::pInstance = 0;
 
-PCCommands *PCCommands::instance ()
+Commands *Commands::instance ()
 {
-    if (!PCCommands::pInstance) {
-        PCCommands::pInstance = new PCCommands ();
+    if (!Commands::pInstance) {
+        Commands::pInstance = new Commands ();
     }
-    return PCCommands::pInstance;
+    return Commands::pInstance;
 }
 
-PCCommands::PCCommands (QObject *parent)
+Commands::Commands (QObject *parent)
     : QObject (parent)
 {
 }
 
-PCCommands::~PCCommands ()
+Commands::~Commands ()
 {
     if (pInstance == this) {
         pInstance = 0;
     }
 }
 
-void PCCommands::addAction (const QString &category, QAction *action)
+void Commands::addAction (const QString &category, QAction *action)
 {
     actionHash.insert (category, action);
     loadShortcuts (action);
 }
 
-QStringList PCCommands::categories ()
+QStringList Commands::categories ()
 {
     return actionHash.uniqueKeys ();
 }
 
-QList<QAction *> PCCommands::actions (const QString &categoty)
+QList<QAction *> Commands::actions (const QString &categoty)
 {
     return categoty.isEmpty () ? actionHash.values () : actionHash.values (categoty);
 }
 
-QAction *PCCommands::action (const QString &actionName)
+QAction *Commands::action (const QString &actionName)
 {
         foreach(QAction *action, actionHash.values ()) {
             if (action->objectName () == actionName) {
@@ -52,7 +52,7 @@ QAction *PCCommands::action (const QString &actionName)
     return 0;
 }
 
-void PCCommands::loadShortcuts (QAction *action)
+void Commands::loadShortcuts (QAction *action)
 {
     QSettings *settings = AppSettings::instance ();
     settings->beginGroup ("Actions");
@@ -73,7 +73,7 @@ void PCCommands::loadShortcuts (QAction *action)
     }
 }
 
-void PCCommands::saveAction (const QString &actionName)
+void Commands::saveAction (const QString &actionName)
 {
     QAction *savedAction = action (actionName);
     QStringList qslShortcuts;

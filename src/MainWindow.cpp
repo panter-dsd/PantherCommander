@@ -34,7 +34,7 @@
 #include "src/Preferences/PreferencesDialog.h"
 #include "src/dialogs/CopyMoveDialog.h"
 #include "PCToolBar.h"
-#include "PCCommands.h"
+#include "Commands.h"
 
 MainWindow::MainWindow (QWidget *parent)
     : QMainWindow (parent)
@@ -165,7 +165,7 @@ void MainWindow::createActions ()
     connect (actionCpCurFileName2Cmd_, SIGNAL(triggered (bool)),
              this, SLOT(slotCpCurFileName2Cmd ()));
     addAction (actionCpCurFileName2Cmd_);
-    PCCommands::instance ()->addAction (tr ("Command line"), actionCpCurFileName2Cmd_);
+    Commands::instance ()->addAction (tr ("Command line"), actionCpCurFileName2Cmd_);
 
     actionCpCurFileNameWhithPath2Cmd_ = new QAction (this);
     actionCpCurFileNameWhithPath2Cmd_->setObjectName ("actionCpCurFileNameWhithPath2Cmd_");
@@ -174,7 +174,7 @@ void MainWindow::createActions ()
     connect (actionCpCurFileNameWhithPath2Cmd_, SIGNAL(triggered (bool)),
              this, SLOT(slotCpCurFileNameWhithPath2Cmd ()));
     addAction (actionCpCurFileNameWhithPath2Cmd_);
-    PCCommands::instance ()->addAction (tr ("Command line"), actionCpCurFileNameWhithPath2Cmd_);
+    Commands::instance ()->addAction (tr ("Command line"), actionCpCurFileNameWhithPath2Cmd_);
 
     actionClearCmd_ = new QAction (this);
     actionClearCmd_->setObjectName ("actionClearCmd_");
@@ -183,7 +183,7 @@ void MainWindow::createActions ()
     connect (actionClearCmd_, SIGNAL(triggered (bool)),
              consoleCommandComboBox_->lineEdit (), SLOT(clear ()));
     addAction (actionClearCmd_);
-    PCCommands::instance ()->addAction (tr ("Command line"), actionClearCmd_);
+    Commands::instance ()->addAction (tr ("Command line"), actionClearCmd_);
 
     actionRunConsole_ = new QAction (this);
     actionRunConsole_->setObjectName ("actionRunConsole_");
@@ -192,7 +192,7 @@ void MainWindow::createActions ()
     connect (actionRunConsole_, SIGNAL(triggered (bool)),
              this, SLOT(slotRunConsole ()));
     addAction (actionRunConsole_);
-    PCCommands::instance ()->addAction (tr ("Misc"), actionRunConsole_);
+    Commands::instance ()->addAction (tr ("Misc"), actionRunConsole_);
 
     actionView_ = new QAction (this);
     actionView_->setObjectName ("actionView_");
@@ -201,7 +201,7 @@ void MainWindow::createActions ()
     connect (actionView_, SIGNAL(triggered (bool)),
              this, SLOT(slotView ()));
     addAction (actionView_);
-    PCCommands::instance ()->addAction (tr ("File operations"), actionView_);
+    Commands::instance ()->addAction (tr ("File operations"), actionView_);
 
     actionEdit_ = new QAction (this);
     actionEdit_->setObjectName ("actionEdit_");
@@ -210,7 +210,7 @@ void MainWindow::createActions ()
 //	connect(actionEdit_, SIGNAL(triggered(bool)),
 //			this, SLOT(slotView()));
     addAction (actionEdit_);
-    PCCommands::instance ()->addAction (tr ("File operations"), actionEdit_);
+    Commands::instance ()->addAction (tr ("File operations"), actionEdit_);
 
     actionCopy_ = new QAction (this);
     actionCopy_->setObjectName ("actionCopy_");
@@ -219,7 +219,7 @@ void MainWindow::createActions ()
     connect (actionCopy_, SIGNAL(triggered (bool)),
              this, SLOT(slotCopy ()));
     addAction (actionCopy_);
-    PCCommands::instance ()->addAction (tr ("File operations"), actionCopy_);
+    Commands::instance ()->addAction (tr ("File operations"), actionCopy_);
 
     actionMove_ = new QAction (this);
     actionMove_->setObjectName ("actionMove_");
@@ -228,7 +228,7 @@ void MainWindow::createActions ()
     connect (actionMove_, SIGNAL(triggered (bool)),
              this, SLOT(slotMove ()));
     addAction (actionMove_);
-    PCCommands::instance ()->addAction (tr ("File operations"), actionMove_);
+    Commands::instance ()->addAction (tr ("File operations"), actionMove_);
 
     actionRename_ = new QAction (this);
     actionRename_->setObjectName ("actionRename_");
@@ -237,7 +237,7 @@ void MainWindow::createActions ()
     connect (actionRename_, SIGNAL(triggered (bool)),
              this, SLOT(slotRename ()));
     addAction (actionRename_);
-    PCCommands::instance ()->addAction (tr ("File operations"), actionRename_);
+    Commands::instance ()->addAction (tr ("File operations"), actionRename_);
 
     actionMkDir_ = new QAction (this);
     actionMkDir_->setObjectName ("actionMkDir_");
@@ -246,7 +246,7 @@ void MainWindow::createActions ()
     connect (actionMkDir_, SIGNAL(triggered (bool)),
              this, SLOT(slotMkDir ()));
     addAction (actionMkDir_);
-    PCCommands::instance ()->addAction (tr ("File operations"), actionMkDir_);
+    Commands::instance ()->addAction (tr ("File operations"), actionMkDir_);
 
     actionRemove_ = new QAction (this);
     actionRemove_->setObjectName ("actionRemove_");
@@ -255,7 +255,7 @@ void MainWindow::createActions ()
     connect (actionRemove_, SIGNAL(triggered (bool)),
              this, SLOT(slotRemove ()));
     addAction (actionRemove_);
-    PCCommands::instance ()->addAction (tr ("File operations"), actionRemove_);
+    Commands::instance ()->addAction (tr ("File operations"), actionRemove_);
 
     actionExit_ = new QAction (this);
     actionExit_->setObjectName ("actionExit_");
@@ -264,7 +264,7 @@ void MainWindow::createActions ()
     connect (actionExit_, SIGNAL(triggered (bool)),
              qApp, SLOT(quit ()));
     addAction (actionExit_);
-    PCCommands::instance ()->addAction (tr ("Window"), actionExit_);
+    Commands::instance ()->addAction (tr ("Window"), actionExit_);
 
     actionFindFiles_ = new QAction (this);
     actionFindFiles_->setObjectName ("actionFindFiles_");
@@ -273,7 +273,7 @@ void MainWindow::createActions ()
     connect (actionFindFiles_, SIGNAL(triggered (bool)),
              this, SLOT(slotFindFiles ()));
     addAction (actionFindFiles_);
-    PCCommands::instance ()->addAction (tr ("Tools"), actionFindFiles_);
+    Commands::instance ()->addAction (tr ("Tools"), actionFindFiles_);
 
     actionPreferences_ = new QAction (this);
     actionPreferences_->setObjectName ("actionPreferences_");
@@ -282,7 +282,7 @@ void MainWindow::createActions ()
     connect (actionPreferences_, SIGNAL(triggered (bool)),
              this, SLOT(slotPreferences ()));
     addAction (actionPreferences_);
-    PCCommands::instance ()->addAction (tr ("Preferences"), actionPreferences_);
+    Commands::instance ()->addAction (tr ("Preferences"), actionPreferences_);
 }
 
 //
@@ -1094,7 +1094,7 @@ void MainWindow::toolBarActionExecute (const ToolBarButton &actionButton)
 #endif
     QFileInfo fi (actionButton.qsCommand);
     if (!fi.exists ()) {
-        QAction *action = PCCommands::instance ()->action (actionButton.qsCommand);
+        QAction *action = Commands::instance ()->action (actionButton.qsCommand);
         if (action) {
             action->trigger ();
         }

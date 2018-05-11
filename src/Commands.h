@@ -6,15 +6,15 @@ class QAction;
 #include <QtCore/QMultiHash>
 #include <QtCore/QList>
 
-class PCCommands : public QObject
+class Commands : public QObject
 {
 Q_OBJECT
 private:
     QMultiHash<QString, QAction *> actionHash;
 public:
-    static PCCommands *instance ();
+    static Commands *instance ();
 
-    virtual ~PCCommands ();
+    virtual ~Commands ();
 
     void addAction (const QString &category, QAction *action);
 
@@ -27,10 +27,10 @@ public:
     void saveAction (const QString &actionName);
 
 protected:
-    explicit PCCommands (QObject *parent = 0);
+    explicit Commands (QObject *parent = 0);
 
 private:
-    static PCCommands *pInstance;
+    static Commands *pInstance;
 
     void loadShortcuts (QAction *action);
 };
