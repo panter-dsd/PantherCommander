@@ -51,7 +51,7 @@ void FileWidgetPrivate::createWidgets ()
 {
     Q_Q(FileWidget);
 
-    model = new QFileListModel (q);
+    model = new FileListModel (q);
     model->setObjectName (QLatin1String ("_filesystem_model"));
     QDir::Filters filters = QDir::AllDirs | QDir::Files | QDir::Drives;
     filters |= QDir::Readable | QDir::Writable | QDir::Executable;

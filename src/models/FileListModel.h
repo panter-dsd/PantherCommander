@@ -6,9 +6,9 @@
 
 class QFileIconProvider;
 
-class QFileListModelPrivate;
+class FileListModelPrivate;
 
-class QFileListModel : public QAbstractItemModel
+class FileListModel : public QAbstractItemModel
 {
 Q_OBJECT
 
@@ -35,9 +35,9 @@ public:
         FilePermissions = Qt::UserRole + 3
     };
 
-    explicit QFileListModel (QObject *parent = 0);
+    explicit FileListModel (QObject *parent = 0);
 
-    virtual ~QFileListModel ();
+    virtual ~FileListModel ();
 
     QDir::Filters filter () const;
 
@@ -122,11 +122,11 @@ Q_SIGNALS:
     void rootPathChanged (const QString &path);
 
 private:
-    Q_DISABLE_COPY(QFileListModel)
+    Q_DISABLE_COPY(FileListModel)
 
-    Q_DECLARE_PRIVATE(QFileListModel)
+    Q_DECLARE_PRIVATE(FileListModel)
 
-    QFileListModelPrivate *const d_ptr;
+    FileListModelPrivate *const d_ptr;
     Q_PRIVATE_SLOT(d_func (), void _q_directoryChanged ())
     Q_PRIVATE_SLOT(d_func (), void _q_finishedLoadIcons ())
 };

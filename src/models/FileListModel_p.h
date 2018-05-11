@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QFileListModel.h"
+#include "FileListModel.h"
 
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
@@ -13,7 +13,7 @@
 #include <QtGui/QIcon>
 #include <QtWidgets/QFileIconProvider>
 
-class QPCFileInfo
+class FileInfo
 {
 public:
     enum Type
@@ -21,18 +21,18 @@ public:
         Dir, File, System
     };
 
-    QPCFileInfo ()
+    FileInfo ()
         : m_permissions (0)
     {
     }
 
-    QPCFileInfo (const QFileInfo &fileInfo)
+    FileInfo (const QFileInfo &fileInfo)
         : m_fileInfo (fileInfo)
         , m_permissions (0)
     {
     }
 
-    bool operator== (const QPCFileInfo &fileInfo) const
+    bool operator== (const FileInfo &fileInfo) const
     {
         return m_fileInfo == fileInfo.m_fileInfo && m_permissions == fileInfo.m_permissions;
     }
@@ -113,19 +113,19 @@ public:
     Type type () const
     {
         if (m_fileInfo.isDir ()) {
-            return QPCFileInfo::Dir;
+            return FileInfo::Dir;
         }
         if (m_fileInfo.isFile ()) {
-            return QPCFileInfo::File;
+            return FileInfo::File;
         }
 /*#ifdef Q_WS_WIN
 		//TODO: implement
 #else
 		//!isDir() && !isFile() can be omitted since they are checked above
 		if(m_fileInfo.exists() && !m_fileInfo.isSymLink())
-			return QPCFileInfo::System;
+			return FileInfo::System;
 #endif*/
-        return QPCFileInfo::System;
+        return FileInfo::System;
     }
 
     inline QString fileName () const
@@ -213,18 +213,18 @@ private:
     QIcon m_icon;
 };
 
-class QFileListModelPrivate
+class FileListModelPrivate
 {
-    Q_DECLARE_PUBLIC(QFileListModel)
+    Q_DECLARE_PUBLIC(FileListModel)
 
 public:
-    QFileListModelPrivate ();
+    FileListModelPrivate ();
 
-    ~QFileListModelPrivate ();
+    ~FileListModelPrivate ();
 
-    QPCFileInfo *node (const QModelIndex &index) const;
+    FileInfo *node (const QModelIndex &index) const;
 
-    QModelIndex index (const QPCFileInfo *node) const;
+    QModelIndex index (const FileInfo *node) const;
 
     QModelIndex index (const QString &fileName, int column) const;
 
@@ -240,7 +240,7 @@ public:
 
     inline bool indexValid (const QModelIndex &index) const
     {
-        Q_Q(const QFileListModel);
+        Q_Q(const FileListModel);
         return (index.isValid () && index.model () == q
                 && index.row () < q->rowCount (index.parent ())
                 && index.column () < q->columnCount (index.parent ()));
@@ -248,11 +248,11 @@ public:
 
     static QString size (qint64 bytes);
 
-    QFileListModel *q_ptr;
+    FileListModel *q_ptr;
 
     QDir rootDir;
-    QPCFileInfo root;
-    QList<QPCFileInfo *> nodes;
+    FileInfo root;
+    QList<FileInfo *> nodes;
 
     int sortColumn;
     Qt::SortOrder sortOrder;

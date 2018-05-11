@@ -1,5 +1,5 @@
-#include "QFileListModel.h"
-#include "QFileListModel_p.h"
+#include "FileListModel.h"
+#include "FileListModel_p.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDirIterator>
@@ -34,13 +34,13 @@ static void getInfoList (const QDir &dir, QFileInfoList *infos)
     }
 }
 
-static void getIcons (QList<QPCFileInfo *> *infos, QFileIconProvider *iconProvider)
+static void getIcons (QList<FileInfo *> *infos, QFileIconProvider *iconProvider)
 {
     Q_ASSERT (infos);
     Q_ASSERT (iconProvider);
 
     for (int i = 0, n = infos->size (); i < n; ++i) {
-        QPCFileInfo *info = (*infos)[i];
+        FileInfo *info = (*infos)[i];
 
         if (info->icon ().isNull ()) {
             if (info->fileName () == QLatin1String ("..")) {
@@ -52,7 +52,7 @@ static void getIcons (QList<QPCFileInfo *> *infos, QFileIconProvider *iconProvid
     }
 }
 
-QFileListModelPrivate::QFileListModelPrivate ()
+FileListModelPrivate::FileListModelPrivate ()
     : q_ptr (0)
     , sortColumn (0)
     , sortOrder (Qt::AscendingOrder)
@@ -67,7 +67,7 @@ QFileListModelPrivate::QFileListModelPrivate ()
 #endif
 }
 
-QFileListModelPrivate::~QFileListModelPrivate ()
+FileListModelPrivate::~FileListModelPrivate ()
 {
     abort ();
 
@@ -85,20 +85,20 @@ QFileListModelPrivate::~QFileListModelPrivate ()
     q_ptr = 0;
 }
 
-QPCFileInfo *QFileListModelPrivate::node (const QModelIndex &index) const
+FileInfo *FileListModelPrivate::node (const QModelIndex &index) const
 {
     if (!index.isValid ()) {
-        return const_cast<QPCFileInfo *> (&root);
+        return const_cast<FileInfo *> (&root);
     }
 
-    QPCFileInfo *node = static_cast<QPCFileInfo *> (index.internalPointer ());
+    FileInfo *node = static_cast<FileInfo *> (index.internalPointer ());
     Q_ASSERT (node);
     return node;
 }
 
-QModelIndex QFileListModelPrivate::index (const QPCFileInfo *node) const
+QModelIndex FileListModelPrivate::index (const FileInfo *node) const
 {
-    QPCFileInfo *parentNode = 0;//(node ? node->parent : 0);
+    FileInfo *parentNode = 0;//(node ? node->parent : 0);
 
     if (!parentNode || node == &root) {
         return QModelIndex ();
@@ -106,11 +106,11 @@ QModelIndex QFileListModelPrivate::index (const QPCFileInfo *node) const
 
     // get the parent's row
     Q_ASSERT (node);
-    int visualRow = nodes.indexOf (const_cast<QPCFileInfo *> (node));
-    return q_func ()->createIndex (visualRow, 0, const_cast<QPCFileInfo *> (node));
+    int visualRow = nodes.indexOf (const_cast<FileInfo *> (node));
+    return q_func ()->createIndex (visualRow, 0, const_cast<FileInfo *> (node));
 }
 
-QModelIndex QFileListModelPrivate::index (const QString &fileName, int column) const
+QModelIndex FileListModelPrivate::index (const QString &fileName, int column) const
 {
     if (fileName == root.fileName ()) {
         return QModelIndex ();
@@ -118,7 +118,7 @@ QModelIndex QFileListModelPrivate::index (const QString &fileName, int column) c
 
     // get the parent's row
     for (int row = 0, n = nodes.size (); row < n; ++row) {
-        QPCFileInfo *node = nodes.at (row);
+        FileInfo *node = nodes.at (row);
 
         if (fileName == node->fileName ()) {
             return q_func ()->createIndex (row, column, node);
@@ -128,16 +128,16 @@ QModelIndex QFileListModelPrivate::index (const QString &fileName, int column) c
     return QModelIndex ();
 }
 
-void QFileListModelPrivate::abort ()
+void FileListModelPrivate::abort ()
 {
     future.cancel ();
     future.waitForFinished ();
     sheduledUpdate = false;
 }
 
-void QFileListModelPrivate::fetchFileList ()
+void FileListModelPrivate::fetchFileList ()
 {
-    Q_Q (QFileListModel);
+    Q_Q (FileListModel);
 
     if (inUpdate) {
         sheduledUpdate = true;
@@ -186,7 +186,7 @@ void QFileListModelPrivate::fetchFileList ()
         q->beginInsertRows (QModelIndex (), 0, rowCount - 1);
 
         for (int row = 0; row < rowCount; ++row) {
-            nodes.append (new QPCFileInfo (infos.at (row)));
+            nodes.append (new FileInfo (infos.at (row)));
         }
 
         q->endInsertRows ();
@@ -198,9 +198,9 @@ void QFileListModelPrivate::fetchFileList ()
     inUpdate = false;
 }
 
-void QFileListModelPrivate::updateFileList ()
+void FileListModelPrivate::updateFileList ()
 {
-    Q_Q (QFileListModel);
+    Q_Q (FileListModel);
 
     if (inUpdate) {
         sheduledUpdate = true;
@@ -232,7 +232,7 @@ void QFileListModelPrivate::updateFileList ()
         q->beginInsertRows (QModelIndex (), size, size + d - 1);
 
         for (int row = size, n = size + d; row < n; ++row) {
-            nodes.append (new QPCFileInfo (infos.at (row)));
+            nodes.append (new FileInfo (infos.at (row)));
         }
 
         q->endInsertRows ();
@@ -273,7 +273,7 @@ void QFileListModelPrivate::updateFileList ()
 
         // update changed rows
         for (int row = 0; row < rowCount; ++row) {
-            nodes[row] = new QPCFileInfo (infos.at (row));
+            nodes[row] = new FileInfo (infos.at (row));
         }
 
         QModelIndexList newList;
@@ -293,9 +293,9 @@ void QFileListModelPrivate::updateFileList ()
     inUpdate = false;
 }
 
-void QFileListModelPrivate::_q_directoryChanged ()
+void FileListModelPrivate::_q_directoryChanged ()
 {
-    Q_Q (QFileListModel);
+    Q_Q (FileListModel);
     sheduledUpdate = true;
 
     if (!updateTimer.isActive ()) {
@@ -303,16 +303,16 @@ void QFileListModelPrivate::_q_directoryChanged ()
     }
 }
 
-void QFileListModelPrivate::_q_finishedLoadIcons ()
+void FileListModelPrivate::_q_finishedLoadIcons ()
 {
-    Q_Q (QFileListModel);
-    emit q->dataChanged (q->index (0, QFileListModel::NameColumn),
-                         q->index (nodes.size () - 1, QFileListModel::NameColumn));
+    Q_Q (FileListModel);
+    emit q->dataChanged (q->index (0, FileListModel::NameColumn),
+                         q->index (nodes.size () - 1, FileListModel::NameColumn));
 }
 
-QFileListModel::QFileListModel (QObject *parent)
+FileListModel::FileListModel (QObject *parent)
     : QAbstractItemModel (parent)
-    , d_ptr (new QFileListModelPrivate)
+    , d_ptr (new FileListModelPrivate)
 {
     d_ptr->q_ptr = this;
 
@@ -325,14 +325,14 @@ QFileListModel::QFileListModel (QObject *parent)
 #endif
 }
 
-QFileListModel::~QFileListModel ()
+FileListModel::~FileListModel ()
 {
     delete d_ptr;
 }
 
-QModelIndex QFileListModel::index (int row, int column, const QModelIndex &parent) const
+QModelIndex FileListModel::index (int row, int column, const QModelIndex &parent) const
 {
-    Q_D (const QFileListModel);
+    Q_D (const FileListModel);
 
     if (row < 0 || column < 0 || row >= rowCount (parent) || column >= columnCount (parent)) {
         return QModelIndex ();
@@ -341,21 +341,21 @@ QModelIndex QFileListModel::index (int row, int column, const QModelIndex &paren
     return createIndex (row, column, d->nodes.at (row));
 }
 
-QModelIndex QFileListModel::buddy (const QModelIndex &index) const
+QModelIndex FileListModel::buddy (const QModelIndex &index) const
 {
     return index.sibling (index.row (), NameColumn);
 }
 
-QModelIndex QFileListModel::parent (const QModelIndex &child) const
+QModelIndex FileListModel::parent (const QModelIndex &child) const
 {
 //	if(!child.isValid() || (child.row() == 0 && child.column() == 0))
 //		return QModelIndex();
     return QModelIndex ();
 }
 
-bool QFileListModel::hasChildren (const QModelIndex &parent) const
+bool FileListModel::hasChildren (const QModelIndex &parent) const
 {
-    Q_D (const QFileListModel);
+    Q_D (const FileListModel);
 
     if (parent.column () > 0) {
         return false;
@@ -368,9 +368,9 @@ bool QFileListModel::hasChildren (const QModelIndex &parent) const
     return d->node (parent)->isDir ();
 }
 
-int QFileListModel::rowCount (const QModelIndex &parent) const
+int FileListModel::rowCount (const QModelIndex &parent) const
 {
-    Q_D (const QFileListModel);
+    Q_D (const FileListModel);
 
     if (parent.column () > 0) {
         return 0;
@@ -383,15 +383,15 @@ int QFileListModel::rowCount (const QModelIndex &parent) const
     return 0;
 }
 
-int QFileListModel::columnCount (const QModelIndex &parent) const
+int FileListModel::columnCount (const QModelIndex &parent) const
 {
     return (parent.column () > 0) ? 0 : ColumnCount;
 }
 
-Qt::ItemFlags QFileListModel::flags (const QModelIndex &index) const
+Qt::ItemFlags FileListModel::flags (const QModelIndex &index) const
 {
-    Q_D (const QFileListModel);
-    QPCFileInfo *node = d->node (index);
+    Q_D (const FileListModel);
+    FileInfo *node = d->node (index);
 
     if (!node) {
         return Qt::NoItemFlags;
@@ -424,7 +424,7 @@ Qt::ItemFlags QFileListModel::flags (const QModelIndex &index) const
     return flags;
 }
 
-QString QFileListModelPrivate::size (qint64 bytes)
+QString FileListModelPrivate::size (qint64 bytes)
 {
     // According to the Si standard KB is 1000 bytes, KiB is 1024
     // but on windows sizes are calculated by dividing by 1024 so we do what they do.
@@ -434,33 +434,33 @@ QString QFileListModelPrivate::size (qint64 bytes)
     const qint64 tb = 1024 * gb;
 
     if (bytes >= tb) {
-        return QFileListModel::tr ("%1 TB").arg (QLocale ().toString (qreal (bytes) / tb, 'f', 3));
+        return FileListModel::tr ("%1 TB").arg (QLocale ().toString (qreal (bytes) / tb, 'f', 3));
     }
 
     if (bytes >= gb) {
-        return QFileListModel::tr ("%1 GB").arg (QLocale ().toString (qreal (bytes) / gb, 'f', 2));
+        return FileListModel::tr ("%1 GB").arg (QLocale ().toString (qreal (bytes) / gb, 'f', 2));
     }
 
     if (bytes >= mb) {
-        return QFileListModel::tr ("%1 MB").arg (QLocale ().toString (qreal (bytes) / mb, 'f', 1));
+        return FileListModel::tr ("%1 MB").arg (QLocale ().toString (qreal (bytes) / mb, 'f', 1));
     }
 
     if (bytes >= kb) {
-        return QFileListModel::tr ("%1 KB").arg (QLocale ().toString (bytes / kb));
+        return FileListModel::tr ("%1 KB").arg (QLocale ().toString (bytes / kb));
     }
 
-    return QFileListModel::tr ("%1 bytes").arg (QLocale ().toString (bytes));
+    return FileListModel::tr ("%1 bytes").arg (QLocale ().toString (bytes));
 }
 
-QVariant QFileListModel::data (const QModelIndex &index, int role) const
+QVariant FileListModel::data (const QModelIndex &index, int role) const
 {
-    Q_D (const QFileListModel);
+    Q_D (const FileListModel);
 
     if (!index.isValid () || index.model () != this) {
         return QVariant ();
     }
 
-    QPCFileInfo *node = d->node (index);
+    FileInfo *node = d->node (index);
 
     switch (role) {
         case Qt::EditRole:
@@ -601,7 +601,7 @@ QVariant QFileListModel::data (const QModelIndex &index, int role) const
     return QVariant ();
 }
 
-bool QFileListModel::setData (const QModelIndex &index, const QVariant &value, int role)
+bool FileListModel::setData (const QModelIndex &index, const QVariant &value, int role)
 {
     /* if (role != Qt::EditRole)
              return false;
@@ -616,7 +616,7 @@ bool QFileListModel::setData (const QModelIndex &index, const QVariant &value, i
     return false;
 }
 
-QVariant QFileListModel::headerData (int section, Qt::Orientation orientation, int role) const
+QVariant FileListModel::headerData (int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole) {
         if (orientation == Qt::Horizontal) {
@@ -656,61 +656,61 @@ QVariant QFileListModel::headerData (int section, Qt::Orientation orientation, i
     return QVariant ();
 }
 
-bool QFileListModel::isDir (const QModelIndex &index) const
+bool FileListModel::isDir (const QModelIndex &index) const
 {
-    Q_D (const QFileListModel);
-    QPCFileInfo *node = d->node (index);
+    Q_D (const FileListModel);
+    FileInfo *node = d->node (index);
     return node ? node->isDir () : false;
 }
 
-qint64 QFileListModel::size (const QModelIndex &index) const
+qint64 FileListModel::size (const QModelIndex &index) const
 {
-    Q_D (const QFileListModel);
-    QPCFileInfo *node = d->node (index);
+    Q_D (const FileListModel);
+    FileInfo *node = d->node (index);
     return node ? node->size () : 0;
 }
 
-QFile::Permissions QFileListModel::permissions (const QModelIndex &index) const
+QFile::Permissions FileListModel::permissions (const QModelIndex &index) const
 {
-    Q_D (const QFileListModel);
-    QPCFileInfo *node = d->node (index);
+    Q_D (const FileListModel);
+    FileInfo *node = d->node (index);
     return node ? node->permissions () : QFile::Permissions (0);
 }
 
-QString QFileListModel::filePath (const QModelIndex &index) const
+QString FileListModel::filePath (const QModelIndex &index) const
 {
-    Q_D (const QFileListModel);
-    QPCFileInfo *node = d->node (index);
+    Q_D (const FileListModel);
+    FileInfo *node = d->node (index);
     return node ? node->filePath () : QString ();
 }
 
-QString QFileListModel::fileName (const QModelIndex &index) const
+QString FileListModel::fileName (const QModelIndex &index) const
 {
-    Q_D (const QFileListModel);
-    QPCFileInfo *node = d->node (index);
+    Q_D (const FileListModel);
+    FileInfo *node = d->node (index);
     return node ? node->fileName () : QString ();
 }
 
-QVariant QFileListModel::myComputer () const
+QVariant FileListModel::myComputer () const
 {
     return QDir::rootPath ();
 }
 
-QDir QFileListModel::rootDirectory () const
+QDir FileListModel::rootDirectory () const
 {
-    Q_D (const QFileListModel);
+    Q_D (const FileListModel);
     return d->rootDir;
 }
 
-QString QFileListModel::rootPath () const
+QString FileListModel::rootPath () const
 {
-    Q_D (const QFileListModel);
+    Q_D (const FileListModel);
     return d->rootDir.absolutePath ();
 }
 
-QModelIndex QFileListModel::setRootPath (const QString &path)
+QModelIndex FileListModel::setRootPath (const QString &path)
 {
-    Q_D (QFileListModel);
+    Q_D (FileListModel);
 
     d->rootDir.setPath (path);
     d->root.setFileInfo (QFileInfo (path));
@@ -736,9 +736,9 @@ QModelIndex QFileListModel::setRootPath (const QString &path)
     return QModelIndex ();
 }
 
-QModelIndex QFileListModel::index (const QString &fileName) const
+QModelIndex FileListModel::index (const QString &fileName) const
 {
-    Q_D (const QFileListModel);
+    Q_D (const FileListModel);
 
     for (int row = 0, n = d->nodes.size (); row < n; ++row) {
         if (d->nodes.at (row)->fileName () == fileName) {
@@ -749,28 +749,28 @@ QModelIndex QFileListModel::index (const QString &fileName) const
     return QModelIndex ();
 }
 
-QDir::Filters QFileListModel::filter () const
+QDir::Filters FileListModel::filter () const
 {
-    Q_D (const QFileListModel);
+    Q_D (const FileListModel);
     return d->rootDir.filter ();
 }
 
-void QFileListModel::setFilter (QDir::Filters filters)
+void FileListModel::setFilter (QDir::Filters filters)
 {
-    Q_D (QFileListModel);
+    Q_D (FileListModel);
     d->rootDir.setFilter (filters);
     d->fetchFileList ();
 }
 
-QFileIconProvider *QFileListModel::iconProvider () const
+QFileIconProvider *FileListModel::iconProvider () const
 {
-    Q_D (const QFileListModel);
+    Q_D (const FileListModel);
     return d->iconProvider;
 }
 
-void QFileListModel::setIconProvider (QFileIconProvider *iconProvider)
+void FileListModel::setIconProvider (QFileIconProvider *iconProvider)
 {
-    Q_D (QFileListModel);
+    Q_D (FileListModel);
 
     if (d->iconProvider == iconProvider) {
         return;
@@ -780,9 +780,9 @@ void QFileListModel::setIconProvider (QFileIconProvider *iconProvider)
     d->iconProvider = iconProvider;
 }
 
-void QFileListModel::sort (int column, Qt::SortOrder order)
+void FileListModel::sort (int column, Qt::SortOrder order)
 {
-    Q_D (QFileListModel);
+    Q_D (FileListModel);
 
     if (d->sortColumn == column && d->sortOrder == order) {
         return;
@@ -848,16 +848,16 @@ void QFileListModel::sort (int column, Qt::SortOrder order)
     emit layoutChanged ();
 }
 
-void QFileListModel::abort ()
+void FileListModel::abort ()
 {
-    Q_D (QFileListModel);
+    Q_D (FileListModel);
     d->updateTimer.stop ();
     d->abort ();
 }
 
-void QFileListModel::refresh ()
+void FileListModel::refresh ()
 {
-    Q_D (QFileListModel);
+    Q_D (FileListModel);
     d->updateTimer.stop ();
     d->_q_directoryChanged ();
 }
@@ -866,7 +866,7 @@ void QFileListModel::refresh ()
 	Returns a list of MIME types that can be used to describe a list of items
 	in the model.
 */
-QStringList QFileListModel::mimeTypes () const
+QStringList FileListModel::mimeTypes () const
 {
     return QStringList ("text/uri-list");
 }
@@ -879,16 +879,16 @@ QStringList QFileListModel::mimeTypes () const
 	If the list of indexes is empty, 0 is returned rather than a serialized
 	empty list.
 */
-QMimeData *QFileListModel::mimeData (const QModelIndexList &indexes) const
+QMimeData *FileListModel::mimeData (const QModelIndexList &indexes) const
 {
-    Q_D (const QFileListModel);
+    Q_D (const FileListModel);
 
     QList<QUrl> urls;
     QList<QModelIndex>::const_iterator it = indexes.constBegin ();
 
     for (; it != indexes.constEnd (); ++it) {
         if ((*it).column () == 0) {
-            QPCFileInfo *node = d->node (*it);
+            FileInfo *node = d->node (*it);
 
             if (node->isLocalFile ()) {
                 urls.append (QUrl::fromLocalFile (node->absoluteFilePath ()));
@@ -914,7 +914,7 @@ QMimeData *QFileListModel::mimeData (const QModelIndexList &indexes) const
 
 	\sa supportedDropActions()
 */
-bool QFileListModel::dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column,
+bool FileListModel::dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column,
                                    const QModelIndex &parent)
 {
     Q_UNUSED (row);
@@ -971,23 +971,23 @@ bool QFileListModel::dropMimeData (const QMimeData *data, Qt::DropAction action,
 /*!
 	\reimp
 */
-Qt::DropActions QFileListModel::supportedDropActions () const
+Qt::DropActions FileListModel::supportedDropActions () const
 {
     return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
 }
 
-bool QFileListModel::event (QEvent *event)
+bool FileListModel::event (QEvent *event)
 {
-    //Q_D(QFileListModel);
+    //Q_D(FileListModel);
     if (event->type () == QEvent::LanguageChange) {
     }
 
     return QAbstractItemModel::event (event);
 }
 
-void QFileListModel::timerEvent (QTimerEvent *event)
+void FileListModel::timerEvent (QTimerEvent *event)
 {
-    Q_D (QFileListModel);
+    Q_D (FileListModel);
 
     if (event->timerId () == d->updateTimer.timerId ()) {
         d->updateTimer.stop ();
@@ -1001,4 +1001,4 @@ void QFileListModel::timerEvent (QTimerEvent *event)
     QAbstractItemModel::timerEvent (event);
 }
 
-#include <moc_QFileListModel.cpp>
+#include <moc_FileListModel.cpp>

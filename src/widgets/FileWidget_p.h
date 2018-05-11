@@ -12,7 +12,7 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPaintEvent>
 
-#include "src/models/QFileListModel.h"
+#include "src/models/FileListModel.h"
 
 class AddressLineEdit : public QLineEdit
 {
@@ -174,7 +174,7 @@ public:
 
     FileWidget *q_ptr;
 
-    QFileListModel *model;
+    FileListModel *model;
     QAbstractProxyModel *proxyModel;
     QTreeView *treeView;
 

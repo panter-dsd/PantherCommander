@@ -8,12 +8,12 @@ INCLUDE_DIRECTORIES(
 )
 
 SET(SOURCE
-    QFileListModel.cpp
+    FileListModel.cpp
     )
 
 SET(HEADERS
-    QFileListModel_p.h
-    QFileListModel.h
+    FileListModel_p.h
+    FileListModel.h
     )
 
 ADD_LIBRARY(${TARGET} ${SOURCE} ${HEADERS})
