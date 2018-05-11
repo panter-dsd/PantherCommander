@@ -1,9 +1,9 @@
 #include <QtGui>
 #include <QtWidgets>
-#include "QFileOperationsConfirmationDialog.h"
+#include "FileOperationsConfirmationDialog.h"
 
 //
-QFileOperationsConfirmationDialog::QFileOperationsConfirmationDialog (QWidget *parent)
+FileOperationsConfirmationDialog::FileOperationsConfirmationDialog (QWidget *parent)
     : QDialog (parent)
 {
     qvblMainLayout = new QVBoxLayout ();
@@ -11,7 +11,7 @@ QFileOperationsConfirmationDialog::QFileOperationsConfirmationDialog (QWidget *p
 }
 
 //
-void QFileOperationsConfirmationDialog::setButtons (int buttons)
+void FileOperationsConfirmationDialog::setButtons (int buttons)
 {
     QPushButton *button;
     QGridLayout *buttonsLayout = new QGridLayout ();
@@ -150,7 +150,7 @@ void QFileOperationsConfirmationDialog::setButtons (int buttons)
 }
 
 //
-void QFileOperationsConfirmationDialog::setFiles (const QString &source, const QString &dest)
+void FileOperationsConfirmationDialog::setFiles (const QString &source, const QString &dest)
 {
     QString qsTmp;
     QGroupBox *qgrbSource = new QGroupBox (tr ("Source file"), this);
@@ -179,14 +179,14 @@ void QFileOperationsConfirmationDialog::setFiles (const QString &source, const Q
 }
 
 //
-void QFileOperationsConfirmationDialog::setText (const QString &text)
+void FileOperationsConfirmationDialog::setText (const QString &text)
 {
     QLabel *qlText = new QLabel (text, this);
     qvblMainLayout->insertWidget (0, qlText);
 }
 
 //
-void QFileOperationsConfirmationDialog::slotButtonClick ()
+void FileOperationsConfirmationDialog::slotButtonClick ()
 {
     bool ok;
     result = sender ()->objectName ().toInt (&ok, 10);

@@ -14,7 +14,7 @@ class QListWidget;
 #include <QDialog>
 #include <QTime>
 #include "QFileOperationsThread.h"
-#include "QFileOperationsConfirmationDialog.h"
+#include "FileOperationsConfirmationDialog.h"
 
 //
 class QFileOperationsDialog : public QDialog

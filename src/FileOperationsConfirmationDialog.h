@@ -8,7 +8,7 @@ class QVBoxLayout;
 #include <QDialog>
 
 //
-class QFileOperationsConfirmationDialog : public QDialog
+class FileOperationsConfirmationDialog : public QDialog
 {
 Q_OBJECT
 public:
@@ -32,7 +32,7 @@ private:
     int result;
     QVBoxLayout *qvblMainLayout;
 public:
-    QFileOperationsConfirmationDialog (QWidget *parent = 0);
+    FileOperationsConfirmationDialog (QWidget *parent = 0);
 
     void setButtons (int buttons);
 

@@ -463,74 +463,74 @@ void QFileOperationsDialog::loadSettings ()
 //
 void QFileOperationsDialog::slotOperationError ()
 {
-    QFileOperationsConfirmationDialog *qfocdDialog;
-    qfocdDialog = new QFileOperationsConfirmationDialog (this);
+    FileOperationsConfirmationDialog *qfocdDialog;
+    qfocdDialog = new FileOperationsConfirmationDialog (this);
     const QStringList &params = qfotOperatinThread->getErrorParams ();
     switch (qfotOperatinThread->getLastError ()) {
         case QFileOperationsThread::FO_DEST_FILE_EXISTS:
             qfocdDialog->setFiles (params.at (0), params.at (1));
-            qfocdDialog->setButtons (QFileOperationsConfirmationDialog::Ovewrite |
-                                     QFileOperationsConfirmationDialog::OvewriteAll |
-                                     QFileOperationsConfirmationDialog::Cancel |
-                                     QFileOperationsConfirmationDialog::Skip |
-                                     QFileOperationsConfirmationDialog::SkipAll |
-                                     QFileOperationsConfirmationDialog::Rename |
-                                     QFileOperationsConfirmationDialog::OvewriteAllOlder |
-                                     QFileOperationsConfirmationDialog::OvewriteAllNew |
-                                     QFileOperationsConfirmationDialog::OvewriteAllSmallest |
-                                     QFileOperationsConfirmationDialog::OvewriteAllLager
+            qfocdDialog->setButtons (FileOperationsConfirmationDialog::Ovewrite |
+                                     FileOperationsConfirmationDialog::OvewriteAll |
+                                     FileOperationsConfirmationDialog::Cancel |
+                                     FileOperationsConfirmationDialog::Skip |
+                                     FileOperationsConfirmationDialog::SkipAll |
+                                     FileOperationsConfirmationDialog::Rename |
+                                     FileOperationsConfirmationDialog::OvewriteAllOlder |
+                                     FileOperationsConfirmationDialog::OvewriteAllNew |
+                                     FileOperationsConfirmationDialog::OvewriteAllSmallest |
+                                     FileOperationsConfirmationDialog::OvewriteAllLager
             );
             break;
         case QFileOperationsThread::FO_PERMISIONS_ERROR:
-            qfocdDialog->setButtons (QFileOperationsConfirmationDialog::Delete |
-                                     QFileOperationsConfirmationDialog::All |
-                                     QFileOperationsConfirmationDialog::Skip |
-                                     QFileOperationsConfirmationDialog::Cancel
+            qfocdDialog->setButtons (FileOperationsConfirmationDialog::Delete |
+                                     FileOperationsConfirmationDialog::All |
+                                     FileOperationsConfirmationDialog::Skip |
+                                     FileOperationsConfirmationDialog::Cancel
             );
             qfocdDialog->setText (tr ("File %1 is hidden or system. Delete anyway?").arg (params.at (0)));
             break;
         case QFileOperationsThread::FO_REMOVE_ERROR:
-            qfocdDialog->setButtons (QFileOperationsConfirmationDialog::Skip |
-                                     QFileOperationsConfirmationDialog::SkipAll |
-                                     QFileOperationsConfirmationDialog::Retry |
-                                     QFileOperationsConfirmationDialog::Cancel
+            qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
+                                     FileOperationsConfirmationDialog::SkipAll |
+                                     FileOperationsConfirmationDialog::Retry |
+                                     FileOperationsConfirmationDialog::Cancel
             );
             qfocdDialog->setText (tr ("Error remove file %1").arg (params.at (0)));
             break;
         case QFileOperationsThread::FO_OPEN_ERROR:
-            qfocdDialog->setButtons (QFileOperationsConfirmationDialog::Skip |
-                                     QFileOperationsConfirmationDialog::Retry |
-                                     QFileOperationsConfirmationDialog::Cancel
+            qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
+                                     FileOperationsConfirmationDialog::Retry |
+                                     FileOperationsConfirmationDialog::Cancel
             );
             qfocdDialog->setText (tr ("Error open file %1").arg (params.at (0)));
             break;
         case QFileOperationsThread::FO_READ_ERROR:
-            qfocdDialog->setButtons (QFileOperationsConfirmationDialog::Skip |
-                                     QFileOperationsConfirmationDialog::SkipAll |
-                                     QFileOperationsConfirmationDialog::Retry |
-                                     QFileOperationsConfirmationDialog::Cancel
+            qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
+                                     FileOperationsConfirmationDialog::SkipAll |
+                                     FileOperationsConfirmationDialog::Retry |
+                                     FileOperationsConfirmationDialog::Cancel
             );
             qfocdDialog->setText (tr ("Error read file %1").arg (params.at (0)));
             break;
         case QFileOperationsThread::FO_WRITE_ERROR:
-            qfocdDialog->setButtons (QFileOperationsConfirmationDialog::Skip |
-                                     QFileOperationsConfirmationDialog::SkipAll |
-                                     QFileOperationsConfirmationDialog::Retry |
-                                     QFileOperationsConfirmationDialog::Cancel
+            qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
+                                     FileOperationsConfirmationDialog::SkipAll |
+                                     FileOperationsConfirmationDialog::Retry |
+                                     FileOperationsConfirmationDialog::Cancel
             );
             qfocdDialog->setText (tr ("Error write file %1").arg (params.at (1)));
             break;
         case QFileOperationsThread::FO_RESIZE_ERROR:
-            qfocdDialog->setButtons (QFileOperationsConfirmationDialog::Skip |
-                                     QFileOperationsConfirmationDialog::SkipAll |
-                                     QFileOperationsConfirmationDialog::Retry |
-                                     QFileOperationsConfirmationDialog::Cancel
+            qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
+                                     FileOperationsConfirmationDialog::SkipAll |
+                                     FileOperationsConfirmationDialog::Retry |
+                                     FileOperationsConfirmationDialog::Cancel
             );
             qfocdDialog->setText (tr ("Error write file %1.\nMaby not free space.").arg (params.at (1)));
             break;
         default:
-            qfocdDialog->setButtons (QFileOperationsConfirmationDialog::Skip |
-                                     QFileOperationsConfirmationDialog::Cancel
+            qfocdDialog->setButtons (FileOperationsConfirmationDialog::Skip |
+                                     FileOperationsConfirmationDialog::Cancel
             );
             qfocdDialog->setText (tr ("Unknow error %1").arg (params.join ("\n")));
             break;
@@ -541,65 +541,65 @@ void QFileOperationsDialog::slotOperationError ()
     }
     delete qfocdDialog;
     switch (res) {
-        case QFileOperationsConfirmationDialog::Ovewrite:
+        case FileOperationsConfirmationDialog::Ovewrite:
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::OvewriteAll:
+        case FileOperationsConfirmationDialog::OvewriteAll:
             qfotOperatinThread->confirmation |= QFileOperationsThread::OVEWRITE_ALL;
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::Cancel:
+        case FileOperationsConfirmationDialog::Cancel:
             slotCancel ();
             qfotOperatinThread->stop ();
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::Skip:
+        case FileOperationsConfirmationDialog::Skip:
             qfotOperatinThread->skipFile ();
             qfotOperatinThread->stop ();
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::SkipAll:
+        case FileOperationsConfirmationDialog::SkipAll:
             qfotOperatinThread->confirmation |= QFileOperationsThread::SKIP_ALL;
             qfotOperatinThread->skipFile ();
             qfotOperatinThread->stop ();
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::OvewriteAllOlder:
+        case FileOperationsConfirmationDialog::OvewriteAllOlder:
             qfotOperatinThread->confirmation |= QFileOperationsThread::OVERWRITE_OLDER;
             if (QFileInfo (params.at (0)).lastModified () <= QFileInfo (params.at (1)).lastModified ()) {
                 qfotOperatinThread->stop ();
             }
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::OvewriteAllNew:
+        case FileOperationsConfirmationDialog::OvewriteAllNew:
             qfotOperatinThread->confirmation |= QFileOperationsThread::OVERWRITE_NEW;
             if (QFileInfo (params.at (0)).lastModified () >= QFileInfo (params.at (1)).lastModified ()) {
                 qfotOperatinThread->stop ();
             }
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::OvewriteAllSmallest:
+        case FileOperationsConfirmationDialog::OvewriteAllSmallest:
             qfotOperatinThread->confirmation |= QFileOperationsThread::OVERWRITE_SMALLEST;
             if (QFileInfo (params.at (0)).size () <= QFileInfo (params.at (1)).size ()) {
                 qfotOperatinThread->stop ();
             }
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::OvewriteAllLager:
+        case FileOperationsConfirmationDialog::OvewriteAllLager:
             qfotOperatinThread->confirmation |= QFileOperationsThread::OVERWRITE_LAGER;
             if (QFileInfo (params.at (0)).size () >= QFileInfo (params.at (1)).size ()) {
                 qfotOperatinThread->stop ();
             }
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::Delete:
+        case FileOperationsConfirmationDialog::Delete:
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::All:
+        case FileOperationsConfirmationDialog::All:
             qfotOperatinThread->confirmation |= QFileOperationsThread::OVEWRITE_REMOVE_HIDDEN_SYSTEM;
             qfotOperatinThread->slotResume ();
             break;
-        case QFileOperationsConfirmationDialog::Retry:
+        case FileOperationsConfirmationDialog::Retry:
             qfotOperatinThread->slotResume ();
             break;
         default:
