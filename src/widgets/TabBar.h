@@ -7,7 +7,7 @@ class TabBar : public QTabBar
 Q_OBJECT
     Q_PROPERTY(bool showTabBarWhenOneTab
                    READ
-                   showTabBarWhenOneTab
+                       showTabBarWhenOneTab
                    WRITE
                    setShowTabBarWhenOneTab)
 

@@ -69,12 +69,12 @@ namespace Konsole
                        processId)
         Q_PROPERTY(QString keyBindings
                        READ
-                       keyBindings
+                           keyBindings
                        WRITE
                        setKeyBindings)
         Q_PROPERTY(QSize size
                        READ
-                       size
+                           size
                        WRITE
                        setSize)
 

@@ -766,7 +766,7 @@ void TerminalDisplay::scrollImage (int lines, const QRect &screenWindowRegion)
         || !region.isValid ()
         || (region.top () + abs (lines)) >= region.bottom ()
         || this->_lines <= region.height ()) {
-            return;
+        return;
     }
 
     QRect scrollRect;
@@ -928,7 +928,7 @@ void TerminalDisplay::updateImage ()
             }
         }
 
-        if (!_resizing) // not while _resizing, we're expecting a paintEvent
+        if (!_resizing) { // not while _resizing, we're expecting a paintEvent
             for (x = 0; x < columnsToUpdate; x++) {
                 _hasBlinker |= (newLine[x].rendition & RE_BLINK);
 
@@ -937,22 +937,25 @@ void TerminalDisplay::updateImage ()
                 // where characters exceed their cell width.
                 if (dirtyMask[x]) {
                     quint16 c = newLine[x + 0].character;
-                    if (!c)
+                    if (!c) {
                         continue;
+                    }
                     int p = 0;
                     disstrU[p++] = c; //fontMap(c);
                     bool lineDraw = isLineChar (c);
                     bool doubleWidth = (x + 1 == columnsToUpdate) ? false : (newLine[x + 1].character == 0);
                     cr = newLine[x].rendition;
                     _clipboard = newLine[x].backgroundColor;
-                    if (newLine[x].foregroundColor != cf)
+                    if (newLine[x].foregroundColor != cf) {
                         cf = newLine[x].foregroundColor;
+                    }
                     int lln = columnsToUpdate - x;
                     for (len = 1; len < lln; len++) {
                         const Character &ch = newLine[x + len];
 
-                        if (!ch.character)
-                            continue; // Skip trailing part of multi-col chars.
+                        if (!ch.character) {
+                            continue;
+                        } // Skip trailing part of multi-col chars.
 
                         bool nextIsDoubleWidth = (x + len + 1 == columnsToUpdate) ? false : (
                             newLine[x + len + 1].character == 0);
@@ -971,10 +974,12 @@ void TerminalDisplay::updateImage ()
                     QString unistr (disstrU, p);
 
                     bool saveFixedFont = _fixedFont;
-                    if (lineDraw)
+                    if (lineDraw) {
                         _fixedFont = false;
-                    if (doubleWidth)
+                    }
+                    if (doubleWidth) {
                         _fixedFont = false;
+                    }
 
                     updateLine = true;
 
@@ -983,13 +988,15 @@ void TerminalDisplay::updateImage ()
                 }
 
             }
+        }
 
         //both the top and bottom halves of double height _lines must always be redrawn
         //although both top and bottom halves contain the same characters, only
         //the top one is actually
         //drawn.
-        if (_lineProperties.count () > y)
+        if (_lineProperties.count () > y) {
             updateLine |= (_lineProperties[y] & LINE_DOUBLEHEIGHT);
+        }
 
         // if the characters on the line are different in the old and the new _image
         // then this line must be repainted.
@@ -1036,8 +1043,9 @@ void TerminalDisplay::updateImage ()
     // update the parts of the display which have changed
     update (dirtyRegion);
 
-    if (_hasBlinker && !_blinkTimer->isActive ())
+    if (_hasBlinker && !_blinkTimer->isActive ()) {
         _blinkTimer->start (BLINK_DELAY);
+    }
     if (!_hasBlinker && _blinkTimer->isActive ()) {
         _blinkTimer->stop ();
         _blinking = false;
@@ -1308,14 +1316,16 @@ void TerminalDisplay::drawContents (QPainter &paint, const QRect &rect)
                    (_image[qMin (loc(x + len, y) + 1, _imageSize)].character == 0) == doubleWidth &&
                    isLineChar (c = _image[loc(x + len, y)].character) == lineDraw) // Assignment!
             {
-                if (c)
-                    disstrU[p++] = c; //fontMap(c);
+                if (c) {
+                    disstrU[p++] = c;
+                } //fontMap(c);
                 if (doubleWidth) // assert((_image[loc(x+len,y)+1].character == 0)), see above if condition
                     len++; // Skip trailing part of multi-column character
                 len++;
             }
-            if ((x + len < _usedColumns) && (!_image[loc(x + len, y)].character))
-                len++; // Adjust for trailing part of multi-column character
+            if ((x + len < _usedColumns) && (!_image[loc(x + len, y)].character)) {
+                len++;
+            } // Adjust for trailing part of multi-column character
 
             bool save__fixedFont = _fixedFont;
             if (lineDraw)
@@ -1938,8 +1948,9 @@ void TerminalDisplay::extendSelection (const QPoint &position)
         return;
     } // not moved
 
-    if (here == ohere)
-        return; // It's not left, it's not right.
+    if (here == ohere) {
+        return;
+    } // It's not left, it's not right.
 
     if (_actSel < 2 || swapping) {
         if (_columnSelectionMode && !_lineSelectionMode && !_wordSelectionMode) {
@@ -1994,7 +2005,7 @@ void TerminalDisplay::mouseReleaseEvent (QMouseEvent *ev)
                 mouseSignal (3, // release
                              charColumn + 1,
                              charLine + 1 + _scrollBar->value () - _scrollBar->maximum (), 0
-                    );
+                );
             }
         }
         dragInfo.state = diNone;

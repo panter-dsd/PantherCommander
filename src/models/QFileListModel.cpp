@@ -1001,4 +1001,4 @@ void QFileListModel::timerEvent (QTimerEvent *event)
     QAbstractItemModel::timerEvent (event);
 }
 
-#include "moc_QFileListModel.cpp"
+#include <moc_QFileListModel.cpp>

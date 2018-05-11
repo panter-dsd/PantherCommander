@@ -1301,4 +1301,4 @@ void FileWidget::cdUP ()
     d_func ()->_q_navigateToParent ();
 }
 
-#include "moc_FileWidget.cpp"
+#include <moc_FileWidget.cpp>

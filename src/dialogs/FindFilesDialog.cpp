@@ -282,7 +282,7 @@ void FindFilesDialog::showFiles (const QFileInfoList &files)
         filesTable_->setItem (row, 2, sizeItem);
     }
     filesFoundLabel_->setText (tr ("%1 file(s) found").arg (files.size ()) +
-                              (" (Double click on a file to open it)"));
+                               (" (Double click on a file to open it)"));
 }
 
 void FindFilesDialog::_slot_cellActivated (int row, int /* column */)
@@ -295,4 +295,3 @@ void FindFilesDialog::_slot_cellActivated (int row, int /* column */)
     QDesktopServices::openUrl (QUrl (fi.absoluteFilePath ()));
 }
 
-#include "moc_FindFilesDialog.cpp"

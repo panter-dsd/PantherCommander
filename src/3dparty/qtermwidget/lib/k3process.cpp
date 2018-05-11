@@ -321,11 +321,13 @@ bool K3Process::start (RunMode runmode, Communication comm)
         sigemptyset (&act.sa_mask);
         act.sa_handler = SIG_DFL;
         act.sa_flags = 0;
-        for (int sig = 1; sig < NSIG; sig++)
+        for (int sig = 1; sig < NSIG; sig++) {
             sigaction (sig, &act, 0L);
+        }
 
-        if (d->priority)
+        if (d->priority) {
             setpriority (PRIO_PROCESS, 0, d->priority);
+        }
 
         if (!runPrivileged ()) {
             setgid (getgid ());
@@ -333,20 +335,24 @@ bool K3Process::start (RunMode runmode, Communication comm)
             if (pw)
                initgroups(pw->pw_name, pw->pw_gid);
 #endif
-            if (geteuid () != getuid ())
+            if (geteuid () != getuid ()) {
                 setuid (getuid ());
-            if (geteuid () != getuid ())
+            }
+            if (geteuid () != getuid ()) {
                 _exit (1);
+            }
         }
 
         setupEnvironment ();
 
-        if (runmode == DontCare || runmode == OwnGroup)
+        if (runmode == DontCare || runmode == OwnGroup) {
             setsid ();
+        }
 
         const char *executable = arglist[0];
-        if (!d->executable.isEmpty ())
+        if (!d->executable.isEmpty ()) {
             executable = d->executable.data ();
+        }
         execvp (executable, arglist);
 
         char resultByte = 1;
@@ -380,8 +386,9 @@ bool K3Process::start (RunMode runmode, Communication comm)
             return false;
         }
         if (n == -1) {
-            if (errno == EINTR)
-                continue; // Ignore
+            if (errno == EINTR) {
+                continue;
+            } // Ignore
         }
         break; // success
     }
@@ -935,7 +942,7 @@ int K3Process::commSetupDoneC ()
     } else if (communication & Stdout) {
         if (dup2 (out[1], STDOUT_FILENO) < 0 ||
             setsockopt (out[1], SOL_SOCKET, SO_LINGER, (char *) &so, sizeof (so))) {
-                ok = 0;
+            ok = 0;
         }
         if (communication & MergedStderr) {
             if (dup2 (out[1], STDERR_FILENO) < 0) {
@@ -950,7 +957,7 @@ int K3Process::commSetupDoneC ()
     } else if (communication & Stderr) {
         if (dup2 (err[1], STDERR_FILENO) < 0 ||
             setsockopt (err[1], SOL_SOCKET, SO_LINGER, (char *) &so, sizeof (so))) {
-                ok = 0;
+            ok = 0;
         }
     }
 

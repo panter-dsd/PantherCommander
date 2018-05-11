@@ -22,7 +22,7 @@ bool PCShortcutEdit::event (QEvent *e)
     if (e->type () == QEvent::Shortcut ||
         e->type () == QEvent::ShortcutOverride ||
         e->type () == QEvent::KeyRelease) {
-            return true;
+        return true;
     }
     return QLineEdit::event (e);
 }
@@ -35,7 +35,7 @@ void PCShortcutEdit::handleKeyEvent (QKeyEvent *e)
         nextKey == Qt::Key_Shift ||
         nextKey == Qt::Key_Meta ||
         nextKey == Qt::Key_Alt) {
-            return;
+        return;
     }
 
     nextKey |= translateModifiers (e->modifiers (), e->text ());
@@ -71,7 +71,7 @@ int PCShortcutEdit::translateModifiers (Qt::KeyboardModifiers state,
                                         || !text.at (0).isPrint ()
                                         || text.at (0).isLetter ()
                                         || text.at (0).isSpace ())) {
-                                            result |= Qt::SHIFT;
+        result |= Qt::SHIFT;
     }
     if (state & Qt::ControlModifier) {
         result |= Qt::CTRL;

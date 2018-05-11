@@ -74,24 +74,24 @@ void MainWindow::createWidgets ()
 
     leftDriveBar_ = new DriveBar (this);
     connect (leftDriveBar_, SIGNAL(discChanged (
-                                         const QString&)),
+                                       const QString&)),
              this, SLOT(slotSetDisc (
                             const QString&)));
 
     rightDriveBar_ = new DriveBar (this);
     connect (rightDriveBar_, SIGNAL(discChanged (
-                                          const QString&)),
+                                        const QString&)),
              this, SLOT(slotSetDisc (
                             const QString&)));
 
     leftPanel_ = new QFilePanel (this);
     leftPanel_->setObjectName ("LeftPanel");
     connect (leftPanel_, SIGNAL(pathChanged (
-                                       const QString&)),
+                                    const QString&)),
              leftDriveBar_, SLOT(slotSetDisc (
-                                       const QString&)));
+                                     const QString&)));
     connect (leftPanel_, SIGNAL(pathChanged (
-                                       const QString&)),
+                                    const QString&)),
              this, SLOT(slotPathChanged (
                             const QString&)));
     leftDriveBar_->slotSetDisc (leftPanel_->path ());
@@ -99,11 +99,11 @@ void MainWindow::createWidgets ()
     rightPanel_ = new QFilePanel (this);
     rightPanel_->setObjectName ("RightPanel");
     connect (rightPanel_, SIGNAL(pathChanged (
-                                        const QString&)),
+                                     const QString&)),
              rightDriveBar_, SLOT(slotSetDisc (
-                                        const QString&)));
+                                      const QString&)));
     connect (rightPanel_, SIGNAL(pathChanged (
-                                        const QString&)),
+                                     const QString&)),
              this, SLOT(slotPathChanged (
                             const QString&)));
     rightDriveBar_->slotSetDisc (rightPanel_->path ());
@@ -115,7 +115,7 @@ void MainWindow::createWidgets ()
     panelsSplitter_->addWidget (rightPanel_);
 
     QObject::connect (panelsSplitter_, SIGNAL(customContextMenuRequested (
-                                                 const QPoint&)),
+                                                  const QPoint&)),
                       this, SLOT(showSplitterContextMenu (
                                      const QPoint&)));
 
@@ -315,7 +315,7 @@ void MainWindow::createCommandButtons ()
     qhblLayout->setMargin (0);
 
     runConsoleButton_ = new QPushButton (actionRunConsole_->shortcut ().toString () + " " + actionRunConsole_->text (),
-                                     commandButtonsFrame_
+                                         commandButtonsFrame_
     );
     runConsoleButton_->setFlat (true);
     runConsoleButton_->setFocusPolicy (Qt::NoFocus);
@@ -328,7 +328,7 @@ void MainWindow::createCommandButtons ()
     qhblLayout->addWidget (splitter);
 
     viewButton_ = new QPushButton (actionView_->shortcut ().toString () + " " + actionView_->text (),
-                               commandButtonsFrame_
+                                   commandButtonsFrame_
     );
     viewButton_->setFlat (true);
     viewButton_->setFocusPolicy (Qt::NoFocus);
@@ -341,7 +341,7 @@ void MainWindow::createCommandButtons ()
     qhblLayout->addWidget (splitter);
 
     editButton_ = new QPushButton (actionEdit_->shortcut ().toString () + " " + actionEdit_->text (),
-                               commandButtonsFrame_
+                                   commandButtonsFrame_
     );
     editButton_->setFlat (true);
     editButton_->setFocusPolicy (Qt::NoFocus);
@@ -354,7 +354,7 @@ void MainWindow::createCommandButtons ()
     qhblLayout->addWidget (splitter);
 
     copyButton_ = new QPushButton (actionCopy_->shortcut ().toString () + " " + actionCopy_->text (),
-                               commandButtonsFrame_
+                                   commandButtonsFrame_
     );
     copyButton_->setFlat (true);
     copyButton_->setFocusPolicy (Qt::NoFocus);
@@ -367,7 +367,7 @@ void MainWindow::createCommandButtons ()
     qhblLayout->addWidget (splitter);
 
     moveButton_ = new QPushButton (actionMove_->shortcut ().toString () + " " + actionMove_->text (),
-                               commandButtonsFrame_
+                                   commandButtonsFrame_
     );
     moveButton_->setFlat (true);
     moveButton_->setFocusPolicy (Qt::NoFocus);
@@ -380,7 +380,7 @@ void MainWindow::createCommandButtons ()
     qhblLayout->addWidget (splitter);
 
     mkDirButton_ = new QPushButton (actionMkDir_->shortcut ().toString () + " " + actionMkDir_->text (),
-                                commandButtonsFrame_
+                                    commandButtonsFrame_
     );
     mkDirButton_->setFlat (true);
     mkDirButton_->setFocusPolicy (Qt::NoFocus);
@@ -393,7 +393,7 @@ void MainWindow::createCommandButtons ()
     qhblLayout->addWidget (splitter);
 
     removeButton_ = new QPushButton (actionRemove_->shortcut ().toString () + " " + actionRemove_->text (),
-                                 commandButtonsFrame_
+                                     commandButtonsFrame_
     );
     removeButton_->setFlat (true);
     removeButton_->setFocusPolicy (Qt::NoFocus);
@@ -406,7 +406,7 @@ void MainWindow::createCommandButtons ()
     qhblLayout->addWidget (splitter);
 
     exitButton_ = new QPushButton (actionExit_->shortcut ().toString () + " " + actionExit_->text (),
-                               commandButtonsFrame_
+                                   commandButtonsFrame_
     );
     exitButton_->setFlat (true);
     exitButton_->setFocusPolicy (Qt::NoFocus);
@@ -474,7 +474,7 @@ void MainWindow::loadSettings ()
 
     leftDriveBar_->setVisible (settings->value ("Interface/ShowDriveBar", true).toBool ());
     rightDriveBar_->setVisible (settings->value ("Interface/ShowTwoDriveBar", true).toBool ()
-                                  && settings->value ("Interface/ShowDriveBar", true).toBool ());
+                                && settings->value ("Interface/ShowDriveBar", true).toBool ());
 
     consolePath_->setVisible (settings->value ("Interface/ShowCommandLine", true).toBool ());
     consoleCommandComboBox_->setVisible (consolePath_->isVisible ());
@@ -589,14 +589,14 @@ void MainWindow::slotCpCurFileName2Cmd ()
 {
     if (focusedFilePanel_->currentFileName ().contains (" ")) {
         consoleCommandComboBox_->setEditText (consoleCommandComboBox_->currentText () +
-                                        "\"" +
-                                        focusedFilePanel_->currentFileName () +
-                                        "\" "
+                                              "\"" +
+                                              focusedFilePanel_->currentFileName () +
+                                              "\" "
         );
     } else {
         consoleCommandComboBox_->setEditText (consoleCommandComboBox_->currentText () +
-                                        focusedFilePanel_->currentFileName () +
-                                        " "
+                                              focusedFilePanel_->currentFileName () +
+                                              " "
         );
     }
     consoleCommandComboBox_->setFocus ();
@@ -612,14 +612,14 @@ void MainWindow::slotCpCurFileNameWhithPath2Cmd ()
     qsName += focusedFilePanel_->currentFileName ();
     if (qsName.contains (" ")) {
         consoleCommandComboBox_->setEditText (consoleCommandComboBox_->currentText () +
-                                        "\"" +
-                                        qsName +
-                                        "\" "
+                                              "\"" +
+                                              qsName +
+                                              "\" "
         );
     } else {
         consoleCommandComboBox_->setEditText (consoleCommandComboBox_->currentText () +
-                                        qsName +
-                                        " "
+                                              qsName +
+                                              " "
         );
     }
     consoleCommandComboBox_->setFocus ();
@@ -807,7 +807,7 @@ void MainWindow::slotRemove (const QStringList &fileList)
 //
 QFileOperationsDialog *
 MainWindow::addJob (QFileOperationsDialog *queue, QFileOperationsThread::FileOperation operation,
-                        const QStringList &parameters)
+                    const QStringList &parameters)
 {
     if (!queue) {
         queue = new QFileOperationsDialog (0);
@@ -1047,7 +1047,8 @@ void MainWindow::dragMoveEvent (QDragMoveEvent *event)
     bool isAccepted = false;
     QWidget *widget = childAt (event->pos ());
 //Command Buttons
-    isAccepted = widget == runConsoleButton_ || widget == viewButton_ || widget == editButton_ || widget == removeButton_;
+    isAccepted = widget == runConsoleButton_ || widget == viewButton_ || widget == editButton_ ||
+                 widget == removeButton_;
 
         foreach(PCToolBar *toolBar, toolBars_) {
             if (toolBar == widget || toolBar == widget->parentWidget ()) {

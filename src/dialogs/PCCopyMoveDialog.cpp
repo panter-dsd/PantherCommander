@@ -30,8 +30,8 @@ void PCCopyMoveDialog::createControls ()
     queueComboBox_ = new QComboBox (this);
 
     buttons_ = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                                        Qt::Horizontal,
-                                        this
+                                     Qt::Horizontal,
+                                     this
     );
     connect (buttons_,
              SIGNAL(accepted ()),

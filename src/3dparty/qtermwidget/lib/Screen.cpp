@@ -201,8 +201,9 @@ void Screen::setMargins (int top, int bot)
     if (top == 0) {
         top = 1;
     }      // Default
-    if (bot == 0)
-        bot = lines;  // Default
+    if (bot == 0) {
+        bot = lines;
+    }  // Default
     top = top - 1;              // Adjust to internal lineno
     bot = bot - 1;              // Adjust to internal lineno
     if (!(0 <= top && top < bot && bot < lines)) {
@@ -299,13 +300,15 @@ void Screen::insertChars (int n)
         n = 1;
     } // Default
 
-    if (screenLines[cuY].size () < cuX)
+    if (screenLines[cuY].size () < cuX) {
         screenLines[cuY].resize (cuX);
+    }
 
     screenLines[cuY].insert (cuX, n, ' ');
 
-    if (screenLines[cuY].count () > columns)
+    if (screenLines[cuY].count () > columns) {
         screenLines[cuY].resize (columns);
+    }
 }
 
 void Screen::deleteLines (int n)
@@ -916,8 +919,9 @@ void Screen::scrollUp (int n)
     if (n == 0) {
         n = 1;
     } // Default
-    if (tmargin == 0)
-        addHistLine (); // hist.history
+    if (tmargin == 0) {
+        addHistLine ();
+    } // hist.history
     scrollUp (tmargin, n);
 }
 
@@ -1147,10 +1151,11 @@ void Screen::moveImage (int dest, int sourceBegin, int sourceEnd)
             sel_BR = -1;
         } // Clear selection (see below)
 
-        if ((sel_BR >= srca) && (sel_BR <= srce))
+        if ((sel_BR >= srca) && (sel_BR <= srce)) {
             sel_BR += diff;
-        else if ((sel_BR >= desta) && (sel_BR <= deste))
-            sel_BR = -1; // Clear selection (see below)
+        } else if ((sel_BR >= desta) && (sel_BR <= deste)) {
+            sel_BR = -1;
+        } // Clear selection (see below)
 
         if (sel_BR < 0) {
             clearSelection ();

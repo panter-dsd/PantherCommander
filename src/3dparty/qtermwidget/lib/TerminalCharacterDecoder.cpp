@@ -156,7 +156,7 @@ void HTMLDecoder::decodeLine (const Character *const characters, int count, Line
 
             if (_lastRendition & RE_BOLD ||
                 (_colorTable && characters[i].isBold (_colorTable))) {
-                    style.append ("font-weight:bold;");
+                style.append ("font-weight:bold;");
             }
 
             if (_lastRendition & RE_UNDERLINE) {

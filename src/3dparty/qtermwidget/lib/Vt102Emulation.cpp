@@ -324,8 +324,9 @@ void Vt102Emulation::receiveChar (int cc)
         // This means, they do neither a resetToken nor a pushToToken. Some of them, do
         // of course. Guess this originates from a weakly layered handling of the X-on
         // X-off protocol, which comes really below this level.
-        if (cc == CNTL('X') || cc == CNTL('Z') || cc == ESC)
-            resetToken (); //VT100: CAN or SUB
+        if (cc == CNTL('X') || cc == CNTL('Z') || cc == ESC) {
+            resetToken ();
+        } //VT100: CAN or SUB
         if (cc != ESC) {
             tau (TY_CTL(cc + '@'), 0, 0);
             return;
@@ -413,7 +414,7 @@ void Vt102Emulation::receiveChar (int cc)
             addArgument ();
             return;
         }
-        for (i = 0; i <= argc; i++)
+        for (i = 0; i <= argc; i++) {
             if (epp()) {
                 tau (TY_CSI_PR(cc, argv[i]), 0, 0);
             } else if (egt()) {
@@ -431,20 +432,24 @@ void Vt102Emulation::receiveChar (int cc)
             } else {
                 tau (TY_CSI_PS(cc, argv[i]), 0, 0);
             }
+        }
         resetToken ();
     } else // mode VT52
     {
-        if (lec(1, 0, ESC))
+        if (lec(1, 0, ESC)) {
             return;
+        }
         if (les(1, 0, CHR)) {
             tau (TY_CHR(), s[0], 0);
             resetToken ();
             return;
         }
-        if (lec(2, 1, 'Y'))
+        if (lec(2, 1, 'Y')) {
             return;
-        if (lec(3, 1, 'Y'))
+        }
+        if (lec(3, 1, 'Y')) {
             return;
+        }
         if (p < 4) {
             tau (TY_VT52(s[1]), 0, 0);
             resetToken ();
