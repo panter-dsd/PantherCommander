@@ -1,10 +1,10 @@
 #include <QtWidgets>
 
-#include "QPreferenceGlobal.h"
+#include "GlobalPreferencePage.h"
 #include "src/AppSettings.h"
 
 //
-QPreferenceGlobal::QPreferenceGlobal (QWidget *parent)
+GlobalPreferencePage::GlobalPreferencePage (QWidget *parent)
     : AbstractPreferencesPage (parent)
 {
     createControls ();
@@ -14,12 +14,12 @@ QPreferenceGlobal::QPreferenceGlobal (QWidget *parent)
 }
 
 //
-QPreferenceGlobal::~QPreferenceGlobal ()
+GlobalPreferencePage::~GlobalPreferencePage ()
 {
 }
 
 //
-void QPreferenceGlobal::saveSettings ()
+void GlobalPreferencePage::saveSettings ()
 {
     QSettings *settings = AppSettings::instance ();
     settings->setValue ("Global/UseNativeDialogs", qchbUseNativeDialogs->isChecked ());
@@ -28,25 +28,25 @@ void QPreferenceGlobal::saveSettings ()
 }
 
 //
-void QPreferenceGlobal::loadSettings ()
+void GlobalPreferencePage::loadSettings ()
 {
     QSettings *settings = AppSettings::instance ();
     qchbUseNativeDialogs->setChecked (settings->value ("Global/UseNativeDialogs", true).toBool ());
 }
 
 //
-void QPreferenceGlobal::setDefaults ()
+void GlobalPreferencePage::setDefaults ()
 {
 }
 
 //
-void QPreferenceGlobal::createControls ()
+void GlobalPreferencePage::createControls ()
 {
     qchbUseNativeDialogs = new QCheckBox (tr ("Use native dialogs"), this);
 }
 
 //
-void QPreferenceGlobal::setLayouts ()
+void GlobalPreferencePage::setLayouts ()
 {
     QVBoxLayout *mainLayout = new QVBoxLayout ();
     mainLayout->addWidget (qchbUseNativeDialogs);
@@ -55,7 +55,7 @@ void QPreferenceGlobal::setLayouts ()
 }
 
 //
-void QPreferenceGlobal::setConnects ()
+void GlobalPreferencePage::setConnects ()
 {
     QList<QCheckBox *> checkBoxList = this->findChildren<QCheckBox *> ();
         foreach(const QCheckBox *checkBox, checkBoxList) {

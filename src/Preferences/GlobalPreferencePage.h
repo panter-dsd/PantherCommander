@@ -10,15 +10,15 @@ class QLineEdit;
 class QCheckBox;
 
 //
-class QPreferenceGlobal : public AbstractPreferencesPage
+class GlobalPreferencePage : public AbstractPreferencesPage
 {
 Q_OBJECT
 private:
     QCheckBox *qchbUseNativeDialogs;
 public:
-    QPreferenceGlobal (QWidget *parent = 0);
+    GlobalPreferencePage (QWidget *parent = 0);
 
-    ~QPreferenceGlobal ();
+    ~GlobalPreferencePage ();
 
     void saveSettings ();
 

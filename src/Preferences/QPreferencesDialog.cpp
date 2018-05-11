@@ -8,7 +8,7 @@
 #include "QPreferencesDialog.h"
 
 #include "AbstractPreferencesPage.h"
-#include "QPreferenceGlobal.h"
+#include "GlobalPreferencePage.h"
 #include "InterfacePreference.h"
 #include "CommandsPreference.h"
 #include "src/AppSettings.h"
@@ -34,7 +34,7 @@ void QPreferencesDialog::createControls ()
 {
     qlwPreferencesList = new QListWidget (this);
     QStringList qslPreferenceItems;
-    qslPreferenceItems << QPreferenceGlobal::preferenceGroup ()
+    qslPreferenceItems << GlobalPreferencePage::preferenceGroup ()
                        << InterfacePreference::preferenceGroup ()
                        << CommandsPreference::preferenceGroup ();
     qlwPreferencesList->addItems (qslPreferenceItems);
@@ -46,7 +46,7 @@ void QPreferencesDialog::createControls ()
 
     area = new QScrollArea (this);
     area->setWidgetResizable (true);
-    area->setWidget (new QPreferenceGlobal (qswPreferencesWidgets));
+    area->setWidget (new GlobalPreferencePage (qswPreferencesWidgets));
     qswPreferencesWidgets->addWidget (area);
 
     area = new QScrollArea (this);

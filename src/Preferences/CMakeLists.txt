@@ -16,7 +16,7 @@ SET(SOURCE
     CommandsPreference.cpp
     AbstractPreferencesPage.cpp
     InterfacePreference.cpp
-    QPreferenceGlobal.cpp
+    GlobalPreferencePage.cpp
     QPreferencesDialog.cpp
     QToolButtonPreference.cpp
     )
@@ -26,7 +26,7 @@ SET(HEADERS
     CommandsPreference.h
     AbstractPreferencesPage.h
     InterfacePreference.h
-    QPreferenceGlobal.h
+    GlobalPreferencePage.h
     QPreferencesDialog.h
     QToolButtonPreference.h
     )
