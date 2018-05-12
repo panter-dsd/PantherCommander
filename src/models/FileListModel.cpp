@@ -515,26 +515,6 @@ QVariant FileListModel::data (const QModelIndex &index, int role) const
                 }
                     break;
 
-                case AttributesColumn:
-#ifdef Q_WS_WIN
-                    {
-                        qint64 attributes = FileOperationsThread::winFileAttributes (node->absoluteFilePath());
-
-                        if (attributes != INVALID_FILE_ATTRIBUTES) {
-                            QString attr;
-                            attr += (attributes & FILE_ATTRIBUTE_READONLY) ? "r" : "-";
-                            attr += (attributes & FILE_ATTRIBUTE_ARCHIVE) ? "a" : "-";
-                            attr += (attributes & FILE_ATTRIBUTE_HIDDEN) ? "h" : "-";
-                            attr += (attributes & FILE_ATTRIBUTE_SYSTEM) ? "s" : "-";
-                            attr += (attributes & FILE_ATTRIBUTE_COMPRESSED) ? "c" : "-";
-                            attr += (attributes & FILE_ATTRIBUTE_ENCRYPTED) ? "e" : "-";
-                            return attr;
-                        }
-                    }
-
-#endif // Q_WS_WIN
-                    break;
-
                 default:
                     break;
             }
@@ -641,9 +621,6 @@ QVariant FileListModel::headerData (int section, Qt::Orientation orientation, in
 
                 case PermissionsColumn:
                     return tr ("Permissions");
-
-                case AttributesColumn:
-                    return tr ("Attr");
 
                 default:
                     break;
@@ -915,7 +892,7 @@ QMimeData *FileListModel::mimeData (const QModelIndexList &indexes) const
 	\sa supportedDropActions()
 */
 bool FileListModel::dropMimeData (const QMimeData *data, Qt::DropAction action, int row, int column,
-                                   const QModelIndex &parent)
+                                  const QModelIndex &parent)
 {
     Q_UNUSED (row);
     Q_UNUSED (column);

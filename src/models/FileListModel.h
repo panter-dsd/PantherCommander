@@ -22,7 +22,6 @@ public:
         OwnerColumn,
         GroupColumn,
         PermissionsColumn,
-        AttributesColumn,
 
         ColumnCount
     };
