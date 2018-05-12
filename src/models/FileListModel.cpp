@@ -39,15 +39,10 @@ static void getIcons (QList<FileInfo *> *infos, QFileIconProvider *iconProvider)
     Q_ASSERT (infos);
     Q_ASSERT (iconProvider);
 
-    for (int i = 0, n = infos->size (); i < n; ++i) {
-        FileInfo *info = (*infos)[i];
-
+    for (FileInfo *info : *infos) {
         if (info->icon ().isNull ()) {
-            if (info->fileName () == QLatin1String ("..")) {
-                info->setIcon (iconProvider->icon (QFileIconProvider::Desktop));
-            } else {
-                info->setIcon (iconProvider->icon (info->fileInfo ()));
-            }
+            const bool isDotDot = info->fileName () == QLatin1String ("..") ;
+            info->setIcon (iconProvider->icon (isDotDot ? QFileInfo(info->filePath ()) : info->fileInfo ()));
         }
     }
 }
@@ -932,15 +927,6 @@ bool FileListModel::dropMimeData (const QMimeData *data, Qt::DropAction action, 
 Qt::DropActions FileListModel::supportedDropActions () const
 {
     return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction;
-}
-
-bool FileListModel::event (QEvent *event)
-{
-    //Q_D(FileListModel);
-    if (event->type () == QEvent::LanguageChange) {
-    }
-
-    return QAbstractItemModel::event (event);
 }
 
 void FileListModel::timerEvent (QTimerEvent *event)

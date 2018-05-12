@@ -112,9 +112,7 @@ public Q_SLOTS:
     void refresh ();
 
 protected:
-    bool event (QEvent *event);
-
-    void timerEvent (QTimerEvent *event);
+    virtual void timerEvent (QTimerEvent *event) override;
 
 Q_SIGNALS:
 
