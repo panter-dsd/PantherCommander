@@ -3,19 +3,20 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QList>
 #include <QtCore/QObject>
-
-class VolumeWatcher;
+#include <QtCore/QStorageInfo>
 
 class VolumeInfoProvider : public QObject
 {
 Q_OBJECT
+public:
+    using Storages = QList<QStorageInfo>;
 
 public:
     explicit VolumeInfoProvider (QObject *parent = 0);
 
     virtual ~VolumeInfoProvider ();
 
-    virtual QFileInfoList volumes () const;
+    virtual Storages volumes () const;
 
     virtual QString volumeLabel (const QString &volume) const;
 
@@ -29,7 +30,10 @@ Q_SIGNALS:
 
     void volumeRemoved (const QString &volume);
 
-protected:
-    VolumeWatcher *watcher;
+private:
+    Q_DISABLE_COPY (VolumeInfoProvider)
+
+private:
+    Storages storages_;
 };
 

@@ -13,11 +13,11 @@ SelectDiscDialog::SelectDiscDialog (QWidget *parent)
     discList = new QListWidget (this);
 
     QListWidgetItem *item;
-        foreach(const QFileInfo &fi, VolumeInfoProvider ().volumes ()) {
-            item = new QListWidgetItem (QDir::toNativeSeparators (fi.absoluteFilePath ()), discList);
-            item->setData (Qt::EditRole, fi.absoluteFilePath ());
-            discList->addItem (item);
-        }
+    for (const QStorageInfo &info : VolumeInfoProvider ().volumes ()) {
+        item = new QListWidgetItem (QDir::toNativeSeparators (info.rootPath ()), discList);
+        item->setData (Qt::EditRole, info.rootPath ());
+        discList->addItem (item);
+    }
 
     discList->setCurrentRow (0);
 

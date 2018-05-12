@@ -59,33 +59,33 @@ void DriveBar::loadDrivesList ()
     QAction *action;
     QToolButton *button;
 
-        foreach(const QFileInfo &fi, VolumeInfoProvider ().volumes ()) {
-            const QString &path = fi.path ();
+    for (const QStorageInfo &info : VolumeInfoProvider ().volumes ()) {
+        const QString &path = info.rootPath ();
 
-            action = new QAction (this);
-            action->setText (isDrive (path) ? path.left (1) : fi.fileName ());
+        action = new QAction (this);
+        action->setText (isDrive (path) ? path.left (1) : info.rootPath ());
 #ifdef Q_WS_WIN
-            action->setIcon(iconProvider->icon(fi));
+        action->setIcon(iconProvider->icon(fi));
 #else
-            action->setIcon (iconProvider->icon (QFileIconProvider::Drive));
+        action->setIcon (iconProvider->icon (QFileIconProvider::Drive));
 #endif
-            action->setToolTip (QDir::toNativeSeparators (path));
-            action->setData (path);
-            action->setCheckable (true);
-            actionGroup->addAction (action);
+        action->setToolTip (QDir::toNativeSeparators (path));
+        action->setData (path);
+        action->setCheckable (true);
+        actionGroup->addAction (action);
 
-            button = new QToolButton (this);
-            button->setIconSize (QSize (16, 16));
-            button->setDefaultAction (action);
-            button->setToolButtonStyle (Qt::ToolButtonTextBesideIcon);
-            button->setAutoRaise (true);
-            button->setFocusPolicy (Qt::NoFocus);
-            button->setContextMenuPolicy (Qt::CustomContextMenu);
-            connect (button, SIGNAL(customContextMenuRequested (QPoint)),
-                     this, SLOT(_q_showContextMenu (QPoint)));
+        button = new QToolButton (this);
+        button->setIconSize (QSize (16, 16));
+        button->setDefaultAction (action);
+        button->setToolButtonStyle (Qt::ToolButtonTextBesideIcon);
+        button->setAutoRaise (true);
+        button->setFocusPolicy (Qt::NoFocus);
+        button->setContextMenuPolicy (Qt::CustomContextMenu);
+        connect (button, SIGNAL(customContextMenuRequested (QPoint)),
+                 this, SLOT(_q_showContextMenu (QPoint)));
 
-            layout->addWidget (button);
-        }
+        layout->addWidget (button);
+    }
     setLayout (layout);
 }
 

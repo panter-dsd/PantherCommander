@@ -51,10 +51,10 @@ void FilePanel::createWidgets ()
     qcbDriveComboBox = new QComboBox (this);
     qcbDriveComboBox->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Preferred);
     qcbDriveComboBox->setFocusPolicy (Qt::NoFocus);
-        foreach(const QFileInfo &fi, VolumeInfoProvider ().volumes ()) {
-            QString path = fi.absoluteFilePath ();
-            qcbDriveComboBox->addItem (QString ("[-%1-]").arg (isDrive (path) ? path.left (1) : fi.fileName ()));
-        }
+    for (const QStorageInfo &info : VolumeInfoProvider ().volumes ()) {
+        QString path = info.rootPath ();
+        qcbDriveComboBox->addItem (QString ("[-%1-]").arg (isDrive (path) ? path.left (1) : info.rootPath ()));
+    }
 
     qlDiscInformation = new QLabel (this);
 

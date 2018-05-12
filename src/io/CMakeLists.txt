@@ -9,14 +9,10 @@ INCLUDE_DIRECTORIES(
 
 SET(SOURCE
     VolumeInfoProvider.cpp
-    VolumeWatcher.cpp
-    VolumeWatcher_unix.cpp
     )
 
 SET(HEADERS
     VolumeInfoProvider.h
-    VolumeWatcher_p.h
-    VolumeWatcher_unix_p.h
     )
 
 ADD_LIBRARY(${TARGET} ${SOURCE} ${HEADERS})
