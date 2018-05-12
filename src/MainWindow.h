@@ -1,8 +1,9 @@
 #pragma once
 
-#include <QMainWindow>
-#include <QMap>
-#include <QPointer>
+#include <QtCore/QMap>
+#include <QtCore/QPointer>
+
+#include <QtWidgets/QMainWindow>
 
 class QLabel;
 
@@ -39,14 +40,9 @@ class ToolBarButton;
 class MainWindow : public QMainWindow
 {
 Q_OBJECT
-    Q_PROPERTY(QStringList commandHistory
-                   READ
-                       commandHistory
-                   WRITE
-                   setCommandHistory)
 
 public:
-    explicit MainWindow (QWidget *parent = 0);
+    explicit MainWindow (QWidget *parent = nullptr);
 
     virtual ~MainWindow ();
 
@@ -67,21 +63,21 @@ private:
 
     void loadSettings ();
 
-    inline void connectToolBar (ToolBar *toolBar);
+    void connectToolBar (ToolBar *toolBar);
 
     QMenu *createToolBarsMenu (ToolBar *currentToolBar);
 
 protected:
-    void resizeEvent (QResizeEvent *event);
+    virtual void resizeEvent (QResizeEvent *event) override;
 
-    void dropEvent (QDropEvent *event);
+    virtual void dropEvent (QDropEvent *event) override;
 
-    void dragMoveEvent (QDragMoveEvent *event);
+    virtual void dragMoveEvent (QDragMoveEvent *event) override;
 
-    void dragEnterEvent (QDragEnterEvent *event);
+    virtual void dragEnterEvent (QDragEnterEvent *event) override;
 
     FileOperationsDialog *addJob (FileOperationsDialog *queue, FileOperationsThread::FileOperation operation,
-                                   const QStringList &parameters);
+                                  const QStringList &parameters);
 
 private Q_SLOTS:
 
@@ -134,13 +130,6 @@ private Q_SLOTS:
     void cdExecute (const QString &path);
 
     void slotToolBarContextMenu (const QPoint &pos);
-
-    /* ** TESTING PURPOSES ONLY ** */
-    void slotTestingFileDialog ();
-
-#ifdef Q_WS_WIN
-    void slotTestingEnableNTFSPermissionLookup(bool enable);
-#endif
 
 private:
     DriveBar *leftDriveBar_;
