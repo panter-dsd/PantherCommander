@@ -598,36 +598,17 @@ bool FileListModel::setData (const QModelIndex &index, const QVariant &value, in
 
 QVariant FileListModel::headerData (int section, Qt::Orientation orientation, int role) const
 {
-    if (role == Qt::DisplayRole) {
-        if (orientation == Qt::Horizontal) {
-            switch (section) {
-                case NameColumn:
-                    return tr ("Name");
-
-                case TypeColumn:
-                    return tr ("Type");
-
-                case SizeColumn:
-                    return tr ("Size");
-
-                case ModifiedTimeColumn:
-                    return tr ("Date");
-
-                case OwnerColumn:
-                    return tr ("Owner");
-
-                case GroupColumn:
-                    return tr ("Group");
-
-                case PermissionsColumn:
-                    return tr ("Permissions");
-
-                default:
-                    break;
-            }
-        }
-
-        return section + 1;
+    if ((role == Qt::DisplayRole) && (orientation == Qt::Horizontal)) {
+        static const QMap<int, QString> header {
+            {NameColumn,         tr ("Name")},
+            {TypeColumn,         tr ("Type")},
+            {SizeColumn,         tr ("Size")},
+            {ModifiedTimeColumn, tr ("Date")},
+            {OwnerColumn,        tr ("Owner")},
+            {GroupColumn,        tr ("Group")},
+            {PermissionsColumn,  tr ("Permissions")},
+        };
+        return header.value (section, QString {});
     }
 
     return QVariant ();
