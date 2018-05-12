@@ -26,14 +26,16 @@ Q_SIGNALS:
 
     void volumeAdded (const QString &volume);
 
-    void volumeChanged (const QString &volume);
-
     void volumeRemoved (const QString &volume);
 
 private:
     Q_DISABLE_COPY (VolumeInfoProvider)
 
+    void checkVolumes ();
+
 private:
     Storages storages_;
+
+    class QTimer *timer_;
 };
 
