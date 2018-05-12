@@ -12,15 +12,15 @@ public:
     using Storages = QList<QStorageInfo>;
 
 public:
-    explicit VolumeInfoProvider (QObject *parent = 0);
+    explicit VolumeInfoProvider (QObject *parent = nullptr);
 
     virtual ~VolumeInfoProvider ();
 
-    virtual Storages volumes () const;
+    Storages volumes () const;
 
-    virtual QString volumeLabel (const QString &volume) const;
+    QString volumeLabel (const QString &volume) const;
 
-    virtual bool getDiskFreeSpace (const QString &volume, qint64 *total, qint64 *free, qint64 *available) const;
+    bool getDiskFreeSpace (const QString &volume, qint64 *total, qint64 *free, qint64 *available) const;
 
 Q_SIGNALS:
 
