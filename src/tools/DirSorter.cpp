@@ -245,23 +245,24 @@ bool DirSortItemComparator::operator() (const DirSortItem &n1, const DirSortItem
 
 QFileInfoList Dir::sortFileList (QFileInfoList &infos, QDir::SortFlags sort)
 {
-    QFileInfoList ret;
-    int n = infos.size ();
-    if (n > 0) {
-        if (n == 1 || ((sort & QDir::SortByMask) == QDir::Unsorted)) {
-            ret = infos;
+    QFileInfoList result {};
+    const int count = infos.size ();
+    result.reserve (count);
+    if (count > 0) {
+        if (count == 1 || ((sort & QDir::SortByMask) == QDir::Unsorted)) {
+            result = infos;
         } else {
-            DirSortItem *si = new DirSortItem[n];
-            for (int i = 0; i < n; ++i) {
+            DirSortItem *si = new DirSortItem[count];
+            for (int i = 0; i < count; ++i) {
                 si[i].item_ = infos.at (i);
             }
-            qSort (si, si + n, DirSortItemComparator (sort));
+            qSort (si, si + count, DirSortItemComparator (sort));
             // put them back in the list(s)
-            for (int i = 0; i < n; ++i) {
-                ret.append (si[i].item_);
+            for (int i = 0; i < count; ++i) {
+                result.append (si[i].item_);
             }
             delete[] si;
         }
     }
-    return ret;
+    return result;
 }
