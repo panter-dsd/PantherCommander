@@ -2,23 +2,13 @@
 
 #include "AbstractPreferencesPage.h"
 
-
-class QLabel;
-
-class QLineEdit;
-
-class QCheckBox;
-
-
 class GlobalPreferencePage : public AbstractPreferencesPage
 {
 Q_OBJECT
-private:
-    QCheckBox *qchbUseNativeDialogs;
 public:
-    GlobalPreferencePage (QWidget *parent = 0);
+    explicit GlobalPreferencePage (QWidget *parent = nullptr);
 
-    ~GlobalPreferencePage ();
+    virtual ~GlobalPreferencePage ();
 
     void saveSettings ();
 
@@ -26,18 +16,13 @@ public:
 
     void setDefaults ();
 
-//	QString preferenceGroup() const
-//	{ return tr("Global"); }
-    static QString preferenceGroup ()
-    {
-        return tr ("Global");
-    }
+    static QString preferenceGroup ();
 
 private:
-    void createControls ();
-
-    void setLayouts ();
 
     void setConnects ();
+
+private:
+    class QCheckBox *useNativeDialogs_;
 };
 
