@@ -24,13 +24,6 @@ public:
     static QString preferenceGroup ();
 
 private:
-    void createControls ();
-
-    void setLayouts ();
-
-    void setConnects ();
-
-private:
     QGroupBox *globalGroupBox_;
     QCheckBox *showDriveBar_;
     QCheckBox *showTwoDriveBars_;
