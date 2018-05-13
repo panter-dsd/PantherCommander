@@ -101,45 +101,27 @@ void FileOperationsDialog::createActions ()
 //
 void FileOperationsDialog::setConnects ()
 {
-    connect (actionPauseResume,
-             SIGNAL(triggered ()),
-             this,
-             SLOT(slotPauseResume ()));
-    connect (actionCancel,
-             SIGNAL(triggered ()),
-             this,
-             SLOT(slotCancel ()));
-    connect (actionShowHideJobList,
-             SIGNAL(triggered ()),
-             this,
-             SLOT(slotShowHideJobList ()));
-    connect (this,
-             SIGNAL(jobAdding (SJob & )),
-             this,
-             SLOT(slotAddingJob (SJob & )));
+    connect (actionPauseResume, &QAction::triggered, this, &FileOperationsDialog::slotPauseResume);
+    connect (actionCancel, &QAction::triggered, this, &FileOperationsDialog::slotCancel);
+    connect (actionShowHideJobList, &QAction::triggered, this, &FileOperationsDialog::slotShowHideJobList);
+    connect (this, &FileOperationsDialog::jobAdding, this, &FileOperationsDialog::slotAddingJob);
 
-    connect (qfotOperatinThread,
-             SIGNAL(finished ()),
-             this,
-             SLOT(slotNextJob ()));
-    connect (qfotOperatinThread,
-             SIGNAL(changedPercent (int)),
-             qprbCurrentFile,
-             SLOT(setValue (int)));
-    connect (qfotOperatinThread,
-             SIGNAL(changedValue (qint64)),
-             this,
-             SLOT(slotValueChanged (qint64)));
-    connect (qfotOperatinThread,
-             SIGNAL(currentFileCopyChanged (QString, QString)),
-             this,
-             SLOT(slotCurrentFileCopyChanged (QString, QString)),
+    connect (qfotOperatinThread, &FileOperationsThread::finished,
+             this, &FileOperationsDialog::slotNextJob
+    );
+    connect (qfotOperatinThread, &FileOperationsThread::changedPercent,
+             qprbCurrentFile, &QProgressBar::setValue
+    );
+    connect (qfotOperatinThread, &FileOperationsThread::changedValue,
+             this, &FileOperationsDialog::slotValueChanged
+    );
+    connect (qfotOperatinThread, &FileOperationsThread::currentFileCopyChanged,
+             this, &FileOperationsDialog::slotCurrentFileCopyChanged,
              Qt::BlockingQueuedConnection
     );
-    connect (qfotOperatinThread,
-             SIGNAL(operationError ()),
-             this,
-             SLOT(slotOperationError ()));
+    connect (qfotOperatinThread, &FileOperationsThread::operationError,
+             this, &FileOperationsDialog::slotOperationError
+    );
 }
 
 //
