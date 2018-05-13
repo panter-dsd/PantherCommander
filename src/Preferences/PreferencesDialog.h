@@ -8,17 +8,17 @@ class QDialogButtonBox;
 
 class QPushButton;
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 class PreferencesDialog : public QDialog
 {
 Q_OBJECT
 
-private:
-    QListWidget *qlwPreferencesList;
-    QStackedWidget *qswPreferencesWidgets;
-    QDialogButtonBox *qdbbButtons;
-    QPushButton *qpbSetDefaults;
+public:
+    explicit PreferencesDialog (QWidget *parent = nullptr,
+                                Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
+
+    virtual ~PreferencesDialog ();
 
 private:
     void createControls ();
@@ -31,26 +31,22 @@ private:
 
     void loadSettings ();
 
-    void saveSattings ();
-
-public:
-    PreferencesDialog (QWidget *parent = 0,
-                        Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
-
-    ~PreferencesDialog ();
+    void saveSettings ();
 
 private Q_SLOTS:
 
     void slotSavePreferences ();
 
-    void slotSavePreferencesAndExit ()
-    {
-        slotSavePreferences ();
-        close ();
-    }
+    void slotSavePreferencesAndExit ();
 
     void slotSetApplyEnabled ();
 
     void slotSetDefaults ();
+
+private:
+    QListWidget *preferencesList_;
+    QStackedWidget *preferencesWidgets_;
+    QDialogButtonBox *buttons_;
+    QPushButton *setDefaultsButton_;
 };
 
