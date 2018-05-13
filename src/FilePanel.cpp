@@ -46,7 +46,7 @@ void FilePanel::createWidgets ()
     qtbDriveButton->setToolButtonStyle (Qt::ToolButtonTextBesideIcon);
     qtbDriveButton->setAutoRaise (true);
     qtbDriveButton->setFocusPolicy (Qt::NoFocus);
-    connect (qtbDriveButton, SIGNAL(clicked ()), this, SLOT(slotSelectDisc ()));
+    connect (qtbDriveButton, &QToolButton::clicked, this, &FilePanel::slotSelectDisc);
 
     qcbDriveComboBox = new QComboBox (this);
     qcbDriveComboBox->setSizePolicy (QSizePolicy::Maximum, QSizePolicy::Preferred);
@@ -68,20 +68,14 @@ void FilePanel::createWidgets ()
     qtabbTabs->setSelectionBehaviorOnRemove (QTabBar::SelectPreviousTab);
 #endif
 
-    connect (qtabbTabs, SIGNAL(newTab ()), this, SLOT(slotAddTab ()));
-    connect (qtabbTabs, SIGNAL(cloneTab (int)), this, SLOT(slotAddTab ()));
-    connect (qtabbTabs, SIGNAL(currentChanged (int)), this, SLOT(slotCurrentTabChange (int)));
+    connect (qtabbTabs, &TabBar::newTab, this, &FilePanel::slotAddTab);
+    connect (qtabbTabs, &TabBar::tabCloned, this, &FilePanel::slotAddTab);
+    connect (qtabbTabs, &TabBar::currentChanged, this, &FilePanel::slotCurrentTabChange);
 
     qflvCurrentFileList = new FileWidget (qtabbTabs);
     qflvCurrentFileList->setContextMenuPolicy (Qt::PreventContextMenu);
-    connect (qflvCurrentFileList, SIGNAL(directoryEntered (
-                                             const QString&)),
-             this, SLOT(slotPathChanged (
-                            const QString&)));
-    connect (qflvCurrentFileList, SIGNAL(directoryEntered (
-                                             const QString&)),
-             this, SIGNAL(pathChanged (
-                              const QString&)));
+    connect (qflvCurrentFileList, &FileWidget::directoryEntered, this, &FilePanel::slotPathChanged);
+    connect (qflvCurrentFileList, &FileWidget::directoryEntered, this, &FilePanel::pathChanged);
 
     QHBoxLayout *qhbDiscLayout = new QHBoxLayout;
     qhbDiscLayout->addWidget (qtbDriveButton);
@@ -300,14 +294,12 @@ void FilePanel::loadSettings ()
 
         bool bFirstTab = (qtabbTabs->count () == 0);
         if (bFirstTab) {
-            disconnect (qtabbTabs, SIGNAL(currentChanged (int)),
-                        this, SLOT(slotCurrentTabChange (int)));
+            disconnect (qtabbTabs, &TabBar::currentChanged, this, &FilePanel::slotCurrentTabChange);
         }
         int index = addTab (lastVisitedDir, false);
         qtabbTabs->setTabData (index, data);
         if (bFirstTab) {
-            connect (qtabbTabs, SIGNAL(currentChanged (int)),
-                     this, SLOT(slotCurrentTabChange (int)));
+            connect (qtabbTabs, &TabBar::currentChanged, this, &FilePanel::slotCurrentTabChange);
             if (index == currentIndex) {
                 slotCurrentTabChange (index);
             }
@@ -450,7 +442,7 @@ void FilePanel::slotSelectDisc ()
 {
     SelectDiscDialog *dialog = new SelectDiscDialog (this);
     dialog->setPath (path ());
-    connect (dialog, SIGNAL(setectedDisc (QString)), this, SLOT(setPath (QString)));
+    connect (dialog, &SelectDiscDialog::setectedDisc, this, &FilePanel::setPath);
 
     dialog->setWindowFlags (Qt::Popup);
     dialog->setAttribute (Qt::WA_DeleteOnClose);

@@ -35,7 +35,7 @@ Q_SIGNALS:
 
     void newTab ();
 
-    void cloneTab (int index);
+    void tabCloned (int index);
 
 private Q_SLOTS:
 

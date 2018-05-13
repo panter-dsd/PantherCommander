@@ -86,9 +86,7 @@ void TabBar::cloneTab ()
     if (QAction *action = qobject_cast<QAction *> (sender ())) {
         int index = action->data ().toInt ();
         if (index != -1)
-            emit {
-            cloneTab (index);
-        }
+            emit tabCloned (index);
     }
 }
 
