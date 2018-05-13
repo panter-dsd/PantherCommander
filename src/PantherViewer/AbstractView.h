@@ -1,29 +1,23 @@
 #pragma once
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 class AbstractView : public QWidget
 {
 Q_OBJECT
 
-private:
-    QString qsFileName;
 public:
-    AbstractView (const QString &fileName, QWidget *parent = 0);
+    AbstractView (const QString &fileName, QWidget *parent = nullptr);
 
-    static bool isOpen (const QString & /*fileName*/)
-    {
-        return false;
-    }
+    virtual ~AbstractView ();
 
-    virtual void setTextCodec (const QString & /*codecName*/)
-    {
-        ;
-    }
+    static bool isOpen (const QString &fileName);
 
-    virtual QString textCodec ()
-    {
-        return "System";
-    }
+    virtual void setTextCodec (const QString &codecName);
+
+    virtual QString textCodec ();
+
+private:
+    QString fileName_;
 };
 

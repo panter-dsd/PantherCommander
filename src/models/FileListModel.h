@@ -42,14 +42,9 @@ public:
 
     void setFilter (QDir::Filters filters);
 
-    bool isReadOnly () const
-    {
-        return false;
-    }
+    bool isReadOnly () const;
 
-    void setReadOnly (bool)
-    {
-    }
+    void setReadOnly (bool);
 
     QFileIconProvider *iconProvider () const;
 

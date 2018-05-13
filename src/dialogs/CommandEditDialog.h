@@ -29,9 +29,7 @@ Q_OBJECT
 public:
     CommandEditDialog (QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint);
 
-    virtual ~CommandEditDialog ()
-    {
-    }
+    virtual ~CommandEditDialog ();
 
     void setCommandObjectName (const QString &objectName);
 

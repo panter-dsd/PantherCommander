@@ -312,7 +312,6 @@ FileListModel::FileListModel (QObject *parent)
     d_ptr->q_ptr = this;
 
     connect (&d_ptr->futureWatcher, SIGNAL (finished ()), this, SLOT (_q_finishedLoadIcons ()));
-
 #ifndef QT_NO_FILESYSTEMWATCHER
     connect (d_ptr->fileSystemWatcher, SIGNAL (directoryChanged (const QString &)),
              this, SLOT (_q_directoryChanged ()));
@@ -942,6 +941,15 @@ void FileListModel::timerEvent (QTimerEvent *event)
     }
 
     QAbstractItemModel::timerEvent (event);
+}
+
+bool FileListModel::isReadOnly () const
+{
+    return false;
+}
+
+void FileListModel::setReadOnly (bool)
+{
 }
 
 #include <moc_FileListModel.cpp>

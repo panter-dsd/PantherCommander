@@ -18,9 +18,7 @@ Q_OBJECT
 public:
     explicit CopyMoveDialog (QWidget *parent = 0);
 
-    virtual ~CopyMoveDialog ()
-    {
-    }
+    virtual ~CopyMoveDialog ();
 
     void setSource (const QStringList &fileList);
 

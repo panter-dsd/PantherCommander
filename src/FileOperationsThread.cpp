@@ -241,7 +241,7 @@ bool FileOperationsThread::removeFile (const QString &qsFileName)
 
     if (fileInfo.isHidden ()
 #ifdef Q_WS_WIN
-        || (FileOperationsThread::winFileAttributes(qsFileName) & FILE_ATTRIBUTE_SYSTEM)
+        || (FileOperationsThread::winFileAttributes(fileName_) & FILE_ATTRIBUTE_SYSTEM)
 #endif
         ) {
         lastError = FO_PERMISIONS_ERROR;
@@ -253,7 +253,7 @@ bool FileOperationsThread::removeFile (const QString &qsFileName)
     if(file.fileEngine()->fileFlags(QAbstractFileEngine::LocalDiskFlag) & QAbstractFileEngine::LocalDiskFlag)
     {
         // Set null attributes
-        SetFileAttributes((wchar_t*)qsFileName.utf16(), 0);
+        SetFileAttributes((wchar_t*)fileName_.utf16(), 0);
     }
 #endif
 

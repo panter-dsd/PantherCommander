@@ -190,3 +190,7 @@ void CommandEditDialog::removeShortcut ()
 
     delete shortcutWidgets_.takeLast ();
 }
+
+CommandEditDialog::~CommandEditDialog ()
+{
+}

@@ -105,3 +105,7 @@ int CopyMoveDialog::queueIndex () const
     return queueComboBox_->currentIndex ();
 }
 
+CopyMoveDialog::~CopyMoveDialog ()
+{
+}
+
