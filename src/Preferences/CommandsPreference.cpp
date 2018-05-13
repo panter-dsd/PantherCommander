@@ -20,8 +20,7 @@ CommandsPreference::CommandsPreference (QWidget *parent)
     qgbCommands = new QGroupBox (tr ("Commands"), this);
 
     qlwCategoryList = new QListWidget (this);
-    connect (qlwCategoryList, SIGNAL(currentTextChanged (QString)),
-             this, SLOT(loadActions (QString)));
+    connect (qlwCategoryList, &QListWidget::currentTextChanged, this, &CommandsPreference::loadActions);
 
     qtwActionsTable = new QTableWidget (this);
 
@@ -37,8 +36,7 @@ CommandsPreference::CommandsPreference (QWidget *parent)
     qtwActionsTable->setHorizontalScrollMode (QAbstractItemView::ScrollPerPixel);
     qtwActionsTable->verticalHeader ()->hide ();
     qtwActionsTable->setContextMenuPolicy (Qt::ActionsContextMenu);
-    connect (qtwActionsTable, SIGNAL(activated (QModelIndex)),
-             this, SIGNAL(itemActivated ()));
+    connect (qtwActionsTable, &QTableWidget::activated, this, &CommandsPreference::itemActivated);
 
     QHBoxLayout *qhblCommandsLayout = new QHBoxLayout ();
     qhblCommandsLayout->addWidget (qlwCategoryList);
@@ -48,12 +46,10 @@ CommandsPreference::CommandsPreference (QWidget *parent)
     qgbFilter = new QGroupBox (tr ("Filter"), this);
 
     qleFilter = new QLineEdit (this);
-    connect (qleFilter, SIGNAL(textChanged (QString)),
-             this, SLOT(filterChange (QString)));
+    connect (qleFilter, &QLineEdit::textChanged, this, &CommandsPreference::filterChange);
 
     qtbClearFilter = new QToolButton (this);
-    connect (qtbClearFilter, SIGNAL(clicked ()),
-             qleFilter, SLOT(clear ()));
+    connect (qtbClearFilter, &QToolButton::clicked, qleFilter, &QLineEdit::clear);
 
     QHBoxLayout *qhblFilterLayout = new QHBoxLayout ();
     qhblFilterLayout->addWidget (qleFilter);
@@ -69,8 +65,7 @@ CommandsPreference::CommandsPreference (QWidget *parent)
     loadSettings ();
 
     qaEditCommand = new QAction (tr ("Edit command"), this);
-    connect (qaEditCommand, SIGNAL(triggered ()),
-             this, SLOT(editCommand ()));
+    connect (qaEditCommand, &QAction::triggered, this, &CommandsPreference::editCommand);
     qtwActionsTable->addAction (qaEditCommand);
 }
 
