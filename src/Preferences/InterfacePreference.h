@@ -2,43 +2,18 @@
 
 #include "AbstractPreferencesPage.h"
 
-
-class QCheckBox;
-
 class QGroupBox;
 
+class QCheckBox;
 
 class InterfacePreference : public AbstractPreferencesPage
 {
 Q_OBJECT
 
-private:
-    QGroupBox *qgbGlobal;
-    QCheckBox *qchbShowDriveBar;
-    QCheckBox *qchbShowTwoDriveBar;
-    QCheckBox *qchbShowDriveButton;
-    QCheckBox *qchbShowDriveComboBox;
-    QCheckBox *qchbShowTabs;
-    QCheckBox *qchbShowHeader;
-    QCheckBox *qchbShowDirInformation;
-    QCheckBox *qchbShowCommandLine;
-    QCheckBox *qchbShowFunctionButtons;
-
-    QGroupBox *qgbCurrentPathEditor;
-    QCheckBox *qchbShowHistory;
-    QCheckBox *qchbShowGotoRoot;
-    QCheckBox *qchbShowGotoUp;
-    QCheckBox *qchbShowGotoHome;
-
-    QGroupBox *qgbFlatInterface;
-    QCheckBox *qchbFlatToolBar;
-    QCheckBox *qchbFlatDriveBar;
-    QCheckBox *qchbFlatDriveButtons;
-    QCheckBox *qchbFlatFunctionButtons;
 public:
-    InterfacePreference (QWidget *parent = 0);
+    explicit InterfacePreference (QWidget *parent = nullptr);
 
-    ~InterfacePreference ();
+    virtual ~InterfacePreference ();
 
     void saveSettings ();
 
@@ -46,10 +21,7 @@ public:
 
     void setDefaults ();
 
-    static QString preferenceGroup ()
-    {
-        return tr ("Interface");
-    }
+    static QString preferenceGroup ();
 
 private:
     void createControls ();
@@ -57,5 +29,29 @@ private:
     void setLayouts ();
 
     void setConnects ();
+
+private:
+    QGroupBox *globalGroupBox_;
+    QCheckBox *showDriveBar_;
+    QCheckBox *showTwoDriveBars_;
+    QCheckBox *showDriveButton_;
+    QCheckBox *showDriveComboBox_;
+    QCheckBox *showTabs_;
+    QCheckBox *showHeader_;
+    QCheckBox *showDirInformation_;
+    QCheckBox *showCommandLine_;
+    QCheckBox *showFunctionButtons_;
+
+    QGroupBox *currentPathEditorGroupBox_;
+    QCheckBox *showHistory_;
+    QCheckBox *showGoRoot_;
+    QCheckBox *showGoUp_;
+    QCheckBox *showGoHome_;
+
+    QGroupBox *flatInterface_;
+    QCheckBox *flatToolBar_;
+    QCheckBox *flatDriveBar_;
+    QCheckBox *flatDriveButtons_;
+    QCheckBox *flatFunctionButtons_;
 };
 
