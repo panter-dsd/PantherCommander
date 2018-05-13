@@ -33,14 +33,8 @@ void CopyMoveDialog::createControls ()
                                      Qt::Horizontal,
                                      this
     );
-    connect (buttons_,
-             SIGNAL(accepted ()),
-             this,
-             SLOT(accept ()));
-    connect (buttons_,
-             SIGNAL(rejected ()),
-             this,
-             SLOT(reject ()));
+    connect (buttons_, &QDialogButtonBox::accepted, this, &CopyMoveDialog::accept);
+    connect (buttons_, &QDialogButtonBox::rejected, this, &CopyMoveDialog::reject);
 }
 
 void CopyMoveDialog::setLayouts ()

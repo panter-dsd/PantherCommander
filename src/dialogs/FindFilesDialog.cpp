@@ -88,7 +88,7 @@ FindFilesDialog::FindFilesDialog (QWidget *parent)
     QWidget *preferencesPage = new QWidget (this);
 
     browseButton_ = new QPushButton (tr ("&Browse..."), this);
-    connect (browseButton_, SIGNAL(clicked ()), this, SLOT(browse ()));
+    connect (browseButton_, &QPushButton::clicked, this, &FindFilesDialog::browse);
 
     fileComboBox_ = new QComboBox (this);
     fileComboBox_->setEditable (true);
@@ -133,8 +133,7 @@ FindFilesDialog::FindFilesDialog (QWidget *parent)
     filesTable_->verticalHeader ()->hide ();
     filesTable_->setShowGrid (false);
 
-    connect (filesTable_, SIGNAL(cellActivated (int, int)),
-             this, SLOT(_slot_cellActivated (int, int)));
+    connect (filesTable_, &QTableWidget::cellActivated, this, &FindFilesDialog::_slot_cellActivated);
 
     filesFoundLabel_ = new QLabel (this);
 
@@ -146,7 +145,7 @@ FindFilesDialog::FindFilesDialog (QWidget *parent)
     tabber_->addTab (resultsPage, tr ("&Results"));
 
     findButton_ = new QPushButton (tr ("&Find"), this);
-    connect (findButton_, SIGNAL(clicked ()), this, SLOT(find ()));
+    connect (findButton_, &QPushButton::clicked, this, &FindFilesDialog::find);
 
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
     buttonsLayout->addStretch ();
