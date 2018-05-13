@@ -21,10 +21,8 @@ SelectDiscDialog::SelectDiscDialog (QWidget *parent)
 
     discList->setCurrentRow (0);
 
-    connect (discList, SIGNAL(itemActivated (QListWidgetItem * )),
-             this, SLOT(selectDisc (QListWidgetItem * )));
-    connect (discList, SIGNAL(itemClicked (QListWidgetItem * )),
-             this, SLOT(selectDisc (QListWidgetItem * )));
+    connect (discList, &QListWidget::itemActivated, this, &SelectDiscDialog::selectDisc);
+    connect (discList, &QListWidget::itemClicked, this, &SelectDiscDialog::selectDisc);
 
     QVBoxLayout *layout = new QVBoxLayout ();
     layout->setContentsMargins (0, 0, 0, 0);
