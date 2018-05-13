@@ -146,14 +146,13 @@ void InterfacePreference::setLayouts ()
 //
 void InterfacePreference::setConnects ()
 {
-    connect (qchbShowDriveBar, SIGNAL(toggled (bool)), qchbShowTwoDriveBar, SLOT(setEnabled (bool)));
+    connect (qchbShowDriveBar, &QCheckBox::toggled, qchbShowTwoDriveBar, &QCheckBox::setEnabled);
 
-    QList<QCheckBox *> checkBoxList = this->findChildren<QCheckBox *> ();
-        foreach(const QCheckBox *checkBox, checkBoxList) {
-            connect (checkBox, SIGNAL(stateChanged (int)), this, SIGNAL(modified ()));
-        }
+    for (const QCheckBox *checkBox: this->findChildren<QCheckBox *> ()) {
+        connect (checkBox, &QCheckBox::stateChanged, this, &InterfacePreference::modified);
+    }
 
-    connect (qgbCurrentPathEditor, SIGNAL(toggled (bool)), this, SIGNAL(modified ()));
-    connect (qgbFlatInterface, SIGNAL(toggled (bool)), this, SIGNAL(modified ()));
+    connect (qgbCurrentPathEditor, &QGroupBox::toggled, this, &InterfacePreference::modified);
+    connect (qgbFlatInterface, &QGroupBox::toggled, this, &InterfacePreference::modified);
 }
 //
