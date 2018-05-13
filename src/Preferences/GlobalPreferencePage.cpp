@@ -57,9 +57,8 @@ void GlobalPreferencePage::setLayouts ()
 //
 void GlobalPreferencePage::setConnects ()
 {
-    QList<QCheckBox *> checkBoxList = this->findChildren<QCheckBox *> ();
-        foreach(const QCheckBox *checkBox, checkBoxList) {
-            connect (checkBox, SIGNAL(stateChanged (int)), this, SIGNAL(modified ()));
-        }
+    for (const QCheckBox *checkBox : findChildren<QCheckBox *> ()) {
+        connect (checkBox, &QCheckBox::stateChanged, this, &GlobalPreferencePage::modified);
+    }
 }
 //
