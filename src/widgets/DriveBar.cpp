@@ -6,7 +6,6 @@
 #include <QtWidgets/QToolButton>
 
 #include "DriveBar.h"
-#include "src/AppSettings.h"
 
 #ifdef Q_WS_WIN
 #  include "filecontextmenu.h"
@@ -30,7 +29,7 @@ DriveBar::DriveBar (QWidget *parent)
     lastChecked = 0;
 
     actionGroup = new QActionGroup (this);
-    connect (actionGroup, SIGNAL(triggered (QAction * )), this, SLOT(_q_actionTriggered (QAction * )));
+    connect (actionGroup, &QActionGroup::triggered, this, &DriveBar::_q_actionTriggered);
 
     provider = new VolumeInfoProvider (this);
 
@@ -38,10 +37,8 @@ DriveBar::DriveBar (QWidget *parent)
 
     loadDrivesList ();
 
-    connect (provider, SIGNAL(volumeAdded (
-                                  const QString&)), this, SLOT(volumeAdd (QString)));
-    connect (provider, SIGNAL(volumeRemoved (
-                                  const QString&)), this, SLOT(volumeRemove (QString)));
+    connect (provider, &VolumeInfoProvider::volumeAdded, this, &DriveBar::volumeAdd);
+    connect (provider, &VolumeInfoProvider::volumeRemoved, this, &DriveBar::volumeRemove);
 }
 
 DriveBar::~DriveBar ()
@@ -80,8 +77,7 @@ void DriveBar::loadDrivesList ()
         button->setAutoRaise (true);
         button->setFocusPolicy (Qt::NoFocus);
         button->setContextMenuPolicy (Qt::CustomContextMenu);
-        connect (button, SIGNAL(customContextMenuRequested (QPoint)),
-                 this, SLOT(_q_showContextMenu (QPoint)));
+        connect (button, &QToolButton::customContextMenuRequested, this, &DriveBar::_q_showContextMenu);
 
         layout->addWidget (button);
     }
