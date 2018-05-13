@@ -21,12 +21,6 @@ public:
     virtual ~PreferencesDialog ();
 
 private:
-    void createControls ();
-
-    void setLayouts ();
-
-    void setConnects ();
-
     void setMaximumSizePreferencesList ();
 
     void loadSettings ();

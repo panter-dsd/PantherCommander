@@ -54,72 +54,16 @@ PreferencesDialog::PreferencesDialog (QWidget *parent, Qt::WindowFlags f)
     setDefaultsButton_ = new QPushButton (tr ("Default"), buttons_);
     buttons_->addButton (setDefaultsButton_, QDialogButtonBox::ApplyRole);
     buttons_->button (QDialogButtonBox::Apply)->setEnabled (false);
-    setLayouts ();
-    setConnects ();
-    loadSettings ();
-}
 
-PreferencesDialog::~PreferencesDialog ()
-{
-    saveSettings ();
-}
+    QHBoxLayout *preferencesLayout = new QHBoxLayout ();
+    preferencesLayout->addWidget (preferencesList_);
+    preferencesLayout->addWidget (preferencesWidgets_);
 
-void PreferencesDialog::createControls ()
-{
-    preferencesList_ = new QListWidget (this);
-    QStringList qslPreferenceItems;
-    qslPreferenceItems << GlobalPreferencePage::preferenceGroup ()
-                       << InterfacePreference::preferenceGroup ()
-                       << CommandsPreference::preferenceGroup ();
-    preferencesList_->addItems (qslPreferenceItems);
-    preferencesList_->setCurrentRow (0);
-    setMaximumSizePreferencesList ();
+    QVBoxLayout *mainLayout = new QVBoxLayout ();
+    mainLayout->addLayout (preferencesLayout);
+    mainLayout->addWidget (buttons_);
+    setLayout (mainLayout);
 
-    QScrollArea *area;
-    preferencesWidgets_ = new QStackedWidget ();
-
-    area = new QScrollArea (this);
-    area->setWidgetResizable (true);
-    area->setWidget (new GlobalPreferencePage (preferencesWidgets_));
-    preferencesWidgets_->addWidget (area);
-
-    area = new QScrollArea (this);
-    area->setWidgetResizable (true);
-    area->setWidget (new InterfacePreference (preferencesWidgets_));
-    preferencesWidgets_->addWidget (area);
-
-    area = new QScrollArea (this);
-    area->setWidgetResizable (true);
-    area->setWidget (new CommandsPreference (preferencesWidgets_));
-    preferencesWidgets_->addWidget (area);
-
-    buttons_ = new QDialogButtonBox (QDialogButtonBox::Ok
-                                     | QDialogButtonBox::Apply
-                                     | QDialogButtonBox::Cancel,
-                                     Qt::Horizontal,
-                                     this
-    );
-
-    setDefaultsButton_ = new QPushButton (tr ("Default"), buttons_);
-    buttons_->addButton (setDefaultsButton_, QDialogButtonBox::ApplyRole);
-    buttons_->button (QDialogButtonBox::Apply)->setEnabled (false);
-}
-
-void PreferencesDialog::setLayouts ()
-{
-    QHBoxLayout *qhblPreferencesLayout = new QHBoxLayout ();
-    qhblPreferencesLayout->addWidget (preferencesList_);
-    qhblPreferencesLayout->addWidget (preferencesWidgets_);
-
-    QVBoxLayout *qvblMainLayout = new QVBoxLayout ();
-    qvblMainLayout->addLayout (qhblPreferencesLayout);
-    qvblMainLayout->addWidget (buttons_);
-
-    setLayout (qvblMainLayout);
-}
-
-void PreferencesDialog::setConnects ()
-{
     connect (buttons_, &QDialogButtonBox::accepted, this, &PreferencesDialog::slotSavePreferencesAndExit);
     connect (buttons_, &QDialogButtonBox::rejected, this, &PreferencesDialog::reject);
     connect (buttons_->button (QDialogButtonBox::Apply), &QPushButton::clicked,
@@ -141,6 +85,12 @@ void PreferencesDialog::setConnects ()
             connect (widget, &AbstractPreferencesPage::modified, this, &PreferencesDialog::slotSetApplyEnabled);
         }
     }
+    loadSettings ();
+}
+
+PreferencesDialog::~PreferencesDialog ()
+{
+    saveSettings ();
 }
 
 void PreferencesDialog::setMaximumSizePreferencesList ()
