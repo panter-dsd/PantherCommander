@@ -41,10 +41,7 @@ void PlainView::createControls ()
     QVBoxLayout *layout = new QVBoxLayout ();
     layout->addWidget (qsbScroll);
     this->setLayout (layout);
-    connect (qsbScroll->verticalScrollBar (),
-             SIGNAL(valueChanged (int)),
-             this,
-             SLOT(slotScroll ()));
+    connect (qsbScroll->verticalScrollBar (), &QScrollBar::valueChanged, this, &PlainView::slotScroll);
 }
 
 //
