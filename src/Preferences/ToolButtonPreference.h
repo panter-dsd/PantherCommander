@@ -11,6 +11,7 @@ class QToolButton;
 class QAction;
 
 #include <QtWidgets/QWidget>
+
 #include <QtGui/QIcon>
 
 struct ToolBarButton
@@ -27,33 +28,11 @@ struct ToolBarButton
 class ToolButtonPreference : public QWidget
 {
 Q_OBJECT
-private:
-    QLabel *qlCommand;
-    QLineEdit *qleCommand;
-    QToolButton *qtbPCCommand;
-    QToolButton *qtbCommand;
-
-    QLabel *qlParams;
-    QLineEdit *qleParams;
-
-    QLabel *qlWorkDir;
-    QLineEdit *qleWorkDir;
-    QToolButton *qtbWorkDir;
-
-    QLabel *qlIconFile;
-    QLineEdit *qleIconFile;
-    QToolButton *qtbIconFile;
-
-    QLabel *qlIcon;
-    QListWidget *qlwIcons;
-
-    QLabel *qlCaption;
-    QLineEdit *qleCaption;
-
-    ToolBarButton stbbButton;
 
 public:
-    ToolButtonPreference (QWidget *parent = 0);
+    explicit ToolButtonPreference (QWidget *parent = nullptr);
+
+    virtual ~ToolButtonPreference ();
 
     void setButton (const ToolBarButton &button);
 
@@ -81,5 +60,30 @@ private Q_SLOTS:
     void slotChooseIconFile ();
 
     void slotGetIconList (const QString &iconFileName);
+
+private:
+    QLabel *commandLabel_;
+    QLineEdit *commandEdit_;
+    QToolButton *commandButton_;
+    QToolButton *commandButton2_;
+
+    QLabel *parametersLabel_;
+    QLineEdit *parametersEdit_;
+
+    QLabel *workDirLabel_;
+    QLineEdit *workDirEdit_;
+    QToolButton *workDirButton_;
+
+    QLabel *iconFileLabel_;
+    QLineEdit *iconFileEdit_;
+    QToolButton *iconFileButton_;
+
+    QLabel *iconLabel_;
+    QListWidget *iconList_;
+
+    QLabel *captionLabel_;
+    QLineEdit *captionEdit_;
+
+    ToolBarButton buttons_;
 };
 

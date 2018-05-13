@@ -1,4 +1,7 @@
 #include <QtCore/QDir>
+
+#include <QtGui/QBitmap>
+
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
@@ -6,9 +9,7 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QFileIconProvider>
-#include <QtGui/QBitmap>
 
-#include "ToolButtonPreference.h"
 #include "src/AppSettings.h"
 #include "CommandsDialog.h"
 
@@ -16,6 +17,8 @@
 #  include <qt_windows.h>
 #  include <private/qpixmapdata_p.h>
 #endif
+
+#include "ToolButtonPreference.h"
 
 ToolButtonPreference::ToolButtonPreference (QWidget *parent)
     : QWidget (parent)
@@ -25,42 +28,47 @@ ToolButtonPreference::ToolButtonPreference (QWidget *parent)
     setConnects ();
 }
 
+ToolButtonPreference::~ToolButtonPreference ()
+{
+
+}
+
 void ToolButtonPreference::createControls ()
 {
-    qlCommand = new QLabel (tr ("Command"), this);
-    qleCommand = new QLineEdit (this);
-    qtbPCCommand = new QToolButton (this);
-    qtbPCCommand->setText (QLatin1String ("..."));
-    qtbPCCommand->setToolButtonStyle (Qt::ToolButtonTextOnly);
-    qtbCommand = new QToolButton (this);
-    qtbCommand->setText (QLatin1String (">>"));
-    qtbCommand->setToolButtonStyle (Qt::ToolButtonTextOnly);
+    commandLabel_ = new QLabel (tr ("Command"), this);
+    commandEdit_ = new QLineEdit (this);
+    commandButton_ = new QToolButton (this);
+    commandButton_->setText (QLatin1String ("..."));
+    commandButton_->setToolButtonStyle (Qt::ToolButtonTextOnly);
+    commandButton2_ = new QToolButton (this);
+    commandButton2_->setText (QLatin1String (">>"));
+    commandButton2_->setToolButtonStyle (Qt::ToolButtonTextOnly);
 
-    qlParams = new QLabel (tr ("Parameters"), this);
-    qleParams = new QLineEdit (this);
+    parametersLabel_ = new QLabel (tr ("Parameters"), this);
+    parametersEdit_ = new QLineEdit (this);
 
-    qlWorkDir = new QLabel (tr ("Work dir"), this);
-    qleWorkDir = new QLineEdit (this);
-    qtbWorkDir = new QToolButton (this);
-    qtbWorkDir->setText (QLatin1String (">>"));
-    qtbWorkDir->setToolButtonStyle (Qt::ToolButtonTextOnly);
+    workDirLabel_ = new QLabel (tr ("Work dir"), this);
+    workDirEdit_ = new QLineEdit (this);
+    workDirButton_ = new QToolButton (this);
+    workDirButton_->setText (QLatin1String (">>"));
+    workDirButton_->setToolButtonStyle (Qt::ToolButtonTextOnly);
 
-    qlIconFile = new QLabel (tr ("Icon file"), this);
-    qleIconFile = new QLineEdit (this);
-    qtbIconFile = new QToolButton (this);
-    qtbIconFile->setText (QLatin1String (">>"));
-    qtbIconFile->setToolButtonStyle (Qt::ToolButtonTextOnly);
+    iconFileLabel_ = new QLabel (tr ("Icon file"), this);
+    iconFileEdit_ = new QLineEdit (this);
+    iconFileButton_ = new QToolButton (this);
+    iconFileButton_->setText (QLatin1String (">>"));
+    iconFileButton_->setToolButtonStyle (Qt::ToolButtonTextOnly);
 
-    qlIcon = new QLabel (tr ("Icon"), this);
-    qlwIcons = new QListWidget (this);
-    qlwIcons->setFlow (QListView::LeftToRight);
-    qlwIcons->setViewMode (QListView::IconMode);
-    qlwIcons->setIconSize (QSize (32, 32));
-    qlwIcons->setWrapping (false);
-    qlwIcons->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Maximum);
+    iconLabel_ = new QLabel (tr ("Icon"), this);
+    iconList_ = new QListWidget (this);
+    iconList_->setFlow (QListView::LeftToRight);
+    iconList_->setViewMode (QListView::IconMode);
+    iconList_->setIconSize (QSize (32, 32));
+    iconList_->setWrapping (false);
+    iconList_->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Maximum);
 
-    qlCaption = new QLabel (tr ("Caption"), this);
-    qleCaption = new QLineEdit (this);
+    captionLabel_ = new QLabel (tr ("Caption"), this);
+    captionEdit_ = new QLineEdit (this);
 }
 
 void ToolButtonPreference::setLayouts ()
@@ -68,41 +76,41 @@ void ToolButtonPreference::setLayouts ()
     QGridLayout *qglMainLayout = new QGridLayout ();
 
     QHBoxLayout *qhblCommandLayout = new QHBoxLayout ();
-    qhblCommandLayout->addWidget (qleCommand);
-    qhblCommandLayout->addWidget (qtbPCCommand);
-    qhblCommandLayout->addWidget (qtbCommand);
+    qhblCommandLayout->addWidget (commandEdit_);
+    qhblCommandLayout->addWidget (commandButton_);
+    qhblCommandLayout->addWidget (commandButton2_);
 
     QHBoxLayout *qhblWorkDirLayout = new QHBoxLayout ();
-    qhblWorkDirLayout->addWidget (qleWorkDir);
-    qhblWorkDirLayout->addWidget (qtbWorkDir);
+    qhblWorkDirLayout->addWidget (workDirEdit_);
+    qhblWorkDirLayout->addWidget (workDirButton_);
 
     QHBoxLayout *qhblIconFileLayout = new QHBoxLayout ();
-    qhblIconFileLayout->addWidget (qleIconFile);
-    qhblIconFileLayout->addWidget (qtbIconFile);
+    qhblIconFileLayout->addWidget (iconFileEdit_);
+    qhblIconFileLayout->addWidget (iconFileButton_);
 
-    qglMainLayout->addWidget (qlCommand, 0, 0);
+    qglMainLayout->addWidget (commandLabel_, 0, 0);
     qglMainLayout->addLayout (qhblCommandLayout, 0, 1);
-    qglMainLayout->addWidget (qlParams, 1, 0);
-    qglMainLayout->addWidget (qleParams, 1, 1);
-    qglMainLayout->addWidget (qlWorkDir, 2, 0);
+    qglMainLayout->addWidget (parametersLabel_, 1, 0);
+    qglMainLayout->addWidget (parametersEdit_, 1, 1);
+    qglMainLayout->addWidget (workDirLabel_, 2, 0);
     qglMainLayout->addLayout (qhblWorkDirLayout, 2, 1);
-    qglMainLayout->addWidget (qlIconFile, 3, 0);
+    qglMainLayout->addWidget (iconFileLabel_, 3, 0);
     qglMainLayout->addLayout (qhblIconFileLayout, 3, 1);
-    qglMainLayout->addWidget (qlIcon, 4, 0);
-    qglMainLayout->addWidget (qlwIcons, 4, 1);
-    qglMainLayout->addWidget (qlCaption, 5, 0);
-    qglMainLayout->addWidget (qleCaption, 5, 1);
+    qglMainLayout->addWidget (iconLabel_, 4, 0);
+    qglMainLayout->addWidget (iconList_, 4, 1);
+    qglMainLayout->addWidget (captionLabel_, 5, 0);
+    qglMainLayout->addWidget (captionEdit_, 5, 1);
 
     setLayout (qglMainLayout);
 }
 
 void ToolButtonPreference::setConnects ()
 {
-    connect (qtbPCCommand, &QToolButton::clicked, this, &ToolButtonPreference::slotChoosePCCommand);
-    connect (qtbCommand, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseCommandFile);
-    connect (qtbWorkDir, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseWorkDir);
-    connect (qtbIconFile, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseIconFile);
-    connect (qleIconFile, &QLineEdit::textChanged, this, &ToolButtonPreference::slotGetIconList);
+    connect (commandButton_, &QToolButton::clicked, this, &ToolButtonPreference::slotChoosePCCommand);
+    connect (commandButton2_, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseCommandFile);
+    connect (workDirButton_, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseWorkDir);
+    connect (iconFileButton_, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseIconFile);
+    connect (iconFileEdit_, &QLineEdit::textChanged, this, &ToolButtonPreference::slotGetIconList);
 }
 
 void ToolButtonPreference::slotChooseCommandFile ()
@@ -114,16 +122,16 @@ void ToolButtonPreference::slotChooseCommandFile ()
     }
     command = QFileDialog::getOpenFileName (this,
                                             tr ("Choose command file"),
-                                            QDir (qleCommand->text ()).absolutePath (),
+                                            QDir (commandEdit_->text ()).absolutePath (),
                                             QString (),
                                             0,
                                             options
     );
     if (!command.isEmpty ()) {
-        qleCommand->setText (QDir::toNativeSeparators (command));
-        qleWorkDir->setText (QDir::toNativeSeparators (QFileInfo (command).absolutePath ()));
-        qleIconFile->setText (QDir::toNativeSeparators (command));
-        qleCaption->setText (QFileInfo (command).baseName ());
+        commandEdit_->setText (QDir::toNativeSeparators (command));
+        workDirEdit_->setText (QDir::toNativeSeparators (QFileInfo (command).absolutePath ()));
+        iconFileEdit_->setText (QDir::toNativeSeparators (command));
+        captionEdit_->setText (QFileInfo (command).baseName ());
     }
 }
 
@@ -131,7 +139,7 @@ void ToolButtonPreference::slotChoosePCCommand ()
 {
     CommandsDialog *dialog = new CommandsDialog (this);
     if (dialog->exec ()) {
-        qleCommand->setText (dialog->getCurrentActionName ());
+        commandEdit_->setText (dialog->getCurrentActionName ());
     }
     delete dialog;
 }
@@ -145,11 +153,11 @@ void ToolButtonPreference::slotChooseWorkDir ()
     }
     dir = QFileDialog::getExistingDirectory (this,
                                              tr ("Choose work dir"),
-                                             QDir (qleWorkDir->text ()).absolutePath (),
+                                             QDir (workDirEdit_->text ()).absolutePath (),
                                              options
     );
     if (!dir.isEmpty ()) {
-        qleWorkDir->setText (QDir::toNativeSeparators (dir));
+        workDirEdit_->setText (QDir::toNativeSeparators (dir));
     }
 }
 
@@ -163,13 +171,13 @@ void ToolButtonPreference::slotChooseIconFile ()
     }
     iconFileName = QFileDialog::getOpenFileName (this,
                                                  tr ("Choose command file"),
-                                                 QDir (qleIconFile->text ()).absolutePath (),
+                                                 QDir (iconFileEdit_->text ()).absolutePath (),
                                                  QString (),
                                                  0,
                                                  options
     );
     if (!iconFileName.isEmpty ()) {
-        qleIconFile->setText (QDir::toNativeSeparators (iconFileName));
+        iconFileEdit_->setText (QDir::toNativeSeparators (iconFileName));
     }
 }
 
@@ -205,58 +213,58 @@ QIcon ToolButtonPreference::getIcon (const QString &fileName, int number)
 void ToolButtonPreference::slotGetIconList (const QString &iconFileName)
 {
 #ifdef Q_WS_WIN
-    qlwIcons->clear();
+    iconList_->clear();
     int iconCount = (int)ExtractIconEx((wchar_t*)iconFileName.utf16(), -1, 0, 0, 0);
     QListWidgetItem* item;
     for (int i = 0; i < iconCount; i++) {
-            item = new QListWidgetItem(getIcon(iconFileName, i), QString::number(i), qlwIcons);
-            qlwIcons->addItem(item);
+            item = new QListWidgetItem(getIcon(iconFileName, i), QString::number(i), iconList_);
+            iconList_->addItem(item);
     }
-    if (qlwIcons->count() == 0) {
-        item = new QListWidgetItem(QFileIconProvider().icon(QFileInfo(iconFileName)), QString::number(0), qlwIcons);
-        qlwIcons->addItem(item);
+    if (iconList_->count() == 0) {
+        item = new QListWidgetItem(QFileIconProvider().icon(QFileInfo(iconFileName)), QString::number(0), iconList_);
+        iconList_->addItem(item);
     }
-    qlwIcons->setCurrentItem(qlwIcons->item(0));
+    iconList_->setCurrentItem(iconList_->item(0));
 #else
-    qlwIcons->clear ();
+    iconList_->clear ();
     QListWidgetItem *item;
-    item = new QListWidgetItem (getIcon (iconFileName, 0), QString::number (0), qlwIcons);
-    qlwIcons->addItem (item);
-    if (qlwIcons->count () == 0) {
-        item = new QListWidgetItem (QFileIconProvider ().icon (QFileInfo (iconFileName)), QString::number (0), qlwIcons
+    item = new QListWidgetItem (getIcon (iconFileName, 0), QString::number (0), iconList_);
+    iconList_->addItem (item);
+    if (iconList_->count () == 0) {
+        item = new QListWidgetItem (QFileIconProvider ().icon (QFileInfo (iconFileName)), QString::number (0), iconList_
         );
-        qlwIcons->addItem (item);
+        iconList_->addItem (item);
     }
-    qlwIcons->setCurrentItem (qlwIcons->item (0));
+    iconList_->setCurrentItem (iconList_->item (0));
 #endif
 }
 
 void ToolButtonPreference::setButton (const ToolBarButton &button)
 {
-    stbbButton = button;
-    qleCommand->setText (button.command_);
-    qleParams->setText (button.parameters_);
-    qleWorkDir->setText (button.workDir_);
-    qleIconFile->setText (button.iconFile_);
-    qleCaption->setText (button.caption_);
-    qlwIcons->setCurrentItem (qlwIcons->item (button.iconNumber_));
+    buttons_ = button;
+    commandEdit_->setText (button.command_);
+    parametersEdit_->setText (button.parameters_);
+    workDirEdit_->setText (button.workDir_);
+    iconFileEdit_->setText (button.iconFile_);
+    captionEdit_->setText (button.caption_);
+    iconList_->setCurrentItem (iconList_->item (button.iconNumber_));
 }
 
 ToolBarButton ToolButtonPreference::getButton ()
 {
-    if (qleCommand->text ().isEmpty ()) {
+    if (commandEdit_->text ().isEmpty ()) {
         return ToolBarButton ();
     }
-    stbbButton.command_ = qleCommand->text ();
-    stbbButton.parameters_ = qleParams->text ();
-    stbbButton.workDir_ = qleWorkDir->text ();
-    stbbButton.caption_ = qleCaption->text ();
-    stbbButton.iconFile_ = qleIconFile->text ();
-    if (qlwIcons->count () > 0) {
-        stbbButton.icon_ = qlwIcons->currentItem ()->icon ();
-        stbbButton.iconNumber_ = qlwIcons->currentIndex ().row ();
+    buttons_.command_ = commandEdit_->text ();
+    buttons_.parameters_ = parametersEdit_->text ();
+    buttons_.workDir_ = workDirEdit_->text ();
+    buttons_.caption_ = captionEdit_->text ();
+    buttons_.iconFile_ = iconFileEdit_->text ();
+    if (iconList_->count () > 0) {
+        buttons_.icon_ = iconList_->currentItem ()->icon ();
+        buttons_.iconNumber_ = iconList_->currentIndex ().row ();
     }
-    return stbbButton;
+    return buttons_;
 }
 
 ToolBarButton ToolButtonPreference::getButton (const QString &command)
