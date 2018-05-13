@@ -72,19 +72,18 @@ void ToolBar::refreshActions ()
 
     QAction *action;
     int i = 0;
-        foreach(ToolBarButton button, qlButtons) {
-            if (!button.qsCommand.isEmpty ()) {
-                action = new QAction (button.qiIcon, button.qsCaption, this);
-                connect (action, SIGNAL(triggered ()),
-                         this, SLOT(slotToolButtonPress ()));
-                action->setData (QString::number (i));
-                this->addAction (action);
-            } else {
-                action = this->addSeparator ();
-                action->setData (QString::number (i));
-            }
-            i++;
+    for (const ToolBarButton &button : qlButtons) {
+        if (!button.qsCommand.isEmpty ()) {
+            action = new QAction (button.qiIcon, button.qsCaption, this);
+            connect (action, &QAction::triggered, this, &ToolBar::slotToolButtonPress);
+            action->setData (QString::number (i));
+            this->addAction (action);
+        } else {
+            action = this->addSeparator ();
+            action->setData (QString::number (i));
         }
+        i++;
+    }
 }
 
 void ToolBar::contextMenuEvent (QContextMenuEvent *event)
@@ -97,29 +96,25 @@ void ToolBar::contextMenuEvent (QContextMenuEvent *event)
         ToolBarButton button = qlButtons.at (action->data ().toInt ());
         if (!button.qsCommand.isEmpty ()) {
             menuAction = new QAction (tr ("&Execute ") + button.qsCaption, qmToolBarMenu);
-            connect (menuAction, SIGNAL(triggered ()),
-                     action, SLOT(trigger ()));
+            connect (menuAction, &QAction::triggered, action, &QAction::trigger);
             qmToolBarMenu->addAction (menuAction);
             qmToolBarMenu->addSeparator ();
         }
 
         menuAction = new QAction (tr ("&Change..."), qmToolBarMenu);
         menuAction->setData (action->data ());
-        connect (menuAction, SIGNAL(triggered ()),
-                 this, SLOT(slotToolButtonChange ()));
+        connect (menuAction, &QAction::triggered, this, &ToolBar::slotToolButtonChange);
         qmToolBarMenu->addAction (menuAction);
 
         menuAction = new QAction (tr ("&Delete"), qmToolBarMenu);
         menuAction->setData (action->data ());
-        connect (menuAction, SIGNAL(triggered ()),
-                 this, SLOT(slotToolButtonDelete ()));
+        connect (menuAction, &QAction::triggered, this, &ToolBar::slotToolButtonDelete);
         qmToolBarMenu->addAction (menuAction);
 
         if (!button.qsCommand.isEmpty ()) {
             menuAction = new QAction (tr ("cd ") + button.qsWorkDir, qmToolBarMenu);
             menuAction->setData (action->data ());
-            connect (menuAction, SIGNAL(triggered ()),
-                     this, SLOT(slotToolButtonCD ()));
+            connect (menuAction, &QAction::triggered, this, &ToolBar::slotToolButtonCD);
             qmToolBarMenu->addAction (menuAction);
         }
 
@@ -168,10 +163,8 @@ void ToolBar::slotToolButtonChange ()
                                                             Qt::Horizontal,
                                                             toolButtonChangeDialog
     );
-    connect (qdbbButtonBox, SIGNAL(accepted ()),
-             toolButtonChangeDialog, SLOT(accept ()));
-    connect (qdbbButtonBox, SIGNAL(rejected ()),
-             toolButtonChangeDialog, SLOT(reject ()));
+    connect (qdbbButtonBox, &QDialogButtonBox::accepted, toolButtonChangeDialog, &QDialog::accept);
+    connect (qdbbButtonBox, &QDialogButtonBox::rejected, toolButtonChangeDialog, &QDialog::reject);
 
     QVBoxLayout *layout = new QVBoxLayout ();
     layout->addWidget (qtbpToolButtonPreference);
