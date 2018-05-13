@@ -1,27 +1,29 @@
-#include "DirSorter.h"
-
 #include <QtCore/QDateTime>
+
+#include "DirSorter.h"
 
 struct DirSortItem
 {
-    mutable QString filename_cache;
-    mutable QString suffix_cache;
-    QFileInfo item;
+    mutable QString fileNameCache_;
+    mutable QString suffixCache_;
+    QFileInfo item_;
 };
 
 class DirSortItemComparator
 {
-    int sort_flags;
 
 public:
     DirSortItemComparator (int flags)
-        : sort_flags (flags)
+        : sortFlags_ (flags)
     {
     }
 
     int naturalCompare (const QString &s1, const QString &s2, Qt::CaseSensitivity cs);
 
     bool operator() (const DirSortItem &, const DirSortItem &);
+
+private:
+    int sortFlags_;
 };
 
 static inline QChar getNextChar (const QString &s, int location)
@@ -136,71 +138,71 @@ bool DirSortItemComparator::operator() (const DirSortItem &n1, const DirSortItem
     const DirSortItem *f1 = &n1;
     const DirSortItem *f2 = &n2;
 
-    bool isDir1 = f1->item.isDir () && f1->item.exists ();
-    bool isDir2 = f2->item.isDir () && f2->item.exists ();
+    bool isDir1 = f1->item_.isDir () && f1->item_.exists ();
+    bool isDir2 = f2->item_.isDir () && f2->item_.exists ();
 
-    if ((sort_flags & QDir::DirsFirst) && isDir1 != isDir2) {
+    if ((sortFlags_ & QDir::DirsFirst) && isDir1 != isDir2) {
         return isDir1;
     }
-    if ((sort_flags & QDir::DirsLast) && isDir1 != isDir2) {
+    if ((sortFlags_ & QDir::DirsLast) && isDir1 != isDir2) {
         return !isDir1;
     }
 
-    if ((sort_flags & QDir::DirsFirst) || (sort_flags & QDir::DirsLast)) {
-        bool dotOrDotDot1 = isDotOrDotDot (f1->item.fileName ());
-        bool dotOrDotDot2 = isDotOrDotDot (f2->item.fileName ());
+    if ((sortFlags_ & QDir::DirsFirst) || (sortFlags_ & QDir::DirsLast)) {
+        bool dotOrDotDot1 = isDotOrDotDot (f1->item_.fileName ());
+        bool dotOrDotDot2 = isDotOrDotDot (f2->item_.fileName ());
         if (dotOrDotDot1 && dotOrDotDot2) {
-            return !(sort_flags & QDir::Reversed) && f1->item.fileName ().size () == 1;
+            return !(sortFlags_ & QDir::Reversed) && f1->item_.fileName ().size () == 1;
         } else if (dotOrDotDot1 != dotOrDotDot2) {
-            return !(sort_flags & QDir::Reversed) && dotOrDotDot1;
+            return !(sortFlags_ & QDir::Reversed) && dotOrDotDot1;
         }
     }
 
     int r = 0;
-    int sortBy = (sort_flags & QDir::SortByMask) | (sort_flags & QDir::Type);
-    if ((sort_flags & QDir::DirsFirst) || (sort_flags & QDir::DirsLast)) {
-        if (sort_flags & 0x100/*QDir::AlwaysSortDirsByName*/ && sortBy != QDir::Name && isDir1 && isDir2) {
+    int sortBy = (sortFlags_ & QDir::SortByMask) | (sortFlags_ & QDir::Type);
+    if ((sortFlags_ & QDir::DirsFirst) || (sortFlags_ & QDir::DirsLast)) {
+        if (sortFlags_ & 0x100/*QDir::AlwaysSortDirsByName*/ && sortBy != QDir::Name && isDir1 && isDir2) {
             sortBy = QDir::Name;
         }
     }
 
     switch (sortBy) {
         case QDir::Time:
-            r = f2->item.lastModified ().secsTo (f1->item.lastModified ());
+            r = f2->item_.lastModified ().secsTo (f1->item_.lastModified ());
             break;
         case QDir::Size:
-            r = int (qBound<qint64> (-1, f1->item.size () - f2->item.size (), 1));
+            r = int (qBound<qint64> (-1, f1->item_.size () - f2->item_.size (), 1));
             break;
         case QDir::Type: {
-            bool ic = sort_flags & QDir::IgnoreCase;
+            bool ic = sortFlags_ & QDir::IgnoreCase;
 
-            if (f1->suffix_cache.isNull ()) {
-                if (sort_flags & 0x300/*QDir::Suffix*/) {
-                    f1->suffix_cache = isDir1 ? QLatin1String ("") :
-                                       ic ? suffix (f1->item.fileName ()).toLower ()
-                                          : suffix (f1->item.fileName ());
+            if (f1->suffixCache_.isNull ()) {
+                if (sortFlags_ & 0x300/*QDir::Suffix*/) {
+                    f1->suffixCache_ = isDir1 ? QLatin1String ("") :
+                                       ic ? suffix (f1->item_.fileName ()).toLower ()
+                                          : suffix (f1->item_.fileName ());
                 } else {
-                    f1->suffix_cache = ic ? f1->item.suffix ().toLower ()
-                                          : f1->item.suffix ();
+                    f1->suffixCache_ = ic ? f1->item_.suffix ().toLower ()
+                                          : f1->item_.suffix ();
                 }
             }
-            if (f2->suffix_cache.isNull ()) {
-                if (sort_flags & 0x300/*QDir::Suffix*/) {
-                    f2->suffix_cache = isDir2 ? QLatin1String ("") :
-                                       ic ? suffix (f2->item.fileName ()).toLower ()
-                                          : suffix (f2->item.fileName ());
+            if (f2->suffixCache_.isNull ()) {
+                if (sortFlags_ & 0x300/*QDir::Suffix*/) {
+                    f2->suffixCache_ = isDir2 ? QLatin1String ("") :
+                                       ic ? suffix (f2->item_.fileName ()).toLower ()
+                                          : suffix (f2->item_.fileName ());
                 } else {
-                    f2->suffix_cache = ic ? f2->item.suffix ().toLower ()
-                                          : f2->item.suffix ();
+                    f2->suffixCache_ = ic ? f2->item_.suffix ().toLower ()
+                                          : f2->item_.suffix ();
                 }
             }
 
-            if (sort_flags & 0x200/*QDir::Natural*/) {
-                r = naturalCompare (f1->suffix_cache, f2->suffix_cache, Qt::CaseSensitive);
+            if (sortFlags_ & 0x200/*QDir::Natural*/) {
+                r = naturalCompare (f1->suffixCache_, f2->suffixCache_, Qt::CaseSensitive);
             } else {
-                r = sort_flags & QDir::LocaleAware
-                    ? f1->suffix_cache.localeAwareCompare (f2->suffix_cache)
-                    : f1->suffix_cache.compare (f2->suffix_cache);
+                r = sortFlags_ & QDir::LocaleAware
+                    ? f1->suffixCache_.localeAwareCompare (f2->suffixCache_)
+                    : f1->suffixCache_.compare (f2->suffixCache_);
             }
         }
             break;
@@ -210,23 +212,23 @@ bool DirSortItemComparator::operator() (const DirSortItem &n1, const DirSortItem
 
     if (r == 0 && sortBy != QDir::Unsorted) {
         // Still not sorted - sort by name
-        bool ic = sort_flags & QDir::IgnoreCase;
+        bool ic = sortFlags_ & QDir::IgnoreCase;
 
-        if (f1->filename_cache.isNull ()) {
-            f1->filename_cache = ic ? f1->item.fileName ().toLower ()
-                                    : f1->item.fileName ();
+        if (f1->fileNameCache_.isNull ()) {
+            f1->fileNameCache_ = ic ? f1->item_.fileName ().toLower ()
+                                    : f1->item_.fileName ();
         }
-        if (f2->filename_cache.isNull ()) {
-            f2->filename_cache = ic ? f2->item.fileName ().toLower ()
-                                    : f2->item.fileName ();
+        if (f2->fileNameCache_.isNull ()) {
+            f2->fileNameCache_ = ic ? f2->item_.fileName ().toLower ()
+                                    : f2->item_.fileName ();
         }
 
-        if (sort_flags & 0x200/*QDir::Natural*/) {
-            r = naturalCompare (f1->filename_cache, f2->filename_cache, Qt::CaseSensitive);
+        if (sortFlags_ & 0x200/*QDir::Natural*/) {
+            r = naturalCompare (f1->fileNameCache_, f2->fileNameCache_, Qt::CaseSensitive);
         } else {
-            r = sort_flags & QDir::LocaleAware
-                ? f1->filename_cache.localeAwareCompare (f2->filename_cache)
-                : f1->filename_cache.compare (f2->filename_cache);
+            r = sortFlags_ & QDir::LocaleAware
+                ? f1->fileNameCache_.localeAwareCompare (f2->fileNameCache_)
+                : f1->fileNameCache_.compare (f2->fileNameCache_);
         }
     }
 
@@ -234,7 +236,7 @@ bool DirSortItemComparator::operator() (const DirSortItem &n1, const DirSortItem
         r = (&n1) - (&n2);
     }
 
-    if (sort_flags & QDir::Reversed) {
+    if (sortFlags_ & QDir::Reversed) {
         return r > 0;
     }
 
@@ -251,12 +253,12 @@ QFileInfoList Dir::sortFileList (QFileInfoList &infos, QDir::SortFlags sort)
         } else {
             DirSortItem *si = new DirSortItem[n];
             for (int i = 0; i < n; ++i) {
-                si[i].item = infos.at (i);
+                si[i].item_ = infos.at (i);
             }
             qSort (si, si + n, DirSortItemComparator (sort));
             // put them back in the list(s)
             for (int i = 0; i < n; ++i) {
-                ret.append (si[i].item);
+                ret.append (si[i].item_);
             }
             delete[] si;
         }
