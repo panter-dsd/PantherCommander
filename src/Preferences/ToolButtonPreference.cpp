@@ -234,12 +234,12 @@ void ToolButtonPreference::slotGetIconList (const QString &iconFileName)
 void ToolButtonPreference::setButton (const ToolBarButton &button)
 {
     stbbButton = button;
-    qleCommand->setText (button.qsCommand);
-    qleParams->setText (button.qsParams);
-    qleWorkDir->setText (button.qsWorkDir);
-    qleIconFile->setText (button.qsIconFile);
-    qleCaption->setText (button.qsCaption);
-    qlwIcons->setCurrentItem (qlwIcons->item (button.iconNumber));
+    qleCommand->setText (button.command_);
+    qleParams->setText (button.parameters_);
+    qleWorkDir->setText (button.workDir_);
+    qleIconFile->setText (button.iconFile_);
+    qleCaption->setText (button.caption_);
+    qlwIcons->setCurrentItem (qlwIcons->item (button.iconNumber_));
 }
 
 ToolBarButton ToolButtonPreference::getButton ()
@@ -247,14 +247,14 @@ ToolBarButton ToolButtonPreference::getButton ()
     if (qleCommand->text ().isEmpty ()) {
         return ToolBarButton ();
     }
-    stbbButton.qsCommand = qleCommand->text ();
-    stbbButton.qsParams = qleParams->text ();
-    stbbButton.qsWorkDir = qleWorkDir->text ();
-    stbbButton.qsCaption = qleCaption->text ();
-    stbbButton.qsIconFile = qleIconFile->text ();
+    stbbButton.command_ = qleCommand->text ();
+    stbbButton.parameters_ = qleParams->text ();
+    stbbButton.workDir_ = qleWorkDir->text ();
+    stbbButton.caption_ = qleCaption->text ();
+    stbbButton.iconFile_ = qleIconFile->text ();
     if (qlwIcons->count () > 0) {
-        stbbButton.qiIcon = qlwIcons->currentItem ()->icon ();
-        stbbButton.iconNumber = qlwIcons->currentIndex ().row ();
+        stbbButton.icon_ = qlwIcons->currentItem ()->icon ();
+        stbbButton.iconNumber_ = qlwIcons->currentIndex ().row ();
     }
     return stbbButton;
 }
@@ -265,19 +265,19 @@ ToolBarButton ToolButtonPreference::getButton (const QString &command)
     if (command.isEmpty ()) {
         return button;
     }
-    button.qsCommand = QDir::toNativeSeparators (command);
-    button.qsWorkDir = QDir::toNativeSeparators (QFileInfo (command).absolutePath ());
-    button.qsIconFile = button.qsCommand;
-    button.qsCaption = QFileInfo (command).baseName ();
-    button.iconNumber = -1;
+    button.command_ = QDir::toNativeSeparators (command);
+    button.workDir_ = QDir::toNativeSeparators (QFileInfo (command).absolutePath ());
+    button.iconFile_ = button.command_;
+    button.caption_ = QFileInfo (command).baseName ();
+    button.iconNumber_ = -1;
 #ifdef Q_WS_WIN
-    QIcon icon = getIcon(button.qsIconFile, 0);
+    QIcon icon = getIcon(button.iconFile_, 0);
     if (!icon.isNull()) {
-        button.iconNumber = 0;
-        button.qiIcon = icon;
+        button.iconNumber_ = 0;
+        button.icon_ = icon;
     } else {
-        button.iconNumber = 0;
-        button.qiIcon = QFileIconProvider().icon(QFileInfo(button.qsIconFile));
+        button.iconNumber_ = 0;
+        button.icon_ = QFileIconProvider().icon(QFileInfo(button.iconFile_));
     }
 #endif
     return button;

@@ -27,13 +27,13 @@ void ToolBar::restore ()
     int buttonsCount = settings->value ("ButtonsCount", 0).toInt ();
     for (int i = 0; i < buttonsCount; i++) {
         ToolBarButton button;
-        button.qsCommand = settings->value ("Command_" + QString::number (i), "").toString ();
-        button.qsParams = settings->value ("Params_" + QString::number (i), "").toString ();
-        button.qsWorkDir = settings->value ("WorkDir_" + QString::number (i), "").toString ();
-        button.qsIconFile = settings->value ("IconFile_" + QString::number (i), "").toString ();
-        button.qiIcon = settings->value ("Icon_" + QString::number (i), "").value<QIcon> ();
-        button.iconNumber = settings->value ("IconNumber_" + QString::number (i), -1).toInt ();
-        button.qsCaption = settings->value ("Caption_" + QString::number (i), "").toString ();
+        button.command_ = settings->value ("Command_" + QString::number (i), "").toString ();
+        button.parameters_ = settings->value ("Params_" + QString::number (i), "").toString ();
+        button.workDir_ = settings->value ("WorkDir_" + QString::number (i), "").toString ();
+        button.iconFile_ = settings->value ("IconFile_" + QString::number (i), "").toString ();
+        button.icon_ = settings->value ("Icon_" + QString::number (i), "").value<QIcon> ();
+        button.iconNumber_ = settings->value ("IconNumber_" + QString::number (i), -1).toInt ();
+        button.caption_ = settings->value ("Caption_" + QString::number (i), "").toString ();
         qlButtons << button;
     }
     settings->endGroup ();
@@ -50,13 +50,13 @@ void ToolBar::save ()
 
     int i = 0;
         foreach(const ToolBarButton &button, qlButtons) {
-            settings->setValue ("Command_" + QString::number (i), button.qsCommand);
-            settings->setValue ("Params_" + QString::number (i), button.qsParams);
-            settings->setValue ("WorkDir_" + QString::number (i), button.qsWorkDir);
-            settings->setValue ("IconFile_" + QString::number (i), button.qsIconFile);
-            settings->setValue ("IconNumber_" + QString::number (i), button.iconNumber);
-            settings->setValue ("Icon_" + QString::number (i), button.qiIcon);
-            settings->setValue ("Caption_" + QString::number (i), button.qsCaption);
+            settings->setValue ("Command_" + QString::number (i), button.command_);
+            settings->setValue ("Params_" + QString::number (i), button.parameters_);
+            settings->setValue ("WorkDir_" + QString::number (i), button.workDir_);
+            settings->setValue ("IconFile_" + QString::number (i), button.iconFile_);
+            settings->setValue ("IconNumber_" + QString::number (i), button.iconNumber_);
+            settings->setValue ("Icon_" + QString::number (i), button.icon_);
+            settings->setValue ("Caption_" + QString::number (i), button.caption_);
             i++;
         }
     settings->endGroup ();
@@ -73,8 +73,8 @@ void ToolBar::refreshActions ()
     QAction *action;
     int i = 0;
     for (const ToolBarButton &button : qlButtons) {
-        if (!button.qsCommand.isEmpty ()) {
-            action = new QAction (button.qiIcon, button.qsCaption, this);
+        if (!button.command_.isEmpty ()) {
+            action = new QAction (button.icon_, button.caption_, this);
             connect (action, &QAction::triggered, this, &ToolBar::slotToolButtonPress);
             action->setData (QString::number (i));
             addAction (action);
@@ -94,8 +94,8 @@ void ToolBar::contextMenuEvent (QContextMenuEvent *event)
 
     if (action) {
         ToolBarButton button = qlButtons.at (action->data ().toInt ());
-        if (!button.qsCommand.isEmpty ()) {
-            menuAction = new QAction (tr ("&Execute ") + button.qsCaption, qmToolBarMenu);
+        if (!button.command_.isEmpty ()) {
+            menuAction = new QAction (tr ("&Execute ") + button.caption_, qmToolBarMenu);
             connect (menuAction, &QAction::triggered, action, &QAction::trigger);
             qmToolBarMenu->addAction (menuAction);
             qmToolBarMenu->addSeparator ();
@@ -111,8 +111,8 @@ void ToolBar::contextMenuEvent (QContextMenuEvent *event)
         connect (menuAction, &QAction::triggered, this, &ToolBar::slotToolButtonDelete);
         qmToolBarMenu->addAction (menuAction);
 
-        if (!button.qsCommand.isEmpty ()) {
-            menuAction = new QAction (tr ("cd ") + button.qsWorkDir, qmToolBarMenu);
+        if (!button.command_.isEmpty ()) {
+            menuAction = new QAction (tr ("cd ") + button.workDir_, qmToolBarMenu);
             menuAction->setData (action->data ());
             connect (menuAction, &QAction::triggered, this, &ToolBar::slotToolButtonCD);
             qmToolBarMenu->addAction (menuAction);
@@ -199,7 +199,7 @@ void ToolBar::slotToolButtonCD ()
     }
 
     ToolBarButton button = qlButtons.at (action->data ().toInt ());
-    emit cdExecuted (button.qsWorkDir);
+    emit cdExecuted (button.workDir_);
 }
 
 void ToolBar::dropEvent (QDropEvent *event)
@@ -207,12 +207,12 @@ void ToolBar::dropEvent (QDropEvent *event)
     QAction *action = actionAt (event->pos ());
     if (action && !(event->keyboardModifiers () & Qt::ShiftModifier)) {
         ToolBarButton button = qlButtons.at (action->data ().toInt ());
-        if (!button.qsCommand.isEmpty ()) {
+        if (!button.command_.isEmpty ()) {
             QStringList qslParams;
                 foreach(QUrl url, event->mimeData ()->urls ()) {
                     qslParams << QDir::toNativeSeparators (url.toLocalFile ());
                 }
-            button.qsParams += qslParams.join (QLatin1String (" "));
+            button.parameters_ += qslParams.join (QLatin1String (" "));
             emit toolBarActionExecuted (button);
         } else {//If separator then insert
             int index = action->data ().toInt () + 1;

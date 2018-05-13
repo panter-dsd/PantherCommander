@@ -515,18 +515,18 @@ void MainWindow::slotRunCommand ()
     myProcess->start (qsCommand);
 #endif
 #ifdef Q_WS_WIN
-    if (qsCommand.contains(QRegExp("^cd ")))
+    if (command_.contains(QRegExp("^cd ")))
     {
         QDir dir(consolePath_->text());
-        dir.cd(qsCommand.remove(QRegExp("^cd ")));
+        dir.cd(command_.remove(QRegExp("^cd ")));
         focusedFilePanel_->setPath(dir.absolutePath());
         return;
     }
-    myProcess->start(qsCommand);
+    myProcess->start(command_);
 
-//		QProcess::startDetached("cmd.exe /C "+qsCommand);
+//		QProcess::startDetached("cmd.exe /C "+command_);
 //	if (!rez)
-//		myProcess->start("cmd.exe /C "+qsCommand);
+//		myProcess->start("cmd.exe /C "+command_);
 #endif
 }
 
@@ -962,9 +962,9 @@ void MainWindow::toolBarActionExecute (const ToolBarButton &actionButton)
 #ifndef Q_CC_MSVC
 #warning "TODO: parse params"
 #endif
-    QFileInfo fi (actionButton.qsCommand);
+    QFileInfo fi (actionButton.command_);
     if (!fi.exists ()) {
-        QAction *action = Commands::instance ()->action (actionButton.qsCommand);
+        QAction *action = Commands::instance ()->action (actionButton.command_);
         if (action) {
             action->trigger ();
         }
@@ -972,9 +972,9 @@ void MainWindow::toolBarActionExecute (const ToolBarButton &actionButton)
     if (fi.isDir ()) {
         cdExecute (fi.absoluteFilePath ());
     } else {
-        FileOperationsThread::execute (actionButton.qsCommand,
-                                       actionButton.qsParams.split (QLatin1Char (' ')),
-                                       actionButton.qsWorkDir
+        FileOperationsThread::execute (actionButton.command_,
+                                       actionButton.parameters_.split (QLatin1Char (' ')),
+                                       actionButton.workDir_
         );
     }
 }

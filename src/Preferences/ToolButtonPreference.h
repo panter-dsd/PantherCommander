@@ -15,13 +15,13 @@ class QAction;
 
 struct ToolBarButton
 {
-    QString qsCommand;
-    QString qsParams;
-    QString qsWorkDir;
-    QString qsIconFile;
-    int iconNumber;
-    QIcon qiIcon;
-    QString qsCaption;
+    QString command_;
+    QString parameters_;
+    QString workDir_;
+    QString iconFile_;
+    int iconNumber_;
+    QIcon icon_;
+    QString caption_;
 };
 
 class ToolButtonPreference : public QWidget
