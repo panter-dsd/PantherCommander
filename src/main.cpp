@@ -14,7 +14,7 @@ int main (int argc, char **argv)
     app.setApplicationName ("Panther Commander");
     app.setApplicationVersion (ApplicationVersion);
 
-    app.connect (&app, SIGNAL(lastWindowClosed ()), &app, SLOT(quit ()));
+    app.connect (&app, &QApplication::lastWindowClosed, &app, &QApplication::quit);
 
     QSettings::setDefaultFormat (QSettings::IniFormat);
 

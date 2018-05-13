@@ -70,33 +70,21 @@ void MainWindow::createWidgets ()
     QWidget *widget = new QWidget (this);
 
     leftDriveBar_ = new DriveBar (this);
-    connect (leftDriveBar_, SIGNAL(discChanged (
-                                       const QString&)), this, SLOT(slotSetDisc (
-                                                                        const QString&)));
+    connect (leftDriveBar_, &DriveBar::discChanged, this, &MainWindow::slotSetDisc);
 
     rightDriveBar_ = new DriveBar (this);
-    connect (rightDriveBar_, SIGNAL(discChanged (
-                                        const QString&)), this, SLOT(slotSetDisc (
-                                                                         const QString&)));
+    connect (rightDriveBar_, &DriveBar::discChanged, this, &MainWindow::slotSetDisc);
 
     leftPanel_ = new FilePanel (this);
     leftPanel_->setObjectName ("LeftPanel");
-    connect (leftPanel_, SIGNAL(pathChanged (
-                                    const QString&)), leftDriveBar_, SLOT(slotSetDisc (
-                                                                              const QString&)));
-    connect (leftPanel_, SIGNAL(pathChanged (
-                                    const QString&)), this, SLOT(slotPathChanged (
-                                                                     const QString&)));
+    connect (leftPanel_, &FilePanel::pathChanged, leftDriveBar_, &DriveBar::slotSetDisc);
+    connect (leftPanel_, &FilePanel::pathChanged, this, &MainWindow::slotPathChanged);
     leftDriveBar_->slotSetDisc (leftPanel_->path ());
 
     rightPanel_ = new FilePanel (this);
     rightPanel_->setObjectName ("RightPanel");
-    connect (rightPanel_, SIGNAL(pathChanged (
-                                     const QString&)), rightDriveBar_, SLOT(slotSetDisc (
-                                                                                const QString&)));
-    connect (rightPanel_, SIGNAL(pathChanged (
-                                     const QString&)), this, SLOT(slotPathChanged (
-                                                                      const QString&)));
+    connect (rightPanel_, &FilePanel::pathChanged, rightDriveBar_, &DriveBar::slotSetDisc);
+    connect (rightPanel_, &FilePanel::pathChanged, this, &MainWindow::slotPathChanged);
     rightDriveBar_->slotSetDisc (rightPanel_->path ());
 
     panelsSplitter_ = new QSplitter (widget);
@@ -105,9 +93,7 @@ void MainWindow::createWidgets ()
     panelsSplitter_->addWidget (leftPanel_);
     panelsSplitter_->addWidget (rightPanel_);
 
-    connect (panelsSplitter_, SIGNAL(customContextMenuRequested (
-                                         const QPoint&)), this, SLOT(showSplitterContextMenu (
-                                                                         const QPoint&)));
+    connect (panelsSplitter_, &QSplitter::customContextMenuRequested, this, &MainWindow::showSplitterContextMenu);
 
     consolePath_ = new QLabel (this);
     consolePath_->setAlignment (Qt::AlignRight);
@@ -118,7 +104,7 @@ void MainWindow::createWidgets ()
     consoleCommandComboBox_->setFocusPolicy (Qt::ClickFocus);
     consoleCommandComboBox_->setDuplicatesEnabled (false);
 
-    connect (consoleCommandComboBox_->lineEdit (), SIGNAL(returnPressed ()), this, SLOT(slotRunCommand ()));
+    connect (consoleCommandComboBox_->lineEdit (), &QLineEdit::returnPressed, this, &MainWindow::slotRunCommand);
 
     commandButtonsFrame_ = new QFrame (this);
     commandButtonsFrame_->setSizePolicy (QSizePolicy::Preferred, QSizePolicy::Maximum);
@@ -150,7 +136,7 @@ void MainWindow::createActions ()
     actionCpCurFileName2Cmd_->setObjectName ("actionCpCurFileName2Cmd_");
     actionCpCurFileName2Cmd_->setText (tr ("Copy current file name to command string"));
     actionCpCurFileName2Cmd_->setShortcut (QKeySequence (Qt::CTRL + Qt::Key_Return));
-    connect (actionCpCurFileName2Cmd_, SIGNAL(triggered (bool)), this, SLOT(slotCpCurFileName2Cmd ()));
+    connect (actionCpCurFileName2Cmd_, &QAction::triggered, this, &MainWindow::slotCpCurFileName2Cmd);
     addAction (actionCpCurFileName2Cmd_);
     Commands::instance ()->addAction (tr ("Command line"), actionCpCurFileName2Cmd_);
 
@@ -158,8 +144,9 @@ void MainWindow::createActions ()
     actionCpCurFileNameWhithPath2Cmd_->setObjectName ("actionCpCurFileNameWhithPath2Cmd_");
     actionCpCurFileNameWhithPath2Cmd_->setText (tr ("Copy current file name whith path to command string"));
     actionCpCurFileNameWhithPath2Cmd_->setShortcut (QKeySequence (Qt::CTRL + Qt::SHIFT + Qt::Key_Return));
-    connect (actionCpCurFileNameWhithPath2Cmd_, SIGNAL(triggered (bool)),
-             this, SLOT(slotCpCurFileNameWhithPath2Cmd ()));
+    connect (actionCpCurFileNameWhithPath2Cmd_, &QAction::triggered,
+             this, &MainWindow::slotCpCurFileNameWhithPath2Cmd
+    );
     addAction (actionCpCurFileNameWhithPath2Cmd_);
     Commands::instance ()->addAction (tr ("Command line"), actionCpCurFileNameWhithPath2Cmd_);
 
@@ -167,7 +154,7 @@ void MainWindow::createActions ()
     actionClearCmd_->setObjectName ("actionClearCmd_");
     actionClearCmd_->setText (tr ("Clear command string"));
     actionClearCmd_->setShortcut (QKeySequence (Qt::Key_Escape));
-    connect (actionClearCmd_, SIGNAL(triggered (bool)), consoleCommandComboBox_->lineEdit (), SLOT(clear ()));
+    connect (actionClearCmd_, &QAction::triggered, consoleCommandComboBox_->lineEdit (), &QLineEdit::clear);
     addAction (actionClearCmd_);
     Commands::instance ()->addAction (tr ("Command line"), actionClearCmd_);
 
@@ -175,7 +162,7 @@ void MainWindow::createActions ()
     actionRunConsole_->setObjectName ("actionRunConsole_");
     actionRunConsole_->setText (tr ("Run console"));
     actionRunConsole_->setShortcut (QKeySequence (Qt::Key_F2));
-    connect (actionRunConsole_, SIGNAL(triggered (bool)), this, SLOT(slotRunConsole ()));
+    connect (actionRunConsole_, &QAction::triggered, this, &MainWindow::slotRunConsole);
     addAction (actionRunConsole_);
     Commands::instance ()->addAction (tr ("Misc"), actionRunConsole_);
 
@@ -183,7 +170,7 @@ void MainWindow::createActions ()
     actionView_->setObjectName ("actionView_");
     actionView_->setText (tr ("View"));
     actionView_->setShortcut (QKeySequence (Qt::Key_F3));
-    connect (actionView_, SIGNAL(triggered (bool)), this, SLOT(slotView ()));
+    connect (actionView_, &QAction::triggered, [this] () { slotView (); });
     addAction (actionView_);
     Commands::instance ()->addAction (tr ("File operations"), actionView_);
 
@@ -191,7 +178,7 @@ void MainWindow::createActions ()
     actionEdit_->setObjectName ("actionEdit_");
     actionEdit_->setText (tr ("Edit"));
     actionEdit_->setShortcut (QKeySequence (Qt::Key_F4));
-    connect (actionEdit_, SIGNAL(triggered (bool)), this, SLOT(slotView ()));
+    connect (actionEdit_, &QAction::triggered, [this] () { slotView (); });
     addAction (actionEdit_);
     Commands::instance ()->addAction (tr ("File operations"), actionEdit_);
 
@@ -199,7 +186,7 @@ void MainWindow::createActions ()
     actionCopy_->setObjectName ("actionCopy_");
     actionCopy_->setText (tr ("Copy"));
     actionCopy_->setShortcut (QKeySequence (Qt::Key_F5));
-    connect (actionCopy_, SIGNAL(triggered (bool)), this, SLOT(slotCopy ()));
+    connect (actionCopy_, &QAction::triggered, [this] () { slotCopy (); });
     addAction (actionCopy_);
     Commands::instance ()->addAction (tr ("File operations"), actionCopy_);
 
@@ -207,7 +194,7 @@ void MainWindow::createActions ()
     actionMove_->setObjectName ("actionMove_");
     actionMove_->setText (tr ("Move"));
     actionMove_->setShortcut (QKeySequence (Qt::Key_F6));
-    connect (actionMove_, SIGNAL(triggered (bool)), this, SLOT(slotMove ()));
+    connect (actionMove_, &QAction::triggered, [this] () { slotMove (); });
     addAction (actionMove_);
     Commands::instance ()->addAction (tr ("File operations"), actionMove_);
 
@@ -215,7 +202,7 @@ void MainWindow::createActions ()
     actionRename_->setObjectName ("actionRename_");
     actionRename_->setText (tr ("Rename"));
     actionRename_->setShortcut (QKeySequence (Qt::SHIFT + Qt::Key_F6));
-    connect (actionRename_, SIGNAL(triggered (bool)), this, SLOT(slotRename ()));
+    connect (actionRename_, &QAction::triggered, this, &MainWindow::slotRename);
     addAction (actionRename_);
     Commands::instance ()->addAction (tr ("File operations"), actionRename_);
 
@@ -223,7 +210,7 @@ void MainWindow::createActions ()
     actionMkDir_->setObjectName ("actionMkDir_");
     actionMkDir_->setText (tr ("Create Dir"));
     actionMkDir_->setShortcut (QKeySequence (Qt::Key_F7));
-    connect (actionMkDir_, SIGNAL(triggered (bool)), this, SLOT(slotMkDir ()));
+    connect (actionMkDir_, &QAction::triggered, this, &MainWindow::slotMkDir);
     addAction (actionMkDir_);
     Commands::instance ()->addAction (tr ("File operations"), actionMkDir_);
 
@@ -231,7 +218,7 @@ void MainWindow::createActions ()
     actionRemove_->setObjectName ("actionRemove_");
     actionRemove_->setText (tr ("Remove"));
     actionRemove_->setShortcut (QKeySequence (Qt::Key_F8));
-    connect (actionRemove_, SIGNAL(triggered (bool)), this, SLOT(slotRemove ()));
+    connect (actionRemove_, &QAction::triggered, [this] () { slotRemove (); });
     addAction (actionRemove_);
     Commands::instance ()->addAction (tr ("File operations"), actionRemove_);
 
@@ -239,7 +226,7 @@ void MainWindow::createActions ()
     actionExit_->setObjectName ("actionExit_");
     actionExit_->setText (tr ("Exit"));
     actionExit_->setShortcut (QKeySequence (Qt::ALT + Qt::Key_X));
-    connect (actionExit_, SIGNAL(triggered (bool)), qApp, SLOT(quit ()));
+    connect (actionExit_, &QAction::triggered, qApp, &QApplication::quit);
     addAction (actionExit_);
     Commands::instance ()->addAction (tr ("Window"), actionExit_);
 
@@ -247,7 +234,7 @@ void MainWindow::createActions ()
     actionFindFiles_->setObjectName ("actionFindFiles_");
     actionFindFiles_->setText (tr ("Find Files"));
 //	actionFindFiles_->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_F));
-    connect (actionFindFiles_, SIGNAL(triggered (bool)), this, SLOT(slotFindFiles ()));
+    connect (actionFindFiles_, &QAction::triggered, this, &MainWindow::slotFindFiles);
     addAction (actionFindFiles_);
     Commands::instance ()->addAction (tr ("Tools"), actionFindFiles_);
 
@@ -255,7 +242,7 @@ void MainWindow::createActions ()
     actionPreferences_->setObjectName ("actionPreferences_");
     actionPreferences_->setText (tr ("Preferences"));
 //	actionPreferences_->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_O));
-    connect (actionPreferences_, SIGNAL(triggered (bool)), this, SLOT(slotPreferences ()));
+    connect (actionPreferences_, &QAction::triggered, this, &MainWindow::slotPreferences);
     addAction (actionPreferences_);
     Commands::instance ()->addAction (tr ("Preferences"), actionPreferences_);
 }
@@ -275,6 +262,10 @@ void MainWindow::createMenus ()
 
 void MainWindow::createCommandButtons ()
 {
+    auto connectButtonToAction = [] (QPushButton *b, QAction *a) {
+        connect (b, &QPushButton::clicked, a, &QAction::triggered);
+    };
+
     QFrame *splitter = nullptr;
     QHBoxLayout *qhblLayout = new QHBoxLayout ();
     qhblLayout->setSpacing (0);
@@ -286,7 +277,7 @@ void MainWindow::createCommandButtons ()
     runConsoleButton_->setFlat (true);
     runConsoleButton_->setFocusPolicy (Qt::NoFocus);
     runConsoleButton_->addAction (actionRunConsole_);
-    connect (runConsoleButton_, SIGNAL(clicked ()), actionRunConsole_, SIGNAL(triggered ()));
+    connectButtonToAction (runConsoleButton_, actionRunConsole_);
     qhblLayout->addWidget (runConsoleButton_);
     splitter = new QFrame (commandButtonsFrame_);
     splitter->setFrameShape (QFrame::VLine);
@@ -299,7 +290,7 @@ void MainWindow::createCommandButtons ()
     viewButton_->setFlat (true);
     viewButton_->setFocusPolicy (Qt::NoFocus);
     viewButton_->addAction (actionView_);
-    connect (viewButton_, SIGNAL(clicked ()), actionView_, SIGNAL(triggered ()));
+    connectButtonToAction (viewButton_, actionView_);
     qhblLayout->addWidget (viewButton_);
     splitter = new QFrame (commandButtonsFrame_);
     splitter->setFrameShape (QFrame::VLine);
@@ -312,7 +303,7 @@ void MainWindow::createCommandButtons ()
     editButton_->setFlat (true);
     editButton_->setFocusPolicy (Qt::NoFocus);
     editButton_->addAction (actionEdit_);
-    connect (editButton_, SIGNAL(clicked ()), actionEdit_, SIGNAL(triggered ()));
+    connectButtonToAction (editButton_, actionEdit_);
     qhblLayout->addWidget (editButton_);
     splitter = new QFrame (commandButtonsFrame_);
     splitter->setFrameShape (QFrame::VLine);
@@ -325,7 +316,7 @@ void MainWindow::createCommandButtons ()
     copyButton_->setFlat (true);
     copyButton_->setFocusPolicy (Qt::NoFocus);
     copyButton_->addAction (actionCopy_);
-    connect (copyButton_, SIGNAL(clicked ()), actionCopy_, SIGNAL(triggered ()));
+    connectButtonToAction (copyButton_, actionCopy_);
     qhblLayout->addWidget (copyButton_);
     splitter = new QFrame (commandButtonsFrame_);
     splitter->setFrameShape (QFrame::VLine);
@@ -338,7 +329,7 @@ void MainWindow::createCommandButtons ()
     moveButton_->setFlat (true);
     moveButton_->setFocusPolicy (Qt::NoFocus);
     moveButton_->addAction (actionMove_);
-    connect (moveButton_, SIGNAL(clicked ()), actionMove_, SIGNAL(triggered ()));
+    connectButtonToAction (moveButton_, actionMove_);
     qhblLayout->addWidget (moveButton_);
     splitter = new QFrame (commandButtonsFrame_);
     splitter->setFrameShape (QFrame::VLine);
@@ -351,7 +342,7 @@ void MainWindow::createCommandButtons ()
     mkDirButton_->setFlat (true);
     mkDirButton_->setFocusPolicy (Qt::NoFocus);
     mkDirButton_->addAction (actionMkDir_);
-    connect (mkDirButton_, SIGNAL(clicked ()), actionMkDir_, SIGNAL(triggered ()));
+    connectButtonToAction (mkDirButton_, actionMkDir_);
     qhblLayout->addWidget (mkDirButton_);
     splitter = new QFrame (commandButtonsFrame_);
     splitter->setFrameShape (QFrame::VLine);
@@ -364,7 +355,7 @@ void MainWindow::createCommandButtons ()
     removeButton_->setFlat (true);
     removeButton_->setFocusPolicy (Qt::NoFocus);
     removeButton_->addAction (actionRemove_);
-    connect (removeButton_, SIGNAL(clicked ()), actionRemove_, SIGNAL(triggered ()));
+    connectButtonToAction (removeButton_, actionRemove_);
     qhblLayout->addWidget (removeButton_);
     splitter = new QFrame (commandButtonsFrame_);
     splitter->setFrameShape (QFrame::VLine);
@@ -377,7 +368,7 @@ void MainWindow::createCommandButtons ()
     exitButton_->setFlat (true);
     exitButton_->setFocusPolicy (Qt::NoFocus);
     exitButton_->addAction (actionExit_);
-    connect (exitButton_, SIGNAL(clicked ()), actionExit_, SIGNAL(triggered ()));
+    connectButtonToAction (exitButton_, actionExit_);
     qhblLayout->addWidget (exitButton_);
 
     commandButtonsFrame_->setLayout (qhblLayout);
@@ -465,7 +456,7 @@ void MainWindow::showSplitterContextMenu (const QPoint &pos)
         QAction *action = new QAction (panelsSplitter_);
         action->setText (text);
         action->setData ((double) size / 100);
-        connect (action, SIGNAL(triggered ()), this, SLOT(slotResizeSplitter ()));
+        connect (action, &QAction::triggered, this, &MainWindow::slotResizeSplitter);
         menu.addAction (action);
     }
     menu.exec (panelsSplitter_->mapToGlobal (pos));
@@ -711,8 +702,8 @@ void MainWindow::slotRemove (const QStringList &fileList)
                                                           Qt::Horizontal,
                                                           qdRemoveDialog
     );
-    connect (qdbbButtons, SIGNAL(accepted ()), qdRemoveDialog, SLOT(accept ()));
-    connect (qdbbButtons, SIGNAL(rejected ()), qdRemoveDialog, SLOT(reject ()));
+    connect (qdbbButtons, &QDialogButtonBox::accepted, qdRemoveDialog, &QDialog::accept);
+    connect (qdbbButtons, &QDialogButtonBox::rejected, qdRemoveDialog, &QDialog::reject);
 
     QVBoxLayout *qvblMainLayout = new QVBoxLayout ();
     qvblMainLayout->addWidget (qlQuestion);
@@ -752,8 +743,8 @@ FileOperationsDialog *MainWindow::addJob (FileOperationsDialog *queue,
 {
     if (!queue) {
         queue = new FileOperationsDialog (0);
-        connect (queue, SIGNAL(finished (int)), this, SLOT(slotQueueFinished ()));
-        connect (queue, SIGNAL(jobChanged ()), this, SLOT(slotQueueChanged ()));
+        connect (queue, &FileOperationsDialog::finished, this, &MainWindow::slotQueueFinished);
+        connect (queue, &FileOperationsDialog::jobChanged, this, &MainWindow::slotQueueChanged);
         queueList_ << queue;
         queue->show ();
     }
@@ -813,8 +804,8 @@ void MainWindow::slotMkDir ()
                                                           Qt::Horizontal,
                                                           qdMkDirDialog
     );
-    connect (qdbbButtons, SIGNAL(accepted ()), qdMkDirDialog, SLOT(accept ()));
-    connect (qdbbButtons, SIGNAL(rejected ()), qdMkDirDialog, SLOT(reject ()));
+    connect (qdbbButtons, &QDialogButtonBox::accepted, qdMkDirDialog, &QDialog::accept);
+    connect (qdbbButtons, &QDialogButtonBox::rejected, qdMkDirDialog, &QDialog::reject);
 
     QVBoxLayout *qvblMainLayout = new QVBoxLayout ();
     qvblMainLayout->addWidget (qcbDirName);
@@ -1143,9 +1134,9 @@ void MainWindow::slotRenameToolBar ()
 
 void MainWindow::connectToolBar (ToolBar *toolBar)
 {
-    connect (toolBar, SIGNAL(toolBarActionExecuted (ToolBarButton)), this, SLOT(toolBarActionExecute (ToolBarButton)));
-    connect (toolBar, SIGNAL(cdExecuted (QString)), this, SLOT(cdExecute (QString)));
-    connect (toolBar, SIGNAL(toolbarContextMenu (QPoint)), this, SLOT(slotToolBarContextMenu (QPoint)));
+    connect (toolBar, &ToolBar::toolBarActionExecuted, this, &MainWindow::toolBarActionExecute);
+    connect (toolBar, &ToolBar::cdExecuted, this, &MainWindow::cdExecute);
+    connect (toolBar, &ToolBar::toolbarContextMenu, this, &MainWindow::slotToolBarContextMenu);
 }
 
 void MainWindow::cdExecute (const QString &path)
@@ -1165,7 +1156,7 @@ QMenu *MainWindow::createToolBarsMenu (ToolBar *currentToolBar)
     QAction *menuAction;
 
     menuAction = new QAction (tr ("&Add toolbar"), qmToolBarMenu);
-    connect (menuAction, SIGNAL(triggered ()), this, SLOT(slotAddToolBar ()));
+    connect (menuAction, &QAction::triggered, this, &MainWindow::slotAddToolBar);
     qmToolBarMenu->addAction (menuAction);
 
     if (toolBars_.count () <= 0) {
@@ -1177,7 +1168,7 @@ QMenu *MainWindow::createToolBarsMenu (ToolBar *currentToolBar)
     for (ToolBar *toolBar : toolBars_) {
         menuAction = new QAction (toolBar->name (), removeMenu);
         menuAction->setData (i++);
-        connect (menuAction, SIGNAL(triggered ()), this, SLOT(slotRemoveToolBar ()));
+        connect (menuAction, &QAction::triggered, this, &MainWindow::slotRemoveToolBar);
         removeMenu->addAction (menuAction);
         if (toolBar == currentToolBar) {
             removeMenu->setDefaultAction (menuAction);
@@ -1190,8 +1181,7 @@ QMenu *MainWindow::createToolBarsMenu (ToolBar *currentToolBar)
     for (ToolBar *toolBar : toolBars_) {
         menuAction = new QAction (toolBar->name (), renameMenu);
         menuAction->setData (i++);
-        connect (menuAction, SIGNAL(triggered ()),
-                 this, SLOT(slotRenameToolBar ()));
+        connect (menuAction, &QAction::triggered, this, &MainWindow::slotRenameToolBar);
         renameMenu->addAction (menuAction);
         if (toolBar == currentToolBar) {
             renameMenu->setDefaultAction (menuAction);
@@ -1204,7 +1194,7 @@ QMenu *MainWindow::createToolBarsMenu (ToolBar *currentToolBar)
         menuAction = new QAction (toolBar->name (), showHideMenu);
         menuAction->setCheckable (true);
         menuAction->setChecked (toolBar->isVisible ());
-        connect (menuAction, SIGNAL(triggered (bool)), toolBar, SLOT(setVisible (bool)));
+        connect (menuAction, &QAction::triggered, toolBar, &ToolBar::setVisible);
         showHideMenu->addAction (menuAction);
         if (toolBar == currentToolBar) {
             showHideMenu->setDefaultAction (menuAction);
@@ -1216,7 +1206,7 @@ QMenu *MainWindow::createToolBarsMenu (ToolBar *currentToolBar)
         qmToolBarMenu->addSeparator ();
 
         menuAction = new QAction (tr ("A&dd separator"), qmToolBarMenu);
-        connect (menuAction, SIGNAL(triggered ()), currentToolBar, SLOT(slotAddSeparator ()));
+        connect (menuAction, &QAction::triggered, currentToolBar, &ToolBar::slotAddSeparator);
         qmToolBarMenu->addAction (menuAction);
     }
 
