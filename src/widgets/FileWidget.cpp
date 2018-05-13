@@ -122,26 +122,6 @@ void FileWidgetPrivate::createWidgets ()
     headerView->resizeSection (2, fm.width (QLatin1String ("mp3Folder")));
     headerView->resizeSection (3, fm.width (QLatin1String ("10/29/81 02:02PM")));
     headerView->setContextMenuPolicy (Qt::ActionsContextMenu);
-/*?
-	QActionGroup* showActionGroup = new QActionGroup(q);
-	showActionGroup->setExclusive(false);
-
-	QObject::connect(showActionGroup, SIGNAL(triggered(QAction*)),
-						q, SLOT(_q_showHeader(QAction*)));
-
-	QAbstractItemModel* abstractModel = model;
-#ifndef QT_NO_PROXYMODEL
-	if (proxyModel)
-		abstractModel = proxyModel;
-#endif
-	for (int i = 1, n = abstractModel->columnCount(QModelIndex()); i < n; ++i)
-	{
-		QAction* showHeaderAction = new QAction(showActionGroup);
-		showHeaderAction->setCheckable(true);
-		showHeaderAction->setChecked(true);
-		headerView->addAction(showHeaderAction);
-	}
-*/
     QItemSelectionModel *selectionModel = treeView->selectionModel ();
 
     QObject::connect (selectionModel, SIGNAL(selectionChanged (
@@ -247,7 +227,6 @@ void FileWidgetPrivate::createActions ()
     navigateHistoryAction->setIcon (q->style ()->standardIcon (QStyle::SP_ArrowDown, 0, q));
     navigateHistoryAction->setText ("\\/");
     navigateHistoryAction->setEnabled (false);
-//	QObject::connect(navigateHistoryAction, SIGNAL(triggered(bool)), q, SLOT());
     q->addAction (navigateHistoryAction);
 
     refreshListAction = new QAction (q);
@@ -270,7 +249,6 @@ void FileWidgetPrivate::createActions ()
     newFolderAction->setIcon (q->style ()->standardIcon (QStyle::SP_FileDialogNewFolder, 0, q));
     newFolderAction->setText (FileWidget::tr ("New Folder"));
     newFolderAction->setEnabled (false);
-//	QObject::connect(newFolderAction, SIGNAL(triggered(bool)), q, SLOT(_q_createDirectory()));
     q->addAction (newFolderAction);
 
     renameAction = new QAction (q);
@@ -283,11 +261,8 @@ void FileWidgetPrivate::createActions ()
 
     deleteAction = new QAction (q);
     deleteAction->setObjectName (QLatin1String ("_operation_delete_action"));
-//	deleteAction->setIcon(q->style()->standardIcon(QStyle::, 0, q));
     deleteAction->setText (FileWidget::tr ("Delete"));
     deleteAction->setEnabled (false);
-//	QObject::connect(deleteAction, SIGNAL(triggered(bool)), q, SLOT(_q_createDirectory()));
-//	q->addAction(deleteAction);
 }
 
 void FileWidgetPrivate::retranslateStrings ()
@@ -1016,47 +991,11 @@ void FileWidget::slotRename ()
     d->treeView->edit (index);
     return;
 
-
-/*1	if (!qleRenameEditor)
-	{
-		qleRenameEditor = new QLineEdit(fi.fileName(), d->treeView);
-		qleRenameEditor->setAttribute(Qt::WA_DeleteOnClose);
-		connect(qleRenameEditor, SIGNAL(destroyed()),
-				this, SLOT(slotCloseEditor()));
-		connect(qleRenameEditor, SIGNAL(returnPressed()),
-				this, SLOT(slotRenameFile()));
-		qleRenameEditor->installEventFilter(this);
-		qleRenameEditor->move(d->treeView->visualRect(index).left() + d->treeView->iconSize().width(),
-								d->treeView->visualRect(index).top() + d->treeView->header()->height());
-		qleRenameEditor->resize(d->treeView->columnWidth(0) + d->treeView->columnWidth(1) -
-								d->treeView->iconSize().width(),
-								d->treeView->visualRect(index).height());
-		QPalette palette = qleRenameEditor->palette();
-		palette.setColor(QPalette::Active,
-						QPalette::Highlight,
-						qApp->palette().color(QPalette::Active, QPalette::Highlight));
-		qleRenameEditor->setPalette(palette);
-		qleRenameEditor->show();
-		qleRenameEditor->setFocus();
-	}*/
-
 #ifndef Q_CC_MSVC
 #warning "TODO: shedule this work to custom delegate"
 #warning "TODO: since neigher model nor view can not use editorForIndex"
 #endif
-/*1	QString qsFileName = qleRenameEditor->text();
-	int pos = qsFileName.lastIndexOf(".");
-	if (!selectOnlyFileName || qleRenameEditor->selectedText() == qsFileName.left(pos) || qleRenameEditor->selectedText().isEmpty())
-		qleRenameEditor->selectAll();
-	else
-		qleRenameEditor->setSelection(0, pos);*/
 }
-
-/*1void FileWidget::slotCloseEditor()
-{
-	qleRenameEditor = 0;
-	d_func()->treeView->setFocus();
-}*/
 
 /*!
 	Returns the filter that is used when displaying files.

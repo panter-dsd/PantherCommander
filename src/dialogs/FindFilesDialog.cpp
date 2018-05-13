@@ -233,17 +233,6 @@ QFileInfoList FindFilesDialog::findFiles (const QFileInfoList &files, const QStr
     progressDialog.setWindowTitle (tr ("Find Files"));
     progressDialog.setRange (0, files.size ());
 
-/*	// Create a QFutureWatcher and conncect signals and slots.
-	QFutureWatcher<QFileInfo> futureWatcher;
-	connect(&futureWatcher, SIGNAL(started()), &progressDialog, SLOT(exec()));
-	connect(&futureWatcher, SIGNAL(finished()), &progressDialog, SLOT(reset()));
-	connect(&futureWatcher, SIGNAL(progressRangeChanged(int, int)), &progressDialog, SLOT(setRange(int, int)));
-	connect(&futureWatcher, SIGNAL(progressValueChanged(int)), &progressDialog, SLOT(setValue(int)));
-	connect(&progressDialog, SIGNAL(canceled()), &futureWatcher, SLOT(cancel()));
-
-	futureWatcher.setFuture(QtConcurrent::filtered(files, findText));
-	futureWatcher.waitForFinished();*/
-
     QFileInfoList foundFiles;
     for (int i = 0, n = files.size (); i < n; ++i) {
         progressDialog.setValue (i);

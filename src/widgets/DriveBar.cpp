@@ -40,7 +40,6 @@ DriveBar::DriveBar (QWidget *parent)
 
     connect (provider, SIGNAL(volumeAdded (
                                   const QString&)), this, SLOT(volumeAdd (QString)));
-//	connect(provider, SIGNAL(volumeChanged(const QString&)), this, SLOT(slotRefresh()));
     connect (provider, SIGNAL(volumeRemoved (
                                   const QString&)), this, SLOT(volumeRemove (QString)));
 }
