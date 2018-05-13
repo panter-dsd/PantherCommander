@@ -2,27 +2,25 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QDialogButtonBox>
 
-#include "CommandsDialog.h"
 #include "src/AppSettings.h"
 #include "CommandsPreference.h"
 
+#include "CommandsDialog.h"
+
 CommandsDialog::CommandsDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f)
+    , commandReference_ (new CommandsPreference (this))
+    , buttonBox_ (new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this))
 {
-    commandReference = new CommandsPreference (this);
-    connect (commandReference, &CommandsPreference::itemActivated, this, &CommandsDialog::accept);
+    connect (commandReference_, &CommandsPreference::itemActivated, this, &CommandsDialog::accept);
 
-    qdbbButtons = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                                        Qt::Horizontal,
-                                        this
-    );
-    connect (qdbbButtons, &QDialogButtonBox::accepted, this, &CommandsDialog::saveAndAccept);
-    connect (qdbbButtons, &QDialogButtonBox::rejected, this, &CommandsDialog::reject);
+    connect (buttonBox_, &QDialogButtonBox::accepted, this, &CommandsDialog::saveAndAccept);
+    connect (buttonBox_, &QDialogButtonBox::rejected, this, &CommandsDialog::reject);
 
-    QVBoxLayout *qvblMainLayout = new QVBoxLayout ();
-    qvblMainLayout->addWidget (commandReference);
-    qvblMainLayout->addWidget (qdbbButtons);
-    this->setLayout (qvblMainLayout);
+    QVBoxLayout *layout = new QVBoxLayout ();
+    layout->addWidget (commandReference_);
+    layout->addWidget (buttonBox_);
+    this->setLayout (layout);
 
     loadSettings ();
 }
@@ -34,12 +32,12 @@ CommandsDialog::~CommandsDialog ()
 
 QAction *CommandsDialog::getCurrentAction ()
 {
-    return commandReference->getCurrentAction ();
+    return commandReference_->getCurrentAction ();
 }
 
 QString CommandsDialog::getCurrentActionName ()
 {
-    return commandReference->getCurrentActionName ();
+    return commandReference_->getCurrentActionName ();
 }
 
 void CommandsDialog::loadSettings ()
@@ -71,5 +69,5 @@ void CommandsDialog::saveSetings ()
 
 void CommandsDialog::saveAndAccept ()
 {
-    commandReference->saveSettings ();
+    commandReference_->saveSettings ();
 }

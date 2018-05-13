@@ -1,23 +1,16 @@
 #pragma once
 
-class CommandsPreference;
-
-class QDialogButtonBox;
-
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 class CommandsDialog : public QDialog
 {
 Q_OBJECT
 
-private:
-    CommandsPreference *commandReference;
-    QDialogButtonBox *qdbbButtons;
-
 public:
-    CommandsDialog (QWidget *parent = 0, Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
+    CommandsDialog (QWidget *parent = nullptr,
+                    Qt::WindowFlags f = Qt::WindowSystemMenuHint | Qt::WindowMaximizeButtonHint);
 
-    ~CommandsDialog ();
+    virtual ~CommandsDialog ();
 
     QAction *getCurrentAction ();
 
@@ -30,5 +23,10 @@ public:
 private Q_SLOTS:
 
     void saveAndAccept ();
+
+private:
+    class CommandsPreference *commandReference_;
+
+    class QDialogButtonBox *buttonBox_;
 };
 
