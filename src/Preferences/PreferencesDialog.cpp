@@ -17,7 +17,43 @@ PreferencesDialog::PreferencesDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f)
 {
     setWindowTitle (tr ("Preferences"));
-    createControls ();
+    preferencesList_ = new QListWidget (this);
+    QStringList qslPreferenceItems;
+    qslPreferenceItems << GlobalPreferencePage::preferenceGroup ()
+                       << InterfacePreference::preferenceGroup ()
+                       << CommandsPreference::preferenceGroup ();
+    preferencesList_->addItems (qslPreferenceItems);
+    preferencesList_->setCurrentRow (0);
+    setMaximumSizePreferencesList ();
+
+    QScrollArea *area;
+    preferencesWidgets_ = new QStackedWidget ();
+
+    area = new QScrollArea (this);
+    area->setWidgetResizable (true);
+    area->setWidget (new GlobalPreferencePage (preferencesWidgets_));
+    preferencesWidgets_->addWidget (area);
+
+    area = new QScrollArea (this);
+    area->setWidgetResizable (true);
+    area->setWidget (new InterfacePreference (preferencesWidgets_));
+    preferencesWidgets_->addWidget (area);
+
+    area = new QScrollArea (this);
+    area->setWidgetResizable (true);
+    area->setWidget (new CommandsPreference (preferencesWidgets_));
+    preferencesWidgets_->addWidget (area);
+
+    buttons_ = new QDialogButtonBox (QDialogButtonBox::Ok
+                                     | QDialogButtonBox::Apply
+                                     | QDialogButtonBox::Cancel,
+                                     Qt::Horizontal,
+                                     this
+    );
+
+    setDefaultsButton_ = new QPushButton (tr ("Default"), buttons_);
+    buttons_->addButton (setDefaultsButton_, QDialogButtonBox::ApplyRole);
+    buttons_->button (QDialogButtonBox::Apply)->setEnabled (false);
     setLayouts ();
     setConnects ();
     loadSettings ();
