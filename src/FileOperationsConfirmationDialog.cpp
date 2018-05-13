@@ -7,7 +7,7 @@ FileOperationsConfirmationDialog::FileOperationsConfirmationDialog (QWidget *par
     : QDialog (parent)
 {
     qvblMainLayout = new QVBoxLayout ();
-    this->setLayout (qvblMainLayout);
+    setLayout (qvblMainLayout);
 }
 
 
@@ -190,7 +190,7 @@ void FileOperationsConfirmationDialog::slotButtonClick ()
 {
     bool ok;
     result = sender ()->objectName ().toInt (&ok, 10);
-    this->accept ();
+    accept ();
 }
 
 

@@ -384,7 +384,7 @@ void MainWindow::saveSettings ()
         settings->setValue ("size", size ());
     }
     settings->setValue ("Splitter", panelsSplitter_->saveState ());
-    settings->setValue ("State", this->saveState ());
+    settings->setValue ("State", saveState ());
     settings->endGroup ();
 
     settings->beginGroup ("Global");
@@ -416,14 +416,14 @@ void MainWindow::loadSettings ()
     if (toolBarNames.isEmpty ()) {
         ToolBar *toolBar = new ToolBar (tr ("Main toolbar"), this);
         connectToolBar (toolBar);
-        this->addToolBar (toolBar);
+        addToolBar (toolBar);
         toolBars_ << toolBar;
     }
 
     for (const QString &toolBarName : toolBarNames) {
         ToolBar *toolBar = new ToolBar (toolBarName, this);
         connectToolBar (toolBar);
-        this->addToolBar (toolBar);
+        addToolBar (toolBar);
         toolBars_ << toolBar;
     }
 
@@ -436,7 +436,7 @@ void MainWindow::loadSettings ()
     commandButtonsFrame_->setVisible (settings->value ("Interface/ShowFunctionButtons", true).toBool ());
 
     settings->beginGroup ("MainWindow");
-    this->restoreState (settings->value ("State", QByteArray ()).toByteArray ());
+    restoreState (settings->value ("State", QByteArray ()).toByteArray ());
     move (settings->value ("pos", QPoint (0, 0)).toPoint ());
     resize (settings->value ("size", QSize (640, 480)).toSize ());
     if (settings->value ("IsMaximized", false).toBool ()) {
@@ -1040,7 +1040,7 @@ void MainWindow::slotAddToolBar ()
 
     ToolBar *toolBar = new ToolBar (qsToolBarName, this);
     connectToolBar (toolBar);
-    this->addToolBar (toolBar);
+    addToolBar (toolBar);
     toolBars_ << toolBar;
 }
 
@@ -1056,7 +1056,7 @@ void MainWindow::slotRemoveToolBar ()
     }
 
     QString qsName = toolBar->name ();
-    this->removeToolBar (toolBar);
+    removeToolBar (toolBar);
     toolBars_.removeOne (toolBar);
     toolBar->deleteLater ();
 
@@ -1068,7 +1068,7 @@ void MainWindow::slotRemoveToolBar ()
         ToolBar *toolBar = new ToolBar (tr ("Main toolbar"), this);
         toolBar->hide ();
         connectToolBar (toolBar);
-        this->addToolBar (toolBar);
+        addToolBar (toolBar);
         toolBars_ << toolBar;
     }
 }

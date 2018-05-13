@@ -90,7 +90,7 @@ void ShortcutEdit::setShortcut (const QKeySequence &ks)
     for (int i = 0; i < m_keyNum; ++i) {
         m_key[i] = ks[i];
     }
-    this->setText (ks.toString ());
+    setText (ks.toString ());
 }
 
 QKeySequence ShortcutEdit::shortcut ()

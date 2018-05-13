@@ -80,7 +80,7 @@ void FileOperationsDialog::setLayouts ()
     qvblMainLayout->addLayout (qhblButtonsLayout);
     qvblMainLayout->addWidget (qlwJobs);
 
-    this->setLayout (qvblMainLayout);
+    setLayout (qvblMainLayout);
 }
 
 
@@ -273,7 +273,7 @@ void FileOperationsDialog::slotNextJob ()
         return;
     }
     if (qlJobs.isEmpty () && !isBlocked && addingJobs == 0) {
-        this->close ();
+        close ();
         return;
     }
     while (qlJobs.first ().value == 0) {
@@ -332,7 +332,7 @@ void FileOperationsDialog::slotValueChanged (qint64 value)
         default:
             break;
     }
-    this->setWindowTitle (caption);
+    setWindowTitle (caption);
 
     int time = qtWorkTime.secsTo (QTime::currentTime ());
     if (time == 0) {

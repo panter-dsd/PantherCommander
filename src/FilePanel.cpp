@@ -119,18 +119,18 @@ void FilePanel::slotPathChanged (const QString &path)
 }
 
 
-int FilePanel::addTab (const QString &path, bool bSetCurrent)
+int FilePanel::addTab (const QString &tabPath, bool bSetCurrent)
 {
-    QString qsPath = path;
+    QString qsPath = tabPath;
     if (qsPath.isEmpty ()) {
-        qsPath = this->path ();
+        qsPath = path ();
     }
     if (qsPath.isEmpty ()) {
         qsPath = QApplication::applicationDirPath ();
     }
 
     QString tabText;
-    QDir dir (path);
+    QDir dir (tabPath);
 #ifdef Q_WS_WIN
     tabText = dir.absolutePath().left(2) + dir.dirName();
 #else
@@ -142,7 +142,7 @@ int FilePanel::addTab (const QString &path, bool bSetCurrent)
 #endif
 
     int index = qtabbTabs->addTab (tabText);
-    qtabbTabs->setTabToolTip (index, QDir::toNativeSeparators (path));
+    qtabbTabs->setTabToolTip (index, QDir::toNativeSeparators (tabPath));
     if (bSetCurrent) {
         qtabbTabs->setCurrentIndex (index);
         qflvCurrentFileList->setDirectory (qsPath);

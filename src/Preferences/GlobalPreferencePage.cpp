@@ -51,7 +51,7 @@ void GlobalPreferencePage::setLayouts ()
     QVBoxLayout *mainLayout = new QVBoxLayout ();
     mainLayout->addWidget (qchbUseNativeDialogs);
 
-    this->setLayout (mainLayout);
+    setLayout (mainLayout);
 }
 
 

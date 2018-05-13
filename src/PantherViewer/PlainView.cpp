@@ -25,9 +25,9 @@ void Frame::paintEvent (QPaintEvent *event)
 #ifndef Q_CC_MSVC
 #warning "This is only white, but if other color?"
 #endif
-    painter.fillRect (this->rect (), Qt::white);
+    painter.fillRect (rect (), Qt::white);
     for (int i = 0; i < text_.count (); i++) {
-        painter.drawText (rect_.left (), this->fontMetrics ().height () * (i + 1) + rect_.top (), text_.at (i));
+        painter.drawText (rect_.left (), fontMetrics ().height () * (i + 1) + rect_.top (), text_.at (i));
     }
     event->accept ();
 }
@@ -75,7 +75,7 @@ void PlainView::createControls ()
 
     QVBoxLayout *layout = new QVBoxLayout ();
     layout->addWidget (scrollArea_);
-    this->setLayout (layout);
+    setLayout (layout);
     connect (scrollArea_->verticalScrollBar (), &QScrollBar::valueChanged, this, &PlainView::slotScroll);
 }
 

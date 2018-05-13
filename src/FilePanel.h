@@ -77,7 +77,7 @@ public Q_SLOTS:
 private:
     void createWidgets ();
 
-    int addTab (const QString &path, bool bSetCurrent = true);
+    int addTab (const QString &tabPath, bool bSetCurrent = true);
 
     void updateDirInformation ();
 

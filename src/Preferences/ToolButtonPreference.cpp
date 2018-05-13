@@ -93,7 +93,7 @@ void ToolButtonPreference::setLayouts ()
     qglMainLayout->addWidget (qlCaption, 5, 0);
     qglMainLayout->addWidget (qleCaption, 5, 1);
 
-    this->setLayout (qglMainLayout);
+    setLayout (qglMainLayout);
 }
 
 void ToolButtonPreference::setConnects ()

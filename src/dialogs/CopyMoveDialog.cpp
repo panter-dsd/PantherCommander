@@ -46,7 +46,7 @@ void CopyMoveDialog::setLayouts ()
     qvblMainLayout->addWidget (queueComboBox_);
     qvblMainLayout->addWidget (buttons_);
 
-    this->setLayout (qvblMainLayout);
+    setLayout (qvblMainLayout);
 }
 
 void CopyMoveDialog::setSource (const QStringList &fileList)
@@ -90,7 +90,7 @@ void CopyMoveDialog::updateText ()
         destEdit_->setText (QDir::toNativeSeparators (dest_));
     }
 
-    this->setWindowTitle (operation_);
+    setWindowTitle (operation_);
 }
 
 void CopyMoveDialog::setQueueModel (QStandardItemModel *model)

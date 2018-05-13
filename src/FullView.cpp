@@ -140,7 +140,7 @@ void FullView::focusInEvent (QFocusEvent* event)
 {
 	QTreeView::focusInEvent(event);
 
-	QPalette palette=this->palette();
+	QPalette palette=palette();
 	palette.setColor(QPalette::Active,
 					QPalette::Highlight,
 					qApp->palette().color(QPalette::Active,QPalette::Highlight));
@@ -155,7 +155,7 @@ void FullView::focusOutEvent (QFocusEvent* event)
 {
 	QTreeView::focusOutEvent(event);
 
-	QPalette palette=this->palette();
+	QPalette palette=palette();
 	palette.setColor(QPalette::Active,
 					QPalette::Highlight,
 					qApp->palette().color(QPalette::Inactive,QPalette::Highlight));

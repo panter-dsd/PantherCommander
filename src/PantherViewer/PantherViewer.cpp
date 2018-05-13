@@ -40,7 +40,7 @@ void PantherViewer::createControls ()
 
 void PantherViewer::setLayouts ()
 {
-    this->setCentralWidget (tabs_);
+    setCentralWidget (tabs_);
 }
 
 
@@ -81,11 +81,11 @@ void PantherViewer::createActions ()
 
     actionExit_ = new QAction (tr ("Exit"), this);
     actionExit_->setShortcut (Qt::ALT + Qt::Key_X);
-    this->addAction (actionExit_);
+    addAction (actionExit_);
 
     actionCloseCurrentTab_ = new QAction (tr ("Close tab"), this);
     actionCloseCurrentTab_->setShortcut (Qt::Key_Escape);
-    this->addAction (actionCloseCurrentTab_);
+    addAction (actionCloseCurrentTab_);
 }
 
 
@@ -102,7 +102,7 @@ void PantherViewer::createMenu ()
     qmCodecs->addActions (codecs_->actions ());
     mainMenu_->addMenu (qmCodecs);
 
-    this->setMenuBar (mainMenu_);
+    setMenuBar (mainMenu_);
 }
 
 
@@ -112,7 +112,7 @@ void PantherViewer::createToolBar ()
     mainToolBar_->addAction (actionCloseCurrentTab_);
     mainToolBar_->addAction (actionExit_);
 
-    this->addToolBar (mainToolBar_);
+    addToolBar (mainToolBar_);
 }
 
 
@@ -131,9 +131,9 @@ void PantherViewer::loadSettings ()
 void PantherViewer::saveSettings ()
 {
     QSettings *settings = AppSettings::instance ();
-    if (this->windowState () != Qt::WindowMaximized) {
-        settings->setValue ("PantherViewer/pos", this->pos ());
-        settings->setValue ("PantherViewer/size", this->size ());
+    if (windowState () != Qt::WindowMaximized) {
+        settings->setValue ("PantherViewer/pos", pos ());
+        settings->setValue ("PantherViewer/size", size ());
         settings->setValue ("PantherViewer/IsMaximized", false);
     } else {
         settings->setValue ("PantherViewer/IsMaximized", true);
@@ -191,9 +191,9 @@ void PantherViewer::slotCloseCurrentTab ()
 {
     tabs_->removeTab (tabs_->currentIndex ());
     if (tabs_->count () == 0) {
-        this->close ();
+        close ();
     } else {
-        this->lower ();
+        lower ();
     }
 }
 

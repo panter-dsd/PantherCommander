@@ -20,7 +20,7 @@ CommandsDialog::CommandsDialog (QWidget *parent, Qt::WindowFlags f)
     QVBoxLayout *layout = new QVBoxLayout ();
     layout->addWidget (commandReference_);
     layout->addWidget (buttonBox_);
-    this->setLayout (layout);
+    setLayout (layout);
 
     loadSettings ();
 }

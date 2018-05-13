@@ -140,7 +140,7 @@ void InterfacePreference::setLayouts ()
     qvblMainLayout->addWidget (qgbGlobal);
     qvblMainLayout->addWidget (qgbCurrentPathEditor);
     qvblMainLayout->addWidget (qgbFlatInterface);
-    this->setLayout (qvblMainLayout);
+    setLayout (qvblMainLayout);
 }
 
 
@@ -148,7 +148,7 @@ void InterfacePreference::setConnects ()
 {
     connect (qchbShowDriveBar, &QCheckBox::toggled, qchbShowTwoDriveBar, &QCheckBox::setEnabled);
 
-    for (const QCheckBox *checkBox: this->findChildren<QCheckBox *> ()) {
+    for (const QCheckBox *checkBox: findChildren<QCheckBox *> ()) {
         connect (checkBox, &QCheckBox::stateChanged, this, &InterfacePreference::modified);
     }
 

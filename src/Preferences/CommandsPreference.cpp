@@ -60,7 +60,7 @@ CommandsPreference::CommandsPreference (QWidget *parent)
     qvblMainLayout->addWidget (qgbFilter);
     qvblMainLayout->addWidget (qgbCommands);
 
-    this->setLayout (qvblMainLayout);
+    setLayout (qvblMainLayout);
 
     loadSettings ();
 

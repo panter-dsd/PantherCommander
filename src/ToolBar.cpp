@@ -15,9 +15,9 @@ ToolBar::ToolBar (const QString &name, QWidget *parent)
     : QToolBar (name, parent)
 {
     qsName = name;
-    this->setObjectName (qsName);
+    setObjectName (qsName);
     restore ();
-    this->setAcceptDrops (true);
+    setAcceptDrops (true);
 }
 
 void ToolBar::restore ()
@@ -65,8 +65,8 @@ void ToolBar::save ()
 
 void ToolBar::refreshActions ()
 {
-        foreach(QAction *act, this->actions ()) {
-            this->removeAction (act);
+        foreach(QAction *act, actions ()) {
+            removeAction (act);
             delete act;
         }
 
@@ -77,9 +77,9 @@ void ToolBar::refreshActions ()
             action = new QAction (button.qiIcon, button.qsCaption, this);
             connect (action, &QAction::triggered, this, &ToolBar::slotToolButtonPress);
             action->setData (QString::number (i));
-            this->addAction (action);
+            addAction (action);
         } else {
-            action = this->addSeparator ();
+            action = addSeparator ();
             action->setData (QString::number (i));
         }
         i++;
@@ -89,7 +89,7 @@ void ToolBar::refreshActions ()
 void ToolBar::contextMenuEvent (QContextMenuEvent *event)
 {
     QMenu *qmToolBarMenu = new QMenu (this);
-    QAction *action = this->actionAt (event->pos ());
+    QAction *action = actionAt (event->pos ());
     QAction *menuAction;
 
     if (action) {
@@ -139,7 +139,7 @@ void ToolBar::slotToolButtonPress ()
 void ToolBar::rename (const QString &name)
 {
     qsName = name;
-    this->setObjectName (qsName);
+    setObjectName (qsName);
     save ();
 }
 
@@ -204,7 +204,7 @@ void ToolBar::slotToolButtonCD ()
 
 void ToolBar::dropEvent (QDropEvent *event)
 {
-    QAction *action = this->actionAt (event->pos ());
+    QAction *action = actionAt (event->pos ());
     if (action && !(event->keyboardModifiers () & Qt::ShiftModifier)) {
         ToolBarButton button = qlButtons.at (action->data ().toInt ());
         if (!button.qsCommand.isEmpty ()) {

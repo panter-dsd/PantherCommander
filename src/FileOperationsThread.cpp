@@ -104,7 +104,7 @@ bool FileOperationsThread::copyFile (const QString &qsSourceFileName, const QStr
             return false;
         }
         while (isPaused) {
-            this->msleep (50);
+            msleep (50);
             if (bStopped) {
                 qfFirstFile.close ();
                 qfSecondFile.close ();
@@ -597,7 +597,7 @@ bool FileOperationsThread::error (const QStringList &params)
     slotPause ();
     emit operationError ();
     while (isPaused) {
-        this->msleep (50);
+        msleep (50);
     }
     return !bStopped;
 }
