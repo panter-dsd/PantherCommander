@@ -64,17 +64,6 @@ void FileWidgetPrivate::createWidgets ()
                       q, SLOT(_q_pathChanged (
                                   const QString&)));
 
-/*
-	{
-		QFileListSortFilterProxyModel* prx = new QFileListSortFilterProxyModel(q);
-//		prx->setDynamicSortFilter(true);
-//		prx->setSortRole(Qt::EditRole);
-		proxyModel = prx;
-	}
-	proxyModel->setSourceModel(model);
-*/
-
-//	treeView = new QTreeView(q);
     treeView = new FullView (q);
     treeView->installEventFilter (q);
     treeView->setRootIsDecorated (false);

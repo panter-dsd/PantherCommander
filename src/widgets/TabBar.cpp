@@ -12,14 +12,8 @@ TabBar::TabBar (QWidget *parent)
 {
     setContextMenuPolicy (Qt::CustomContextMenu);
 
-    connect (this, SIGNAL(customContextMenuRequested (
-                              const QPoint&)),
-             this, SLOT(contextMenuRequested (
-                            const QPoint&)));
-
-#if QT_VERSION >= 0x040500
-    connect (this, SIGNAL(tabCloseRequested (int)), this, SLOT(closeTab (int)));
-#endif
+    connect (this, &TabBar::customContextMenuRequested, this, &TabBar::contextMenuRequested);
+    connect (this, &TabBar::tabCloseRequested, this, &TabBar::closeTab);
 }
 
 TabBar::~TabBar ()
@@ -86,7 +80,9 @@ void TabBar::cloneTab ()
     if (QAction *action = qobject_cast<QAction *> (sender ())) {
         int index = action->data ().toInt ();
         if (index != -1)
-            emit tabCloned (index);
+            emit {
+            tabCloned (index);
+        }
     }
 }
 
@@ -123,19 +119,20 @@ void TabBar::closeOtherTabs ()
 void TabBar::contextMenuRequested (const QPoint &pos)
 {
     QMenu menu;
-    QAction *action = menu.addAction (tr ("Add Tab"), this, SIGNAL(newTab ()));
+    QAction *action = nullptr;
+    menu.addAction (tr ("Add Tab"), this, &TabBar::newTab);
 
     int index = tabAt (pos);
     if (index != -1) {
-        action = menu.addAction (tr ("Duplicate Tab"), this, SLOT(cloneTab ()));
+        action = menu.addAction (tr ("Duplicate Tab"), this, &TabBar::cloneTab);
         action->setData (index);
         if (count () > 1) {
             menu.addSeparator ();
 
-            action = menu.addAction (tr ("&Close Tab"), this, SLOT(closeTab ()), QKeySequence::Close);
+            action = menu.addAction (tr ("&Close Tab"), this, &TabBar::closeTab, QKeySequence::Close);
             action->setData (index);
 
-            action = menu.addAction (tr ("Close &Other Tabs"), this, SLOT(closeOtherTabs ()));
+            action = menu.addAction (tr ("Close &Other Tabs"), this, &TabBar::closeOtherTabs);
             action->setData (index);
         }
     }

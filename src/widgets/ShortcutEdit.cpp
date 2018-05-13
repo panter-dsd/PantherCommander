@@ -7,8 +7,7 @@ ShortcutEdit::ShortcutEdit (QWidget *parent)
     : QLineEdit (parent)
 {
     m_keyNum = m_key[0] = m_key[1] = m_key[2] = m_key[3] = 0;
-    connect (this, SIGNAL(textChanged (QString)),
-             this, SLOT(textChange (QString)));
+    connect (this, &ShortcutEdit::textChanged, this, &ShortcutEdit::textChange);
 }
 
 bool ShortcutEdit::event (QEvent *e)
