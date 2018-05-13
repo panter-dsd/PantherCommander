@@ -1,22 +1,6 @@
 #pragma once
 
-class QListWidget;
-
-class QTableWidget;
-
-class QDialogButtonBox;
-
-class QAction;
-
 class QGroupBox;
-
-class QLabel;
-
-class QLineEdit;
-
-class QToolButton;
-
-class QTableWidgetItem;
 
 #include <QtCore/QMap>
 
@@ -34,23 +18,10 @@ Q_OBJECT
         COLUMN_COUNT
     };
 
-private:
-    QGroupBox *qgbCommands;
-    QListWidget *qlwCategoryList;
-    QTableWidget *qtwActionsTable;
-    QGroupBox *qgbFilter;
-    QLineEdit *qleFilter;
-    QToolButton *qtbClearFilter;
-
-    QAction *qaEditCommand;
-
-    QMap<QString, QAction *> editingActions;
 public:
-    CommandsPreference (QWidget *parent = 0);
+    explicit CommandsPreference (QWidget *parent = nullptr);
 
-    virtual ~CommandsPreference ()
-    {
-    }
+    virtual ~CommandsPreference ();
 
     void saveSettings ();
 
@@ -58,10 +29,7 @@ public:
 
     void setDefaults ();
 
-    static QString preferenceGroup ()
-    {
-        return tr ("Commands");
-    }
+    static QString preferenceGroup ();
 
     QAction *getCurrentAction ();
 
@@ -83,5 +51,17 @@ private Q_SLOTS:
 Q_SIGNALS:
 
     void itemActivated ();
+
+private:
+    QGroupBox *commandsGroupBox_;
+    class QListWidget *categoryList_;
+    class QTableWidget *actionsTable_;
+    QGroupBox *filterGroupBox_;
+    class QLineEdit *filterEdit_;
+    class QToolButton *clearFilterButton_;
+
+    QAction *editCommandAction_;
+
+    QMap<QString, QAction *> actions_;
 };
 
