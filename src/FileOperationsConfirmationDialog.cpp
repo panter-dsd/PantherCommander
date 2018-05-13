@@ -17,14 +17,14 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
     QGridLayout *buttonsLayout = new QGridLayout ();
     int row = 0, column = 0;
     if (buttons & Ovewrite) {
-        button = new QPushButton (tr ("Ovewrite"), this);
+        button = new QPushButton (tr ("Overwrite"), this);
         button->setObjectName (QString::number (Ovewrite));
         buttonsLayout->addWidget (button, row, column++);
         if (column >= 3) {
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & OvewriteAll) {
         button = new QPushButton (tr ("OvewriteAll"), this);
@@ -34,7 +34,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & Skip) {
         button = new QPushButton (tr ("Skip"), this);
@@ -44,7 +44,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & SkipAll) {
         button = new QPushButton (tr ("SkipAll"), this);
@@ -54,7 +54,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & Cancel) {
         button = new QPushButton (tr ("Cancel"), this);
@@ -64,7 +64,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & OvewriteAllOlder) {
         button = new QPushButton (tr ("OvewriteAllOlder"), this);
@@ -74,7 +74,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & OvewriteAllNew) {
         button = new QPushButton (tr ("OvewriteAllNew"), this);
@@ -84,7 +84,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & OvewriteAllSmallest) {
         button = new QPushButton (tr ("OvewriteAllSmallest"), this);
@@ -94,7 +94,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & OvewriteAllLager) {
         button = new QPushButton (tr ("OvewriteAllLager"), this);
@@ -104,7 +104,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & Rename) {
         button = new QPushButton (tr ("Rename"), this);
@@ -114,7 +114,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & Delete) {
         button = new QPushButton (tr ("Delete"), this);
@@ -124,7 +124,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & All) {
         button = new QPushButton (tr ("All"), this);
@@ -134,7 +134,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     if (buttons & Retry) {
         button = new QPushButton (tr ("Retry"), this);
@@ -144,7 +144,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
             row++;
             column = 0;
         }
-        connect (button, SIGNAL(clicked ()), this, SLOT(slotButtonClick ()));
+        connect (button, &QPushButton::clicked, this, &FileOperationsConfirmationDialog::slotButtonClick);
     }
     qvblMainLayout->addLayout (buttonsLayout);
 }
