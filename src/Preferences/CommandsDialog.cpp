@@ -10,17 +10,14 @@ CommandsDialog::CommandsDialog (QWidget *parent, Qt::WindowFlags f)
     : QDialog (parent, f)
 {
     commandReference = new CommandsPreference (this);
-    connect (commandReference, SIGNAL(itemActivated ()),
-             this, SLOT(accept ()));
+    connect (commandReference, &CommandsPreference::itemActivated, this, &CommandsDialog::accept);
 
     qdbbButtons = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                         Qt::Horizontal,
                                         this
     );
-    connect (qdbbButtons, SIGNAL(accepted ()),
-             this, SLOT(saveAndAccept ()));
-    connect (qdbbButtons, SIGNAL(rejected ()),
-             this, SLOT(reject ()));
+    connect (qdbbButtons, &QDialogButtonBox::accepted, this, &CommandsDialog::saveAndAccept);
+    connect (qdbbButtons, &QDialogButtonBox::rejected, this, &CommandsDialog::reject);
 
     QVBoxLayout *qvblMainLayout = new QVBoxLayout ();
     qvblMainLayout->addWidget (commandReference);
