@@ -38,19 +38,9 @@ void PantherViewer::setLayouts ()
 //
 void PantherViewer::setConnects ()
 {
-    connect (actionCloseCurrentTab,
-             SIGNAL(triggered ()),
-             this,
-             SLOT(slotCloseCurrentTab ()));
-    connect (actionExit,
-             SIGNAL(triggered ()),
-             this,
-             SLOT(close ()));
-
-    connect (qtabwTabs,
-             SIGNAL(currentChanged (int)),
-             this,
-             SLOT(slotCurrentTabChanged (int)));
+    connect (actionCloseCurrentTab, &QAction::triggered, this, &PantherViewer::slotCloseCurrentTab);
+    connect (actionExit, &QAction::triggered, this, &PantherViewer::close);
+    connect (qtabwTabs, &QTabWidget::currentChanged, this, &PantherViewer::slotCurrentTabChanged);
 }
 
 //
@@ -77,10 +67,7 @@ void PantherViewer::createActions ()
         if (qslCodecs.at (i) == QTextCodec::codecForLocale ()->name ()) {
             action->setChecked (true);
         }
-        connect (action,
-                 SIGNAL(triggered ()),
-                 this,
-                 SLOT(slotSetEncoding ()));
+        connect (action, &QAction::triggered, this, &PantherViewer::slotSetEncoding);
         qagCodecs->addAction (action);
     }
 

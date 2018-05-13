@@ -314,8 +314,7 @@ FileListModel::FileListModel (QObject *parent)
     connect (&d_ptr->futureWatcher, SIGNAL (finished ()), this, SLOT (_q_finishedLoadIcons ()));
 
 #ifndef QT_NO_FILESYSTEMWATCHER
-    connect (d_ptr->fileSystemWatcher, SIGNAL (directoryChanged (
-                                                   const QString &)),
+    connect (d_ptr->fileSystemWatcher, SIGNAL (directoryChanged (const QString &)),
              this, SLOT (_q_directoryChanged ()));
 #endif
 }
