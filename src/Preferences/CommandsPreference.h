@@ -18,6 +18,8 @@ class QToolButton;
 
 class QTableWidgetItem;
 
+#include <QtCore/QMap>
+
 #include "AbstractPreferencesPage.h"
 
 class CommandsPreference : public AbstractPreferencesPage
