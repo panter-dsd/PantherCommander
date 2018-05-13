@@ -36,7 +36,7 @@ PCShortcutWidget::PCShortcutWidget (QWidget *parent)
     qtbDefault = new QToolButton (this);
 
     qtbClear = new QToolButton (this);
-    connect (qtbClear, SIGNAL(clicked ()), qcseEdit, SLOT(clear ()));
+    connect (qtbClear, &QToolButton::clicked, qcseEdit, &ShortcutEdit::clear);
 
     QHBoxLayout *qhblMainLayout = new QHBoxLayout ();
     qhblMainLayout->addWidget (qcseEdit, 10);
@@ -81,19 +81,17 @@ CommandEditDialog::CommandEditDialog (QWidget *parent, Qt::WindowFlags f)
     shortcutBox_ = new QGroupBox (tr ("Shortcuts"), this);
 
     addShortcutButton_ = new QPushButton (tr ("Add shortcut"), this);
-    connect (addShortcutButton_, SIGNAL(clicked ()),
-             this, SLOT(addShortcut ()));
+    connect (addShortcutButton_, &QPushButton::clicked, this, &CommandEditDialog::addShortcut);
 
     removeShortcutButton_ = new QPushButton (tr ("Remove shortcut"), this);
-    connect (removeShortcutButton_, SIGNAL(clicked ()),
-             this, SLOT(removeShortcut ()));
+    connect (removeShortcutButton_, &QPushButton::clicked, this, &CommandEditDialog::removeShortcut);
 
     buttons_ = new QDialogButtonBox (QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
                                      Qt::Horizontal, this
     );
 
-    connect (buttons_, SIGNAL(accepted ()), this, SLOT(accept ()));
-    connect (buttons_, SIGNAL(rejected ()), this, SLOT(reject ()));
+    connect (buttons_, &QDialogButtonBox::accepted, this, &CommandEditDialog::accept);
+    connect (buttons_, &QDialogButtonBox::rejected, this, &CommandEditDialog::reject);
 
     buttonsLayout_ = new QHBoxLayout ();
     buttonsLayout_->addWidget (addShortcutButton_);
