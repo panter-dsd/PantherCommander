@@ -19,10 +19,6 @@ public:
     static QString preferenceGroup ();
 
 private:
-
-    void setConnects ();
-
-private:
     class QCheckBox *useNativeDialogs_;
 };
 

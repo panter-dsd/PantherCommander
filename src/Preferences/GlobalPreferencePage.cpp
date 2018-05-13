@@ -41,13 +41,6 @@ void GlobalPreferencePage::setDefaults ()
 {
 }
 
-void GlobalPreferencePage::setConnects ()
-{
-    for (const QCheckBox *checkBox : findChildren<QCheckBox *> ()) {
-        connect (checkBox, &QCheckBox::stateChanged, this, &GlobalPreferencePage::modified);
-    }
-}
-
 QString GlobalPreferencePage::preferenceGroup ()
 {
     return tr ("Global");
