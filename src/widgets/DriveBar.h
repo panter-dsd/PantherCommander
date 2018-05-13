@@ -1,32 +1,17 @@
 #pragma once
 
-class QAction;
-
-class QActionGroup;
-
-class VolumeInfoProvider;
-
-class QFileIconProvider;
-
 #include <QtWidgets/QFrame>
+
+#include <memory>
 
 class DriveBar : public QFrame
 {
 Q_OBJECT
 
-private:
-    QAction *lastChecked;
-    QActionGroup *actionGroup;
-    VolumeInfoProvider *provider;
-    QFileIconProvider *iconProvider;
-
 public:
-    explicit DriveBar (QWidget *parent = 0);
+    explicit DriveBar (QWidget *parent = nullptr);
 
     virtual ~DriveBar ();
-
-private:
-    void loadDrivesList ();
 
 public Q_SLOTS:
 
@@ -38,12 +23,22 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 
-    void _q_actionTriggered (QAction *action);
+    void actionTriggered (QAction *action);
 
-    void _q_showContextMenu (const QPoint &position);
+    void showContextMenu (const QPoint &position);
 
-    void volumeAdd (const QString &);
+private:
+    void loadDrivesList ();
 
-    void volumeRemove (const QString &);
+    void refresh ();
+
+private:
+    class QAction *lastCheckedAction_;
+
+    class QActionGroup *actionGroup_;
+
+    class VolumeInfoProvider *volumeInfoProvider_;
+
+    std::unique_ptr<class QFileIconProvider> iconProvider_;
 };
 
