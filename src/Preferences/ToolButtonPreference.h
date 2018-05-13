@@ -41,11 +41,6 @@ public:
     static ToolBarButton getButton (const QString &command);
 
 private:
-    void createControls ();
-
-    void setLayouts ();
-
-    void setConnects ();
 
     static QIcon getIcon (const QString &fileName, int number);
 

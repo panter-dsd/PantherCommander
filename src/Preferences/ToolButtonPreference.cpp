@@ -23,18 +23,6 @@
 ToolButtonPreference::ToolButtonPreference (QWidget *parent)
     : QWidget (parent)
 {
-    createControls ();
-    setLayouts ();
-    setConnects ();
-}
-
-ToolButtonPreference::~ToolButtonPreference ()
-{
-
-}
-
-void ToolButtonPreference::createControls ()
-{
     commandLabel_ = new QLabel (tr ("Command"), this);
     commandEdit_ = new QLineEdit (this);
     commandButton_ = new QToolButton (this);
@@ -69,43 +57,35 @@ void ToolButtonPreference::createControls ()
 
     captionLabel_ = new QLabel (tr ("Caption"), this);
     captionEdit_ = new QLineEdit (this);
-}
+    QGridLayout *mainLayout = new QGridLayout ();
 
-void ToolButtonPreference::setLayouts ()
-{
-    QGridLayout *qglMainLayout = new QGridLayout ();
+    QHBoxLayout *commandLayout = new QHBoxLayout ();
+    commandLayout->addWidget (commandEdit_);
+    commandLayout->addWidget (commandButton_);
+    commandLayout->addWidget (commandButton2_);
 
-    QHBoxLayout *qhblCommandLayout = new QHBoxLayout ();
-    qhblCommandLayout->addWidget (commandEdit_);
-    qhblCommandLayout->addWidget (commandButton_);
-    qhblCommandLayout->addWidget (commandButton2_);
+    QHBoxLayout *workDirLayout = new QHBoxLayout ();
+    workDirLayout->addWidget (workDirEdit_);
+    workDirLayout->addWidget (workDirButton_);
 
-    QHBoxLayout *qhblWorkDirLayout = new QHBoxLayout ();
-    qhblWorkDirLayout->addWidget (workDirEdit_);
-    qhblWorkDirLayout->addWidget (workDirButton_);
+    QHBoxLayout *iconFileLayout = new QHBoxLayout ();
+    iconFileLayout->addWidget (iconFileEdit_);
+    iconFileLayout->addWidget (iconFileButton_);
 
-    QHBoxLayout *qhblIconFileLayout = new QHBoxLayout ();
-    qhblIconFileLayout->addWidget (iconFileEdit_);
-    qhblIconFileLayout->addWidget (iconFileButton_);
+    mainLayout->addWidget (commandLabel_, 0, 0);
+    mainLayout->addLayout (commandLayout, 0, 1);
+    mainLayout->addWidget (parametersLabel_, 1, 0);
+    mainLayout->addWidget (parametersEdit_, 1, 1);
+    mainLayout->addWidget (workDirLabel_, 2, 0);
+    mainLayout->addLayout (workDirLayout, 2, 1);
+    mainLayout->addWidget (iconFileLabel_, 3, 0);
+    mainLayout->addLayout (iconFileLayout, 3, 1);
+    mainLayout->addWidget (iconLabel_, 4, 0);
+    mainLayout->addWidget (iconList_, 4, 1);
+    mainLayout->addWidget (captionLabel_, 5, 0);
+    mainLayout->addWidget (captionEdit_, 5, 1);
+    setLayout (mainLayout);
 
-    qglMainLayout->addWidget (commandLabel_, 0, 0);
-    qglMainLayout->addLayout (qhblCommandLayout, 0, 1);
-    qglMainLayout->addWidget (parametersLabel_, 1, 0);
-    qglMainLayout->addWidget (parametersEdit_, 1, 1);
-    qglMainLayout->addWidget (workDirLabel_, 2, 0);
-    qglMainLayout->addLayout (qhblWorkDirLayout, 2, 1);
-    qglMainLayout->addWidget (iconFileLabel_, 3, 0);
-    qglMainLayout->addLayout (qhblIconFileLayout, 3, 1);
-    qglMainLayout->addWidget (iconLabel_, 4, 0);
-    qglMainLayout->addWidget (iconList_, 4, 1);
-    qglMainLayout->addWidget (captionLabel_, 5, 0);
-    qglMainLayout->addWidget (captionEdit_, 5, 1);
-
-    setLayout (qglMainLayout);
-}
-
-void ToolButtonPreference::setConnects ()
-{
     connect (commandButton_, &QToolButton::clicked, this, &ToolButtonPreference::slotChoosePCCommand);
     connect (commandButton2_, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseCommandFile);
     connect (workDirButton_, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseWorkDir);
@@ -113,19 +93,23 @@ void ToolButtonPreference::setConnects ()
     connect (iconFileEdit_, &QLineEdit::textChanged, this, &ToolButtonPreference::slotGetIconList);
 }
 
+ToolButtonPreference::~ToolButtonPreference ()
+{
+
+}
+
 void ToolButtonPreference::slotChooseCommandFile ()
 {
-    QString command;
     QFileDialog::Options options;
     if (!AppSettings::instance ()->useNativeDialogs ()) {
         options = QFileDialog::DontUseNativeDialog;
     }
-    command = QFileDialog::getOpenFileName (this,
-                                            tr ("Choose command file"),
-                                            QDir (commandEdit_->text ()).absolutePath (),
-                                            QString (),
-                                            0,
-                                            options
+    const QString &command = QFileDialog::getOpenFileName (this,
+                                                           tr ("Choose command file"),
+                                                           QDir (commandEdit_->text ()).absolutePath (),
+                                                           QString (),
+                                                           0,
+                                                           options
     );
     if (!command.isEmpty ()) {
         commandEdit_->setText (QDir::toNativeSeparators (command));
@@ -137,24 +121,22 @@ void ToolButtonPreference::slotChooseCommandFile ()
 
 void ToolButtonPreference::slotChoosePCCommand ()
 {
-    CommandsDialog *dialog = new CommandsDialog (this);
-    if (dialog->exec ()) {
-        commandEdit_->setText (dialog->getCurrentActionName ());
+    CommandsDialog dialog (this);
+    if (dialog.exec ()) {
+        commandEdit_->setText (dialog.getCurrentActionName ());
     }
-    delete dialog;
 }
 
 void ToolButtonPreference::slotChooseWorkDir ()
 {
-    QString dir;
-    QFileDialog::Options options;
+    QFileDialog::Options options {};
     if (!AppSettings::instance ()->useNativeDialogs ()) {
         options = QFileDialog::DontUseNativeDialog;
     }
-    dir = QFileDialog::getExistingDirectory (this,
-                                             tr ("Choose work dir"),
-                                             QDir (workDirEdit_->text ()).absolutePath (),
-                                             options
+    const QString &dir = QFileDialog::getExistingDirectory (this,
+                                                            tr ("Choose work dir"),
+                                                            QDir (workDirEdit_->text ()).absolutePath (),
+                                                            options
     );
     if (!dir.isEmpty ()) {
         workDirEdit_->setText (QDir::toNativeSeparators (dir));
@@ -163,18 +145,16 @@ void ToolButtonPreference::slotChooseWorkDir ()
 
 void ToolButtonPreference::slotChooseIconFile ()
 {
-    QString iconFileName;
-    QStringList qslFilter;
-    QFileDialog::Options options;
+    QFileDialog::Options options {};
     if (!AppSettings::instance ()->useNativeDialogs ()) {
         options = QFileDialog::DontUseNativeDialog;
     }
-    iconFileName = QFileDialog::getOpenFileName (this,
-                                                 tr ("Choose command file"),
-                                                 QDir (iconFileEdit_->text ()).absolutePath (),
-                                                 QString (),
-                                                 0,
-                                                 options
+    const QString &iconFileName = QFileDialog::getOpenFileName (this,
+                                                                tr ("Choose command file"),
+                                                                QDir (iconFileEdit_->text ()).absolutePath (),
+                                                                QString (),
+                                                                0,
+                                                                options
     );
     if (!iconFileName.isEmpty ()) {
         iconFileEdit_->setText (QDir::toNativeSeparators (iconFileName));
@@ -227,8 +207,7 @@ void ToolButtonPreference::slotGetIconList (const QString &iconFileName)
     iconList_->setCurrentItem(iconList_->item(0));
 #else
     iconList_->clear ();
-    QListWidgetItem *item;
-    item = new QListWidgetItem (getIcon (iconFileName, 0), QString::number (0), iconList_);
+    QListWidgetItem *item = new QListWidgetItem (getIcon (iconFileName, 0), QString::number (0), iconList_);
     iconList_->addItem (item);
     if (iconList_->count () == 0) {
         item = new QListWidgetItem (QFileIconProvider ().icon (QFileInfo (iconFileName)), QString::number (0), iconList_
@@ -269,7 +248,7 @@ ToolBarButton ToolButtonPreference::getButton ()
 
 ToolBarButton ToolButtonPreference::getButton (const QString &command)
 {
-    ToolBarButton button;
+    ToolBarButton button {};
     if (command.isEmpty ()) {
         return button;
     }
