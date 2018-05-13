@@ -12,7 +12,7 @@ class QFileIconProvider;
 
 class QItemSelection;
 
-//
+
 class QLineEdit;
 
 class FileWidgetPrivate;

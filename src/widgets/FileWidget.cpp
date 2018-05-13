@@ -1211,19 +1211,19 @@ void FileWidget::clearSelection ()
     //setCurrentFile(curFile);
 }
 
-//
+
 void FileWidget::gotoHome ()
 {
     d_func ()->_q_navigateToHome ();
 }
 
-//
+
 void FileWidget::gotoRoot ()
 {
     d_func ()->_q_navigateToRoot ();
 }
 
-//
+
 void FileWidget::cdUP ()
 {
     d_func ()->_q_navigateToParent ();

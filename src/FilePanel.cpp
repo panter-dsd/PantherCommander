@@ -118,7 +118,7 @@ void FilePanel::slotPathChanged (const QString &path)
     qtabbTabs->setTabToolTip (qtabbTabs->currentIndex (), QDir::toNativeSeparators (path));
 }
 
-//
+
 int FilePanel::addTab (const QString &path, bool bSetCurrent)
 {
     QString qsPath = path;
@@ -319,13 +319,13 @@ void FilePanel::loadSettings ()
     qtabbTabs->setVisible (settings->value ("Interface/ShowTabs", true).toBool ());
 }
 
-//
+
 void FilePanel::setDisc (const QString &name)
 {
     setPath (name);
 }
 
-//
+
 void FilePanel::slotSetDisc ()
 {
     killTimer (timerID);
@@ -348,43 +348,43 @@ void FilePanel::slotSetDisc ()
     timerID = startTimer (TIMER_INTERVAL);
 }
 
-//
+
 void FilePanel::clearSelection ()
 {
     qflvCurrentFileList->clearSelection ();
 }
 
-//
+
 QString FilePanel::path () const
 {
     return qflvCurrentFileList->directory ().absolutePath ();
 }
 
-//
+
 QString FilePanel::currentFileName () const
 {
     return qflvCurrentFileList->currentFile ();
 }
 
-//
+
 void FilePanel::setPath (const QString &path)
 {
     qflvCurrentFileList->setDirectory (path);
 }
 
-//
+
 QStringList FilePanel::selectedFiles () const
 {
     return qflvCurrentFileList->selectedFiles ();
 }
 
-//
+
 void FilePanel::slotInformationChanged ()
 {
     updateDiscInformation ();
 }
 
-//
+
 QString FilePanel::size (qint64 bytes)
 {
     // According to the Si standard KB is 1000 bytes, KiB is 1024
@@ -408,7 +408,7 @@ QString FilePanel::size (qint64 bytes)
     return QFileSystemModel::tr ("%1 bytes").arg (QLocale ().toString (bytes));
 }
 
-//
+
 void FilePanel::updateDiscInformation ()
 {
     QString text;
@@ -431,13 +431,13 @@ void FilePanel::updateDiscInformation ()
     qlDiscInformation->setText (text);
 }
 
-//
+
 void FilePanel::timerEvent (QTimerEvent */*event*/)
 {
     updateDiscInformation ();
 }
 
-//
+
 void FilePanel::slotSelectDisc ()
 {
     SelectDiscDialog *dialog = new SelectDiscDialog (this);

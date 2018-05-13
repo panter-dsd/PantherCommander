@@ -1,15 +1,15 @@
 #pragma once
-//
+
 #include "AbstractPreferencesPage.h"
 
-//
+
 class QLabel;
 
 class QLineEdit;
 
 class QCheckBox;
 
-//
+
 class GlobalPreferencePage : public AbstractPreferencesPage
 {
 Q_OBJECT

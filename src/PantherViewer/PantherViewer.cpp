@@ -25,25 +25,25 @@ PantherViewer::PantherViewer (QWidget *parent, Qt::WindowFlags f)
     loadSettings ();
 }
 
-//
+
 PantherViewer::~PantherViewer ()
 {
     saveSettings ();
 }
 
-//
+
 void PantherViewer::createControls ()
 {
     tabs_ = new QTabWidget ();
 }
 
-//
+
 void PantherViewer::setLayouts ()
 {
     this->setCentralWidget (tabs_);
 }
 
-//
+
 void PantherViewer::setConnects ()
 {
     connect (actionCloseCurrentTab_, &QAction::triggered, this, &PantherViewer::slotCloseCurrentTab);
@@ -51,7 +51,7 @@ void PantherViewer::setConnects ()
     connect (tabs_, &QTabWidget::currentChanged, this, &PantherViewer::slotCurrentTabChanged);
 }
 
-//
+
 QStringList PantherViewer::codecsList ()
 {
     QStringList qslCodecs;
@@ -63,7 +63,7 @@ QStringList PantherViewer::codecsList ()
     return qslCodecs;
 }
 
-//
+
 void PantherViewer::createActions ()
 {
     codecs_ = new QActionGroup (this);
@@ -88,7 +88,7 @@ void PantherViewer::createActions ()
     this->addAction (actionCloseCurrentTab_);
 }
 
-//
+
 void PantherViewer::createMenu ()
 {
     mainMenu_ = new QMenuBar (this);
@@ -105,7 +105,7 @@ void PantherViewer::createMenu ()
     this->setMenuBar (mainMenu_);
 }
 
-//
+
 void PantherViewer::createToolBar ()
 {
     mainToolBar_ = new QToolBar (tr ("Main panel"), this);
@@ -115,7 +115,7 @@ void PantherViewer::createToolBar ()
     this->addToolBar (mainToolBar_);
 }
 
-//
+
 void PantherViewer::loadSettings ()
 {
     QSettings *settings = AppSettings::instance ();
@@ -127,7 +127,7 @@ void PantherViewer::loadSettings ()
     }
 }
 
-//
+
 void PantherViewer::saveSettings ()
 {
     QSettings *settings = AppSettings::instance ();
@@ -141,7 +141,7 @@ void PantherViewer::saveSettings ()
     settings->sync ();
 }
 
-//
+
 void PantherViewer::viewFile (const QString &fileName)
 {
     QFileInfo fileInfo (fileName);
@@ -156,7 +156,7 @@ void PantherViewer::viewFile (const QString &fileName)
     tabs_->setTabToolTip (tabIndex, fileName);
 }
 
-//
+
 void PantherViewer::slotSetEncoding ()
 {
     QAction *action = qobject_cast<QAction *> (sender ());
@@ -169,7 +169,7 @@ void PantherViewer::slotSetEncoding ()
     }
 }
 
-//
+
 void PantherViewer::slotCurrentTabChanged (int index)
 {
     AbstractView *view = qobject_cast<AbstractView *> (tabs_->widget (index));
@@ -186,7 +186,7 @@ void PantherViewer::slotCurrentTabChanged (int index)
     }
 }
 
-//
+
 void PantherViewer::slotCloseCurrentTab ()
 {
     tabs_->removeTab (tabs_->currentIndex ());
@@ -196,4 +196,4 @@ void PantherViewer::slotCloseCurrentTab ()
         this->lower ();
     }
 }
-//
+

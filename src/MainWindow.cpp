@@ -791,7 +791,7 @@ void MainWindow::slotMkDir ()
     QSettings *settings = AppSettings::instance ();
     qcbDirName->addItems (settings->value ("Global/MkDirHistory", QStringList ()).toStringList ());
     qcbDirName->setCurrentIndex (-1);
-//
+
     QString fileName = sourcePanel->currentFileName ();
     if (QFileInfo (sourcePanel->path () + fileName).isFile ()) {
         qcbDirName->setEditText (QFileInfo (sourcePanel->path () + fileName).baseName ());

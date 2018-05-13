@@ -15,13 +15,13 @@ InterfacePreference::InterfacePreference (QWidget *parent)
     loadSettings ();
 }
 
-//
+
 InterfacePreference::~InterfacePreference ()
 {
 
 }
 
-//
+
 void InterfacePreference::saveSettings ()
 {
     QSettings *settings = AppSettings::instance ();
@@ -48,7 +48,7 @@ void InterfacePreference::saveSettings ()
     settings->sync ();
 }
 
-//
+
 void InterfacePreference::loadSettings ()
 {
     QSettings *settings = AppSettings::instance ();
@@ -73,12 +73,12 @@ void InterfacePreference::loadSettings ()
     qchbFlatFunctionButtons->setChecked (settings->value ("Interface/FlatFunctionButtons", true).toBool ());
 }
 
-//
+
 void InterfacePreference::setDefaults ()
 {
 }
 
-//
+
 void InterfacePreference::createControls ()
 {
     qgbGlobal = new QGroupBox (tr ("Global"), this);
@@ -107,7 +107,7 @@ void InterfacePreference::createControls ()
     qchbFlatFunctionButtons = new QCheckBox (tr ("Flat function buttons"), this);
 }
 
-//
+
 void InterfacePreference::setLayouts ()
 {
     QVBoxLayout *qvblGlobalLayout = new QVBoxLayout ();
@@ -143,7 +143,7 @@ void InterfacePreference::setLayouts ()
     this->setLayout (qvblMainLayout);
 }
 
-//
+
 void InterfacePreference::setConnects ()
 {
     connect (qchbShowDriveBar, &QCheckBox::toggled, qchbShowTwoDriveBar, &QCheckBox::setEnabled);
@@ -155,4 +155,4 @@ void InterfacePreference::setConnects ()
     connect (qgbCurrentPathEditor, &QGroupBox::toggled, this, &InterfacePreference::modified);
     connect (qgbFlatInterface, &QGroupBox::toggled, this, &InterfacePreference::modified);
 }
-//
+

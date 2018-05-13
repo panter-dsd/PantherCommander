@@ -36,7 +36,7 @@ void Frame::setRect (const QRect &rect)
 {
     rect_ = rect;
 }
-//
+
 PlainView::PlainView (const QString &fileName, QWidget *parent)
     : AbstractView (fileName, parent)
 {
@@ -51,14 +51,14 @@ PlainView::PlainView (const QString &fileName, QWidget *parent)
     stringCount_ = file_->size ();
 }
 
-//
+
 PlainView::~PlainView ()
 {
     file_->close ();
     delete file_;
 }
 
-//
+
 void PlainView::createControls ()
 {
     frame_ = new Frame (this);
@@ -79,7 +79,7 @@ void PlainView::createControls ()
     connect (scrollArea_->verticalScrollBar (), &QScrollBar::valueChanged, this, &PlainView::slotScroll);
 }
 
-//
+
 void PlainView::slotScroll ()
 {
     file_->seek (scrollArea_->verticalScrollBar ()->value ());
@@ -96,7 +96,7 @@ void PlainView::slotScroll ()
     slotReadFile ();
 }
 
-//
+
 bool PlainView::event (QEvent *event)
 {
     if (event->type () == QEvent::Resize) {
@@ -110,7 +110,7 @@ bool PlainView::event (QEvent *event)
     return QWidget::event (event);
 }
 
-//
+
 void PlainView::slotReadFile ()
 {
     file_->seek (scrollArea_->verticalScrollBar ()->value ());
@@ -137,17 +137,17 @@ void PlainView::slotReadFile ()
     frame_->update ();
 }
 
-//
+
 void PlainView::setTextCodec (const QString &codecName)
 {
     textCodec_ = QTextCodec::codecForName (codecName.toLatin1 ());
     slotReadFile ();
 }
 
-//
+
 QString PlainView::textCodec ()
 {
     return QString (textCodec_->name ());
 }
 
-//
+

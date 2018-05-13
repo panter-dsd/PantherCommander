@@ -1,13 +1,13 @@
 #pragma once
 
-//
+
 class QVBoxLayout;
-//
+
 
 #include <QtCore/QFlags>
 #include <QDialog>
 
-//
+
 class FileOperationsConfirmationDialog : public QDialog
 {
 Q_OBJECT

@@ -2,7 +2,7 @@
 #include <QtWidgets>
 #include "FileOperationsConfirmationDialog.h"
 
-//
+
 FileOperationsConfirmationDialog::FileOperationsConfirmationDialog (QWidget *parent)
     : QDialog (parent)
 {
@@ -10,7 +10,7 @@ FileOperationsConfirmationDialog::FileOperationsConfirmationDialog (QWidget *par
     this->setLayout (qvblMainLayout);
 }
 
-//
+
 void FileOperationsConfirmationDialog::setButtons (int buttons)
 {
     QPushButton *button;
@@ -149,7 +149,7 @@ void FileOperationsConfirmationDialog::setButtons (int buttons)
     qvblMainLayout->addLayout (buttonsLayout);
 }
 
-//
+
 void FileOperationsConfirmationDialog::setFiles (const QString &source, const QString &dest)
 {
     QString qsTmp;
@@ -178,19 +178,19 @@ void FileOperationsConfirmationDialog::setFiles (const QString &source, const QS
     qvblMainLayout->insertWidget (1, qgrbDest);
 }
 
-//
+
 void FileOperationsConfirmationDialog::setText (const QString &text)
 {
     QLabel *qlText = new QLabel (text, this);
     qvblMainLayout->insertWidget (0, qlText);
 }
 
-//
+
 void FileOperationsConfirmationDialog::slotButtonClick ()
 {
     bool ok;
     result = sender ()->objectName ().toInt (&ok, 10);
     this->accept ();
 }
-//
+
 

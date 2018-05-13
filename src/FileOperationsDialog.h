@@ -1,6 +1,6 @@
 #pragma once
 
-//
+
 class QLabel;
 
 class QProgressBar;
@@ -10,13 +10,13 @@ class QToolButton;
 class QAction;
 
 class QListWidget;
-//
+
 #include <QDialog>
 #include <QTime>
 #include "FileOperationsThread.h"
 #include "FileOperationsConfirmationDialog.h"
 
-//
+
 class FileOperationsDialog : public QDialog
 {
 Q_OBJECT

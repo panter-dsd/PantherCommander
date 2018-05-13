@@ -23,13 +23,13 @@ PreferencesDialog::PreferencesDialog (QWidget *parent, Qt::WindowFlags f)
     loadSettings ();
 }
 
-//
+
 PreferencesDialog::~PreferencesDialog ()
 {
     saveSattings ();
 }
 
-//
+
 void PreferencesDialog::createControls ()
 {
     qlwPreferencesList = new QListWidget (this);
@@ -71,7 +71,7 @@ void PreferencesDialog::createControls ()
     qdbbButtons->button (QDialogButtonBox::Apply)->setEnabled (false);
 }
 
-//
+
 void PreferencesDialog::setLayouts ()
 {
     QHBoxLayout *qhblPreferencesLayout = new QHBoxLayout ();
@@ -85,7 +85,7 @@ void PreferencesDialog::setLayouts ()
     setLayout (qvblMainLayout);
 }
 
-//
+
 void PreferencesDialog::setConnects ()
 {
     connect (qdbbButtons, &QDialogButtonBox::accepted, this, &PreferencesDialog::slotSavePreferencesAndExit);
@@ -111,7 +111,7 @@ void PreferencesDialog::setConnects ()
     }
 }
 
-//
+
 void PreferencesDialog::setMaximumSizePreferencesList ()
 {
     qlwPreferencesList->setMaximumWidth (50);
@@ -123,7 +123,7 @@ void PreferencesDialog::setMaximumSizePreferencesList ()
     }
 }
 
-//
+
 void PreferencesDialog::slotSavePreferences ()
 {
     for (int i = 0; i < qswPreferencesWidgets->count (); i++) {
@@ -139,13 +139,13 @@ void PreferencesDialog::slotSavePreferences ()
     qdbbButtons->button (QDialogButtonBox::Apply)->setEnabled (false);
 }
 
-//
+
 void PreferencesDialog::slotSetApplyEnabled ()
 {
     qdbbButtons->button (QDialogButtonBox::Apply)->setEnabled (true);
 }
 
-//
+
 void PreferencesDialog::slotSetDefaults ()
 {
     for (int i = 0; i < qswPreferencesWidgets->count (); i++) {
@@ -159,7 +159,7 @@ void PreferencesDialog::slotSetDefaults ()
         }
     }
 }
-//
+
 
 void PreferencesDialog::loadSettings ()
 {

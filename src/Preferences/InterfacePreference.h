@@ -1,13 +1,13 @@
 #pragma once
-//
+
 #include "AbstractPreferencesPage.h"
 
-//
+
 class QCheckBox;
 
 class QGroupBox;
 
-//
+
 class InterfacePreference : public AbstractPreferencesPage
 {
 Q_OBJECT

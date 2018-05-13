@@ -103,7 +103,7 @@ void FullView::mousePressEvent ( QMouseEvent * event)
 
 	QTreeView::mousePressEvent(event);
 }
-//
+
 void FullView::mouseMoveEvent (QMouseEvent* event)
 {
 	if (isRightMouseButtonPressed)
@@ -126,7 +126,7 @@ void FullView::mouseMoveEvent (QMouseEvent* event)
 
 	QTreeView::mouseMoveEvent(event);
 }
-//
+
 void FullView::mouseReleaseEvent (QMouseEvent* event)
 {
 	if (event->button()==Qt::RightButton)

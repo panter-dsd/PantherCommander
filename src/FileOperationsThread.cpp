@@ -451,7 +451,7 @@ bool FileOperationsThread::removeDir (const QString &qsDirName)
     //Set null attributes
     SetFileAttributes((wchar_t*)qsDirName.utf16(), 0);
 #endif
-//
+
     emit currentFileCopyChanged (dir.absoluteFilePath (qsDirName), QString ());
     while (!dir.rmdir (qsDirName)) {
         lastError = FO_REMOVE_ERROR;
@@ -529,7 +529,7 @@ bool FileOperationsThread::moveDir (const QString &qsSourceDir, const QString &q
     // Remove readOnly AND system
     SetFileAttributes((wchar_t*)sourceDir.absolutePath().utf16(), 0);
 #endif
-//
+
     sourceDir.rmdir (sourceDir.absolutePath ());
     emit changedValue (1);
 
