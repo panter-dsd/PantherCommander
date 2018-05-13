@@ -98,16 +98,11 @@ void ToolButtonPreference::setLayouts ()
 
 void ToolButtonPreference::setConnects ()
 {
-    connect (qtbPCCommand, SIGNAL(clicked ()),
-             this, SLOT(slotChoosePCCommand ()));
-    connect (qtbCommand, SIGNAL(clicked ()),
-             this, SLOT(slotChooseCommandFile ()));
-    connect (qtbWorkDir, SIGNAL(clicked ()),
-             this, SLOT(slotChooseWorkDir ()));
-    connect (qtbIconFile, SIGNAL(clicked ()),
-             this, SLOT(slotChooseIconFile ()));
-    connect (qleIconFile, SIGNAL(textChanged (QString)),
-             this, SLOT(slotGetIconList (QString)));
+    connect (qtbPCCommand, &QToolButton::clicked, this, &ToolButtonPreference::slotChoosePCCommand);
+    connect (qtbCommand, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseCommandFile);
+    connect (qtbWorkDir, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseWorkDir);
+    connect (qtbIconFile, &QToolButton::clicked, this, &ToolButtonPreference::slotChooseIconFile);
+    connect (qleIconFile, &QLineEdit::textChanged, this, &ToolButtonPreference::slotGetIconList);
 }
 
 void ToolButtonPreference::slotChooseCommandFile ()
