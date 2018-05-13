@@ -88,17 +88,16 @@ void PreferencesDialog::setLayouts ()
 //
 void PreferencesDialog::setConnects ()
 {
-    connect (qdbbButtons, SIGNAL(accepted ()),
-             this, SLOT(slotSavePreferencesAndExit ()));
-    connect (qdbbButtons, SIGNAL(rejected ()),
-             this, SLOT(reject ()));
-    connect (qdbbButtons->button (QDialogButtonBox::Apply), SIGNAL(clicked ()),
-             this, SLOT(slotSavePreferences ()));
-    connect (qpbSetDefaults, SIGNAL(clicked ()),
-             this, SLOT(slotSetDefaults ()));
+    connect (qdbbButtons, &QDialogButtonBox::accepted, this, &PreferencesDialog::slotSavePreferencesAndExit);
+    connect (qdbbButtons, &QDialogButtonBox::rejected, this, &PreferencesDialog::reject);
+    connect (qdbbButtons->button (QDialogButtonBox::Apply), &QPushButton::clicked,
+             this, &PreferencesDialog::slotSavePreferences
+    );
+    connect (qpbSetDefaults, &QPushButton::clicked, this, &PreferencesDialog::slotSetDefaults);
 
-    connect (qlwPreferencesList, SIGNAL(currentRowChanged (int)),
-             qswPreferencesWidgets, SLOT(setCurrentIndex (int)));
+    connect (qlwPreferencesList, &QListWidget::currentRowChanged,
+             qswPreferencesWidgets, &QStackedWidget::setCurrentIndex
+    );
 
     for (int i = 0; i < qswPreferencesWidgets->count (); i++) {
         QScrollArea *area = qobject_cast<QScrollArea *> (qswPreferencesWidgets->widget (i));
@@ -107,7 +106,7 @@ void PreferencesDialog::setConnects ()
         }
         AbstractPreferencesPage *widget = qobject_cast<AbstractPreferencesPage *> (area->widget ());
         if (widget) {
-            connect (widget, SIGNAL(modified ()), this, SLOT(slotSetApplyEnabled ()));
+            connect (widget, &AbstractPreferencesPage::modified, this, &PreferencesDialog::slotSetApplyEnabled);
         }
     }
 }
