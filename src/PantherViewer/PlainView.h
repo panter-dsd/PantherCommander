@@ -1,6 +1,5 @@
 #pragma once
 
-//
 class QFile;
 
 class QByteArray;
@@ -8,55 +7,37 @@ class QByteArray;
 class QScrollArea;
 
 class QTextCodec;
-//
-#include "AbstractView.h"
-#include <QFrame>
 
-//
+#include <QtWidgets/QFrame>
+
+#include "AbstractView.h"
+
 class Frame : public QFrame
 {
 Q_OBJECT
 
 public:
-    QStringList qslText;
-    QRect qrRect;
-public:
-    Frame (QWidget *parent = 0);
+    explicit Frame (QWidget *parent = nullptr);
 
-    virtual ~Frame ()
-    {
-        ;
-    }
+    virtual ~Frame ();
 
-    void setRect (const QRect &rect)
-    {
-        qrRect = rect;
-    }
+    void setRect (const QRect &rect);
 
 protected:
-    void paintEvent (QPaintEvent * /* event */);
+    virtual void paintEvent (QPaintEvent *event) override;
+
+public:
+    QStringList text_;
+    QRect rect_;
 };
 
-//
 class PlainView : public AbstractView
 {
 Q_OBJECT
-private:
-    Frame *m_frame;
-    QScrollArea *qsbScroll;
-    QFile *qfFile;
-    QTextCodec *qtcCodec;
-    int stringCount;
-    QString qsSplitSymbol;
 public:
-    PlainView (const QString &fileName, QWidget *parent = 0);
+    explicit PlainView (const QString &fileName, QWidget *parent = nullptr);
 
-    ~PlainView ();
-
-    static bool isOpen (const QString & /*fileName*/)
-    {
-        return true;
-    }
+    virtual ~PlainView ();
 
     void setTextCodec (const QString &codecName);
 
@@ -66,12 +47,20 @@ private:
     void createControls ();
 
 protected:
-    bool event (QEvent *event);
+    virtual bool event (QEvent *event) override ;
 
 private Q_SLOTS:
 
     void slotReadFile ();
 
     void slotScroll ();
+
+private:
+    Frame *frame_;
+    QScrollArea *scrollArea_;
+    QFile *file_;
+    QTextCodec *textCodec_;
+    int stringCount_;
+    QString splitSymbol_;
 };
 

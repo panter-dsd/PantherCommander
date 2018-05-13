@@ -1,63 +1,98 @@
-#include <QtWidgets>
+#include <QtCore/QTextCodec>
+
+#include <QtGui/QPainter>
+#include <QtGui/QPaintEvent>
+
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QScrollArea>
+#include <QtWidgets/QScrollBar>
+#include <QtWidgets/QVBoxLayout>
+
 #include "PlainView.h"
 
+Frame::Frame (QWidget *parent)
+    : QFrame (parent)
+{
+}
+
+Frame::~Frame ()
+{
+}
+
+void Frame::paintEvent (QPaintEvent *event)
+{
+    QPainter painter (this);
+#ifndef Q_CC_MSVC
+#warning "This is only white, but if other color?"
+#endif
+    painter.fillRect (this->rect (), Qt::white);
+    for (int i = 0; i < text_.count (); i++) {
+        painter.drawText (rect_.left (), this->fontMetrics ().height () * (i + 1) + rect_.top (), text_.at (i));
+    }
+    event->accept ();
+}
+
+void Frame::setRect (const QRect &rect)
+{
+    rect_ = rect;
+}
 //
 PlainView::PlainView (const QString &fileName, QWidget *parent)
     : AbstractView (fileName, parent)
 {
-    qsSplitSymbol = QChar (0x0D);
-    qsSplitSymbol += QChar (0x0A);
+    splitSymbol_ = QChar (0x0D);
+    splitSymbol_ += QChar (0x0A);
     createControls ();
-    qtcCodec = QTextCodec::codecForLocale ();
-    qfFile = new QFile (fileName);
-    if (!qfFile->open (QFile::ReadOnly)) {
-        QMessageBox::critical (this, tr ("Error open"), qfFile->errorString ());
+    textCodec_ = QTextCodec::codecForLocale ();
+    file_ = new QFile (fileName);
+    if (!file_->open (QFile::ReadOnly)) {
+        QMessageBox::critical (this, tr ("Error open"), file_->errorString ());
     }
-    stringCount = qfFile->size ();
+    stringCount_ = file_->size ();
 }
 
 //
 PlainView::~PlainView ()
 {
-    qfFile->close ();
-    delete qfFile;
+    file_->close ();
+    delete file_;
 }
 
 //
 void PlainView::createControls ()
 {
-    m_frame = new Frame (this);
-    m_frame->setFrameShape (QFrame::Panel);
-    m_frame->setFrameShadow (QFrame::Sunken);
-    m_frame->setSizePolicy (QSizePolicy::Ignored, QSizePolicy::Ignored);
-    qsbScroll = new QScrollArea (this);
-    qsbScroll->setWidget (m_frame);
+    frame_ = new Frame (this);
+    frame_->setFrameShape (QFrame::Panel);
+    frame_->setFrameShadow (QFrame::Sunken);
+    frame_->setSizePolicy (QSizePolicy::Ignored, QSizePolicy::Ignored);
+    scrollArea_ = new QScrollArea (this);
+    scrollArea_->setWidget (frame_);
 #ifndef Q_CC_MSVC
 #warning "This is only white, but if other color?"
 #endif
-    qsbScroll->setBackgroundRole (QPalette::Light);
-    qsbScroll->verticalScrollBar ()->setSingleStep (1);
+    scrollArea_->setBackgroundRole (QPalette::Light);
+    scrollArea_->verticalScrollBar ()->setSingleStep (1);
 
     QVBoxLayout *layout = new QVBoxLayout ();
-    layout->addWidget (qsbScroll);
+    layout->addWidget (scrollArea_);
     this->setLayout (layout);
-    connect (qsbScroll->verticalScrollBar (), &QScrollBar::valueChanged, this, &PlainView::slotScroll);
+    connect (scrollArea_->verticalScrollBar (), &QScrollBar::valueChanged, this, &PlainView::slotScroll);
 }
 
 //
 void PlainView::slotScroll ()
 {
-    qfFile->seek (qsbScroll->verticalScrollBar ()->value ());
+    file_->seek (scrollArea_->verticalScrollBar ()->value ());
 
-    QByteArray buf = qfFile->read (256);
-    int pos = buf.indexOf (qsSplitSymbol, 0);
-    qsbScroll->verticalScrollBar ()->blockSignals (true);
+    QByteArray buf = file_->read (256);
+    int pos = buf.indexOf (splitSymbol_, 0);
+    scrollArea_->verticalScrollBar ()->blockSignals (true);
     if (pos > 0) {
-        qsbScroll->verticalScrollBar ()->setValue (qsbScroll->verticalScrollBar ()->value () + pos);
+        scrollArea_->verticalScrollBar ()->setValue (scrollArea_->verticalScrollBar ()->value () + pos);
     } else {
-        qsbScroll->verticalScrollBar ()->setValue (qsbScroll->verticalScrollBar ()->value () + 256);
+        scrollArea_->verticalScrollBar ()->setValue (scrollArea_->verticalScrollBar ()->value () + 256);
     }
-    qsbScroll->verticalScrollBar ()->blockSignals (false);
+    scrollArea_->verticalScrollBar ()->blockSignals (false);
     slotReadFile ();
 }
 
@@ -65,10 +100,10 @@ void PlainView::slotScroll ()
 bool PlainView::event (QEvent *event)
 {
     if (event->type () == QEvent::Resize) {
-        m_frame->resize (m_frame->width (),
-                         stringCount * m_frame->fontMetrics ().height () + m_frame->fontMetrics ().height ());
-        if (m_frame->height () < qsbScroll->height ()) {
-            m_frame->resize (m_frame->width (), qsbScroll->heightMM ());
+        frame_->resize (frame_->width (),
+                         stringCount_ * frame_->fontMetrics ().height () + frame_->fontMetrics ().height ());
+        if (frame_->height () < scrollArea_->height ()) {
+            frame_->resize (frame_->width (), scrollArea_->heightMM ());
         }
         slotReadFile ();
     }
@@ -78,60 +113,41 @@ bool PlainView::event (QEvent *event)
 //
 void PlainView::slotReadFile ()
 {
-    qfFile->seek (qsbScroll->verticalScrollBar ()->value ());
-    m_frame->qslText.clear ();
-    m_frame->setRect (QRect (10, qsbScroll->verticalScrollBar ()->value (), 0, 0));
-    m_frame->resize (m_frame->fontMetrics ().width ("W") * 256, m_frame->height ());
-    while (m_frame->qslText.count () < qsbScroll->height () / m_frame->fontMetrics ().height ()) {
-        QByteArray buf = qfFile->read (256);//.simplified();
+    file_->seek (scrollArea_->verticalScrollBar ()->value ());
+    frame_->text_.clear ();
+    frame_->setRect (QRect (10, scrollArea_->verticalScrollBar ()->value (), 0, 0));
+    frame_->resize (frame_->fontMetrics ().width ("W") * 256, frame_->height ());
+    while (frame_->text_.count () < scrollArea_->height () / frame_->fontMetrics ().height ()) {
+        QByteArray buf = file_->read (256);//.simplified();
         for (int i = 0; i < buf.count (); i++) {
             if ((unsigned char) (buf[i]) < 32) {
-                if (!qsSplitSymbol.contains (QChar (buf[i]))) {
+                if (!splitSymbol_.contains (QChar (buf[i]))) {
                     buf[i] = '*';
                 }
             }
         }
-        int pos = buf.lastIndexOf (qsSplitSymbol);
+        int pos = buf.lastIndexOf (splitSymbol_);
         if (pos > 0) {
-            qfFile->seek (qfFile->pos () - buf.size () + pos + qsSplitSymbol.count ());
+            file_->seek (file_->pos () - buf.size () + pos + splitSymbol_.count ());
             buf.resize (pos);
         }
-        QString str = qtcCodec->toUnicode (buf);
-        m_frame->qslText.append (str.split (qsSplitSymbol, QString::KeepEmptyParts));
+        QString str = textCodec_->toUnicode (buf);
+        frame_->text_.append (str.split (splitSymbol_, QString::KeepEmptyParts));
     }
-    m_frame->update ();
+    frame_->update ();
 }
 
 //
 void PlainView::setTextCodec (const QString &codecName)
 {
-    qtcCodec = QTextCodec::codecForName (codecName.toLatin1 ());
+    textCodec_ = QTextCodec::codecForName (codecName.toLatin1 ());
     slotReadFile ();
 }
 
 //
 QString PlainView::textCodec ()
 {
-    return QString (qtcCodec->name ());
+    return QString (textCodec_->name ());
 }
 
-//
-Frame::Frame (QWidget *parent)
-    : QFrame (parent)
-{
-}
-
-//
-void Frame::paintEvent (QPaintEvent *ev)
-{
-    QPainter painter (this);
-#ifndef Q_CC_MSVC
-#warning "This is only white, but if other color?"
-#endif
-    painter.fillRect (this->rect (), Qt::white);
-    for (int i = 0; i < qslText.count (); i++) {
-        painter.drawText (qrRect.left (), this->fontMetrics ().height () * (i + 1) + qrRect.top (), qslText.at (i));
-    }
-    ev->accept ();
-}
 //
