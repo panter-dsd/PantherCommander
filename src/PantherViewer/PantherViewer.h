@@ -1,6 +1,5 @@
 #pragma once
 
-//
 class QTabWidget;
 
 class QMenuBar;
@@ -10,29 +9,17 @@ class QToolBar;
 class QAction;
 
 class QActionGroup;
-//
-#include <QMainWindow>
-#include "PlainView.h"
-#include "AbstractView.h"
 
-//
+#include <QtWidgets/QMainWindow>
+
 class PantherViewer : public QMainWindow
 {
 Q_OBJECT
-private:
-    QStringList qslFiles;
-    QTabWidget *qtabwTabs;
-    QMenuBar *qmbMainMenu;
-    QToolBar *qtbarMainToolBar;
-    QActionGroup *qagCodecs;
-
-    QAction *actionExit;
-    QAction *actionCloseCurrentTab;
 
 public:
-    PantherViewer (QWidget *parent = 0, Qt::WindowFlags f = 0);
+    PantherViewer (QWidget *parent = nullptr, Qt::WindowFlags f = 0);
 
-    ~PantherViewer ();
+    virtual ~PantherViewer ();
 
     void viewFile (const QString &fileName);
 
@@ -62,5 +49,15 @@ private Q_SLOTS:
     void slotCurrentTabChanged (int index);
 
     void slotCloseCurrentTab ();
+
+private:
+    QStringList files_;
+    QTabWidget *tabs_;
+    QMenuBar *mainMenu_;
+    QToolBar *mainToolBar_;
+    QActionGroup *codecs_;
+
+    QAction *actionExit_;
+    QAction *actionCloseCurrentTab_;
 };
 

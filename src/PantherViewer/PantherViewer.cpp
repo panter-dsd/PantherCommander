@@ -1,8 +1,16 @@
-#include "PantherViewer.h"
+#include <QtCore/QTextCodec>
+#include <QtCore/QFileInfo>
 
-#include <QtWidgets>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QMessageBox>
 
 #include "src/AppSettings.h"
+#include "PlainView.h"
+#include "AbstractView.h"
+
+#include "PantherViewer.h"
 
 PantherViewer::PantherViewer (QWidget *parent, Qt::WindowFlags f)
     : QMainWindow (parent, f)
@@ -26,21 +34,21 @@ PantherViewer::~PantherViewer ()
 //
 void PantherViewer::createControls ()
 {
-    qtabwTabs = new QTabWidget ();
+    tabs_ = new QTabWidget ();
 }
 
 //
 void PantherViewer::setLayouts ()
 {
-    this->setCentralWidget (qtabwTabs);
+    this->setCentralWidget (tabs_);
 }
 
 //
 void PantherViewer::setConnects ()
 {
-    connect (actionCloseCurrentTab, &QAction::triggered, this, &PantherViewer::slotCloseCurrentTab);
-    connect (actionExit, &QAction::triggered, this, &PantherViewer::close);
-    connect (qtabwTabs, &QTabWidget::currentChanged, this, &PantherViewer::slotCurrentTabChanged);
+    connect (actionCloseCurrentTab_, &QAction::triggered, this, &PantherViewer::slotCloseCurrentTab);
+    connect (actionExit_, &QAction::triggered, this, &PantherViewer::close);
+    connect (tabs_, &QTabWidget::currentChanged, this, &PantherViewer::slotCurrentTabChanged);
 }
 
 //
@@ -58,7 +66,7 @@ QStringList PantherViewer::codecsList ()
 //
 void PantherViewer::createActions ()
 {
-    qagCodecs = new QActionGroup (this);
+    codecs_ = new QActionGroup (this);
     QAction *action;
     QStringList qslCodecs = codecsList ();
     for (int i = 0; i < qslCodecs.count (); i++) {
@@ -68,43 +76,43 @@ void PantherViewer::createActions ()
             action->setChecked (true);
         }
         connect (action, &QAction::triggered, this, &PantherViewer::slotSetEncoding);
-        qagCodecs->addAction (action);
+        codecs_->addAction (action);
     }
 
-    actionExit = new QAction (tr ("Exit"), this);
-    actionExit->setShortcut (Qt::ALT + Qt::Key_X);
-    this->addAction (actionExit);
+    actionExit_ = new QAction (tr ("Exit"), this);
+    actionExit_->setShortcut (Qt::ALT + Qt::Key_X);
+    this->addAction (actionExit_);
 
-    actionCloseCurrentTab = new QAction (tr ("Close tab"), this);
-    actionCloseCurrentTab->setShortcut (Qt::Key_Escape);
-    this->addAction (actionCloseCurrentTab);
+    actionCloseCurrentTab_ = new QAction (tr ("Close tab"), this);
+    actionCloseCurrentTab_->setShortcut (Qt::Key_Escape);
+    this->addAction (actionCloseCurrentTab_);
 }
 
 //
 void PantherViewer::createMenu ()
 {
-    qmbMainMenu = new QMenuBar (this);
+    mainMenu_ = new QMenuBar (this);
 
     QMenu *qmFile = new QMenu (tr ("File"), this);
-    qmFile->addAction (actionCloseCurrentTab);
-    qmFile->addAction (actionExit);
-    qmbMainMenu->addMenu (qmFile);
+    qmFile->addAction (actionCloseCurrentTab_);
+    qmFile->addAction (actionExit_);
+    mainMenu_->addMenu (qmFile);
 
     QMenu *qmCodecs = new QMenu (tr ("Text codecs"), this);
-    qmCodecs->addActions (qagCodecs->actions ());
-    qmbMainMenu->addMenu (qmCodecs);
+    qmCodecs->addActions (codecs_->actions ());
+    mainMenu_->addMenu (qmCodecs);
 
-    this->setMenuBar (qmbMainMenu);
+    this->setMenuBar (mainMenu_);
 }
 
 //
 void PantherViewer::createToolBar ()
 {
-    qtbarMainToolBar = new QToolBar (tr ("Main panel"), this);
-    qtbarMainToolBar->addAction (actionCloseCurrentTab);
-    qtbarMainToolBar->addAction (actionExit);
+    mainToolBar_ = new QToolBar (tr ("Main panel"), this);
+    mainToolBar_->addAction (actionCloseCurrentTab_);
+    mainToolBar_->addAction (actionExit_);
 
-    this->addToolBar (qtbarMainToolBar);
+    this->addToolBar (mainToolBar_);
 }
 
 //
@@ -143,9 +151,9 @@ void PantherViewer::viewFile (const QString &fileName)
     }
     int tabIndex;
     if (PlainView::isOpen (fileName)) {
-        tabIndex = qtabwTabs->addTab (new PlainView (fileName), fileInfo.fileName ());
+        tabIndex = tabs_->addTab (new PlainView (fileName), fileInfo.fileName ());
     }
-    qtabwTabs->setTabToolTip (tabIndex, fileName);
+    tabs_->setTabToolTip (tabIndex, fileName);
 }
 
 //
@@ -155,7 +163,7 @@ void PantherViewer::slotSetEncoding ()
     if (!action) {
         return;
     }
-    AbstractView *view = qobject_cast<AbstractView *> (qtabwTabs->currentWidget ());
+    AbstractView *view = qobject_cast<AbstractView *> (tabs_->currentWidget ());
     if (view) {
         view->setTextCodec (action->text ());
     }
@@ -164,11 +172,11 @@ void PantherViewer::slotSetEncoding ()
 //
 void PantherViewer::slotCurrentTabChanged (int index)
 {
-    AbstractView *view = qobject_cast<AbstractView *> (qtabwTabs->widget (index));
+    AbstractView *view = qobject_cast<AbstractView *> (tabs_->widget (index));
     if (!view) {
         return;
     }
-    QList<QAction *> actionList = qagCodecs->actions ();
+    QList<QAction *> actionList = codecs_->actions ();
     QString codec = view->textCodec ();
     for (int i = 0; i < actionList.count (); i++) {
         if (actionList.at (i)->text () == codec) {
@@ -181,8 +189,8 @@ void PantherViewer::slotCurrentTabChanged (int index)
 //
 void PantherViewer::slotCloseCurrentTab ()
 {
-    qtabwTabs->removeTab (qtabwTabs->currentIndex ());
-    if (qtabwTabs->count () == 0) {
+    tabs_->removeTab (tabs_->currentIndex ());
+    if (tabs_->count () == 0) {
         this->close ();
     } else {
         this->lower ();
