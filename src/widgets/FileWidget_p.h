@@ -108,7 +108,6 @@ public:
         , navigateToRootAction (0)
         , navigateHistoryAction (0)
         , newFolderAction (0)
-        , renameAction (0)
         , deleteAction (0)
         , historyLocation (-1)
     {
@@ -189,7 +188,6 @@ public:
     QAction *navigateHistoryAction;
     QAction *refreshListAction;
     QAction *newFolderAction;
-    QAction *renameAction;
     QAction *deleteAction;
 
     QString lastVisitedDir;

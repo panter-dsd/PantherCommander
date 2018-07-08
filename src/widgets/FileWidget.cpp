@@ -240,14 +240,6 @@ void FileWidgetPrivate::createActions ()
     newFolderAction->setEnabled (false);
     q->addAction (newFolderAction);
 
-    renameAction = new QAction (q);
-    renameAction->setObjectName (QLatin1String ("_operation_rename_action"));
-//	renameAction->setIcon(q->style()->standardIcon(QStyle::, 0, q));
-    renameAction->setText (FileWidget::tr ("Rename"));
-    renameAction->setEnabled (false);
-    QObject::connect (renameAction, SIGNAL(triggered (bool)), q, SLOT(slotRename ()));
-//	q->addAction(renameAction);
-
     deleteAction = new QAction (q);
     deleteAction->setObjectName (QLatin1String ("_operation_delete_action"));
     deleteAction->setText (FileWidget::tr ("Delete"));
@@ -423,84 +415,16 @@ void FileWidgetPrivate::updateDirInfo ()
 */
 void FileWidgetPrivate::_q_rowsInserted (const QModelIndex &parent, int start, int end)
 {
-/*	for (int row = start; row <= end; ++row)
-	{
-		const QModelIndex index = model->index(row, 0, parent);
-		if (model->isDir(index))
-		{
-			++dirInfo.dirsCount;
-		}
-		else
-		{
-			++dirInfo.filesCount;
-			dirInfo.filesSize += model->size(index);
-		}
-	}*/
     updateDirInfo ();
 }
 
 void FileWidgetPrivate::_q_rowsAboutToBeRemoved (const QModelIndex &parent, int start, int end)
 {
-/*	for (int row = start; row <= end; ++row)
-	{
-		const QModelIndex index = model->index(row, 0, parent);
-		if (model->isDir(index))
-		{
-			--dirInfo.dirsCount;
-		}
-		else
-		{
-			--dirInfo.filesCount;
-			dirInfo.filesSize -= model->size(index);
-		}
-	}*/
     updateDirInfo ();
 }
 
 void FileWidgetPrivate::_q_selectionChanged (const QItemSelection &selected, const QItemSelection &deselected)
 {
-/*	QList<int> rows;
-
-	foreach (const QModelIndex& index, selected.indexes())
-	{
-		if (!rows.contains(index.row()))
-		{
-			rows.append(index.row());
-
-			const QModelIndex sourceIndex = mapToSource(index);
-			if (model->isDir(sourceIndex))
-			{
-				++dirInfo.dirsSelectedCount;
-			}
-			else
-			{
-				++dirInfo.filesSelectedCount;
-				dirInfo.filesSelectedSize += model->size(sourceIndex);
-			}
-		}
-	}
-
-	rows.clear();
-
-	foreach (const QModelIndex& index, deselected.indexes())
-	{
-		if (!rows.contains(index.row()))
-		{
-			rows.append(index.row());
-
-			const QModelIndex sourceIndex = mapToSource(index);
-			if (model->isDir(sourceIndex))
-			{
-				--dirInfo.dirsSelectedCount;
-			}
-			else
-			{
-				--dirInfo.filesSelectedCount;
-				dirInfo.filesSelectedSize -= model->size(sourceIndex);
-			}
-		}
-	}
-*/
     updateDirInfo ();
 }
 
@@ -542,8 +466,6 @@ void FileWidgetPrivate::_q_showContextMenu (const QPoint &position)
     if (index.isValid ()) {
         // file context menu
         QFile::Permissions p = model->permissions (index);
-        renameAction->setEnabled (p & QFile::WriteUser);
-        menu.addAction (renameAction);
         deleteAction->setEnabled (p & QFile::WriteUser);
         menu.addAction (deleteAction);
         menu.addSeparator ();
@@ -656,6 +578,7 @@ void FileWidgetPrivate::_q_navigateBackward ()
     }
 }
 
+
 /*!
 	\internal
 
@@ -719,27 +642,6 @@ FileWidget::FileWidget (QWidget *parent)
     d_func ()->init (QString ());
 }
 
-FileWidget::FileWidget (const QString &path, QWidget *parent)
-    : QWidget (parent)
-    , d_ptr (new FileWidgetPrivate)
-{
-    d_func ()->q_ptr = this;
-    d_func ()->init (path);
-
-    //
-    // Set the inactive pallete
-    QPalette palette = d_func ()->treeView->palette ();
-    palette.setColor (QPalette::Active, QPalette::Highlight,
-                      qApp->palette ().color (QPalette::Inactive, QPalette::Highlight));
-    d_func ()->treeView->setPalette (palette);
-    //
-
-#ifndef Q_CC_MSVC
-#warning "TODO: RenameEditor must have it's own settings"
-#endif
-/*1*///	selectOnlyFileName = true;
-/*1*///	qleRenameEditor = 0;
-}
 
 FileWidget::~FileWidget ()
 {
@@ -855,36 +757,12 @@ void FileWidget::setDirectory (const QString &directory)
 
     QDir dir (newDirectory);
     bool isReadable = false;
-#ifndef Q_WS_WIN
     isReadable = dir.isReadable ();
-#else
-    /*3**/
-        if (newDirectory.startsWith(QLatin1String("//"))
-            && newDirectory.split(QLatin1Char('/'), QString::SkipEmptyParts).count() == 1)
-        {
-            isReadable = true;
-        }
-        else
-        {
-            qt_ntfs_permission_lookup++;
-            isReadable = dir.isReadable();
-            qt_ntfs_permission_lookup--;
-        }
-    /**3*/
-#endif
     if (!isReadable) {
-#ifndef Q_CC_MSVC
-#warning "TODO: must be configurable (message, beep, or something else)"
-#endif
-        QApplication::beep ();
-#ifndef QT_NO_MESSAGEBOX
         QMessageBox::critical (this, "", tr ("You have no enought privilegies"));
-#endif
         return;
     }
     d->lastVisitedDir = newDirectory;
-
-    //setUpdatesEnabled(false);
 
     d->treeView->clearSelection ();
     const QModelIndex root = d->model->setRootPath (newDirectory);
@@ -894,8 +772,6 @@ void FileWidget::setDirectory (const QString &directory)
     }
     d->setCurrentIndex (d->model->index (0, 0, root));
     emit directoryEntered (newDirectory);
-
-    //setUpdatesEnabled(true);
 }
 
 void FileWidget::changeEvent (QEvent *event)
@@ -948,68 +824,10 @@ bool FileWidget::eventFilter (QObject *object, QEvent *event)
             }
         }
     }
-/*1	else if (object == qleRenameEditor)
-	{
-		if (event->type() == QEvent::FocusOut)
-		{
-			qleRenameEditor->close();
-		}
-		if (event->type() == QEvent::KeyRelease)
-		{
-			QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-			if (keyEvent->key() == Qt::Key_Escape)
-				qleRenameEditor->close();
-		}
-	}*/
 
     return QWidget::eventFilter (object, event);
 }
 
-void FileWidget::slotRename ()
-{
-    Q_D(FileWidget);
-
-    QModelIndex index = d->treeView->currentIndex ();
-    QString filePath = d->model->filePath (d->mapToSource (index));
-
-    if (!(index.flags () & Qt::ItemIsEditable)) {
-        return;
-    }
-
-    index = d->treeView->model ()->index (index.row (), 0, index.parent ());
-    d->treeView->edit (index);
-    return;
-
-#ifndef Q_CC_MSVC
-#warning "TODO: shedule this work to custom delegate"
-#warning "TODO: since neigher model nor view can not use editorForIndex"
-#endif
-}
-
-/*!
-	Returns the filter that is used when displaying files.
-
-	\sa setFilter()
-*/
-QDir::Filters FileWidget::filter () const
-{
-    Q_D(const FileWidget);
-
-    return d->model->filter ();
-}
-
-/*!
-	Sets the filter used by the model to \a filters. The filter is used
-	to specify the kind of files that should be shown.
-
-	\sa filter()
-*/
-void FileWidget::setFilter (QDir::Filters filters)
-{
-    Q_D(FileWidget);
-
-    d->model->setFilter (filters);
-}
 
 #ifndef Q_CC_MSVC
 #warning "TODO: check history behavoir"
@@ -1047,56 +865,6 @@ void FileWidget::setHistory (const QStringList &paths)
     d->navigateForwardAction->setEnabled (d->historyLocation + 1 < d->history.size ());
 }
 
-/*!
-	Returns the icon provider used by the view.
-*/
-QFileIconProvider *FileWidget::iconProvider () const
-{
-    Q_D(const FileWidget);
-
-    return d->model->iconProvider ();
-}
-
-/*!
-	Sets the icon provider used by the view to the specified \a provider.
-*/
-void FileWidget::setIconProvider (QFileIconProvider *provider)
-{
-    Q_D(FileWidget);
-
-    d->model->setIconProvider (provider);
-}
-
-/*!
-	Returns the item delegate used to render the items in the view.
-*/
-QAbstractItemDelegate *FileWidget::itemDelegate () const
-{
-    Q_D(const FileWidget);
-
-    return d->treeView->itemDelegate ();
-}
-
-/*!
-	Sets the item delegate used to render items in the view to the given \a delegate.
-
-	\warning You should not share the same instance of a delegate between views.
-	Doing so can cause incorrect or unintuitive editing behavior since each
-	view connected to a given delegate may receive the \l{QAbstractItemDelegate::}{closeEditor()}
-	signal, and attempt to access, modify or close an editor that has already been closed.
-
-	Note that the model used is AbstractFileSystemModel. It has custom item data roles,
-	which is described by the \l{AbstractFileSystemModel::}{Roles} enum.
-	You can use a QFileIconProvider if you only want custom icons.
-
-	\sa itemDelegate(), setIconProvider(), AbstractFileSystemModel
-*/
-void FileWidget::setItemDelegate (QAbstractItemDelegate *delegate)
-{
-    Q_D(FileWidget);
-
-    d->treeView->setItemDelegate (delegate);
-}
 
 /*!
 	Returns the absolute path of the current file in the view.
@@ -1111,30 +879,6 @@ QString FileWidget::currentFile () const
     return d->model->filePath (d->mapToSource (index));
 }
 
-/*!
-	Selects the given \a filePath as current in the view.
-
-	\sa currentFile()
-*/
-void FileWidget::setCurrentFile (const QString &fileName)
-{
-    if (fileName.isEmpty ()) {
-        return;
-    }
-
-    Q_D(FileWidget);
-
-    if (!QDir::isRelativePath (fileName)) {
-        QFileInfo info (fileName);
-        QString filePath = info.absoluteDir ().path ();
-
-        if (d->model->rootPath () != filePath) {
-            setDirectory (filePath);
-        }
-    }
-
-    d->setCurrentIndex (d->model->index (fileName));
-}
 
 /*!
 	Returns a list of strings containing the absolute paths of the
@@ -1166,36 +910,6 @@ QStringList FileWidget::selectedFiles () const
     return files;
 }
 
-/*!
-	Selects the given \a filename in the view.
-
-	\sa selectedFiles()
-*/
-void FileWidget::selectFile (const QString &fileName, bool clearSelection)
-{
-    if (fileName.isEmpty () || fileName == QLatin1String ("..")) {
-        return;
-    }
-
-    Q_D(FileWidget);
-
-    if (!QDir::isRelativePath (fileName)) {
-        QFileInfo info (fileName);
-        QString filePath = info.absoluteDir ().path ();
-
-        if (d->model->rootPath () != filePath) {
-            setDirectory (filePath);
-        }
-    }
-
-    const QModelIndex index = d->model->index (fileName);
-    if (index.isValid ()) {
-        if (clearSelection) {
-            d->treeView->clearSelection ();
-        }
-        d->select (index);
-    }
-}
 
 /*!
 	Clears the current selection in the view.
@@ -1206,27 +920,7 @@ void FileWidget::clearSelection ()
 {
     Q_D(FileWidget);
 
-    //QString curFile = currentFile();
     d->treeView->clearSelection ();
-    //setCurrentFile(curFile);
-}
-
-
-void FileWidget::gotoHome ()
-{
-    d_func ()->_q_navigateToHome ();
-}
-
-
-void FileWidget::gotoRoot ()
-{
-    d_func ()->_q_navigateToRoot ();
-}
-
-
-void FileWidget::cdUP ()
-{
-    d_func ()->_q_navigateToParent ();
 }
 
 #include <moc_FileWidget.cpp>

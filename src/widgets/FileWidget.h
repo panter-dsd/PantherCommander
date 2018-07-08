@@ -24,8 +24,6 @@ Q_OBJECT
 public:
     explicit FileWidget (QWidget *parent = 0);
 
-    explicit FileWidget (const QString &path, QWidget *parent = 0);
-
     virtual ~FileWidget ();
 
     QByteArray saveState () const;
@@ -34,33 +32,13 @@ public:
 
     QDir directory () const;
 
-    inline void setDirectory (const QDir &directory);
-
-    QDir::Filters filter () const;
-
-    void setFilter (QDir::Filters filters);
-
     QStringList history () const;
 
     void setHistory (const QStringList &paths);
 
-    QFileIconProvider *iconProvider () const;
-
-    void setIconProvider (QFileIconProvider *provider);
-
-    QAbstractItemDelegate *itemDelegate () const;
-
-    void setItemDelegate (QAbstractItemDelegate *delegate);
-
     QString currentFile () const;
 
-    void setCurrentFile (const QString &fileName);
-
     QStringList selectedFiles () const;
-
-    inline void selectFile (const QString &fileName);
-
-    void selectFile (const QString &fileName, bool clearSelection);
 
     void clearSelection ();
 
@@ -76,25 +54,6 @@ protected:
 Q_SIGNALS:
 
     void directoryEntered (const QString &path);
-
-//**//
-public Q_SLOTS:
-
-    void gotoHome ();
-
-    void gotoRoot ();
-
-    void cdUP ();
-
-    void slotRename ();
-
-/*1private Q_SLOTS:
-	void slotCloseEditor();
-
-private:
-	QLineEdit*						qleRenameEditor;
-	bool							selectOnlyFileName;*/
-//**//
 
 private:
     Q_DISABLE_COPY(FileWidget)
@@ -118,13 +77,4 @@ private:
     Q_PRIVATE_SLOT(d_func (), void _q_navigateToRoot ())
 };
 
-inline void FileWidget::setDirectory (const QDir &directory)
-{
-    setDirectory (directory.absolutePath ());
-}
-
-inline void FileWidget::selectFile (const QString &fileName)
-{
-    selectFile (fileName, true);
-}
 
