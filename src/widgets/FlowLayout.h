@@ -12,7 +12,7 @@ public:
 
     FlowLayout (int margin = -1, int hSpacing = -1, int vSpacing = -1);
 
-    ~FlowLayout ();
+    virtual ~FlowLayout ();
 
     void addItem (QLayoutItem *item);
 
@@ -43,8 +43,9 @@ private:
 
     int smartSpacing (QStyle::PixelMetric pm) const;
 
-    QList<QLayoutItem *> itemList;
-    int m_hSpace;
-    int m_vSpace;
+private:
+    QList<QLayoutItem *> itemList_;
+    int horisontalSpace_;
+    int verticalSpace_;
 };
 
