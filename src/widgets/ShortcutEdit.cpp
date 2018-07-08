@@ -5,9 +5,14 @@
 
 ShortcutEdit::ShortcutEdit (QWidget *parent)
     : QLineEdit (parent)
+    , key_ {0}
+    , keyNumber_ {0}
 {
-    m_keyNum = m_key[0] = m_key[1] = m_key[2] = m_key[3] = 0;
     connect (this, &ShortcutEdit::textChanged, this, &ShortcutEdit::textChange);
+}
+
+ShortcutEdit::~ShortcutEdit ()
+{
 }
 
 bool ShortcutEdit::event (QEvent *e)
@@ -18,9 +23,8 @@ bool ShortcutEdit::event (QEvent *e)
         return true;
     }
 
-    if (e->type () == QEvent::Shortcut ||
-        e->type () == QEvent::ShortcutOverride ||
-        e->type () == QEvent::KeyRelease) {
+    static const auto events = {QEvent::Shortcut, QEvent::ShortcutOverride, QEvent::KeyRelease};
+    if (std::find (std::begin (events), std::end (events), e->type ()) != std::end (events)) {
         return true;
     }
     return QLineEdit::event (e);
@@ -29,7 +33,8 @@ bool ShortcutEdit::event (QEvent *e)
 void ShortcutEdit::handleKeyEvent (QKeyEvent *e)
 {
     int nextKey = e->key ();
-    if (m_keyNum > 3 ||
+
+    if (keyNumber_ > 3 ||
         nextKey == Qt::Key_Control ||
         nextKey == Qt::Key_Shift ||
         nextKey == Qt::Key_Meta ||
@@ -38,34 +43,16 @@ void ShortcutEdit::handleKeyEvent (QKeyEvent *e)
     }
 
     nextKey |= translateModifiers (e->modifiers (), e->text ());
-    switch (m_keyNum) {
-        case 0:
-            m_key[0] = nextKey;
-            break;
-        case 1:
-            m_key[1] = nextKey;
-            break;
-        case 2:
-            m_key[2] = nextKey;
-            break;
-        case 3:
-            m_key[3] = nextKey;
-            break;
-        default:
-            break;
-    }
-    m_keyNum++;
-    QKeySequence ks (m_key[0], m_key[1], m_key[2], m_key[3]);
+    key_.at (keyNumber_) = nextKey;
+    keyNumber_++;
+    QKeySequence ks (key_[0], key_[1], key_[2], key_[3]);
     setText (ks.toString ());
     e->accept ();
 }
 
-int ShortcutEdit::translateModifiers (Qt::KeyboardModifiers state,
-                                        const QString &text)
+int ShortcutEdit::translateModifiers (Qt::KeyboardModifiers state, const QString &text)
 {
     int result = 0;
-    // The shift modifier only counts when it is not used to type a symbol
-    // that is only reachable using the shift key anyway
     if ((state & Qt::ShiftModifier) && (text.size () == 0
                                         || !text.at (0).isPrint ()
                                         || text.at (0).isLetter ()
@@ -86,9 +73,9 @@ int ShortcutEdit::translateModifiers (Qt::KeyboardModifiers state,
 
 void ShortcutEdit::setShortcut (const QKeySequence &ks)
 {
-    m_keyNum = ks.count ();
-    for (int i = 0; i < m_keyNum; ++i) {
-        m_key[i] = ks[i];
+    keyNumber_ = ks.count ();
+    for (int i = 0; i < keyNumber_; ++i) {
+        key_.at (i) = ks[i];
     }
     setText (ks.toString ());
 }
@@ -101,6 +88,8 @@ QKeySequence ShortcutEdit::shortcut ()
 void ShortcutEdit::textChange (const QString &text)
 {
     if (text.isEmpty ()) {
-        m_keyNum = m_key[0] = m_key[1] = m_key[2] = m_key[3] = 0;
+        keyNumber_ = 0;
+        key_.fill (0);
     }
 }
+
